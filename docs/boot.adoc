@@ -1,0 +1,68 @@
+= SpringBoot camp
+:docInfo1
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: img
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../img]
+:source-highlighter: coderay
+
+
+== O mnie
+* Architect Solution - RiscoSoftware 
+* VavaTech trener : Spring ekosystem, JPA , EIP Camel 
+* Sages trener : JPA , EIP - Apache Camel 
+* blog link:http://przewidywalna-java.blogspot.com[]
+* twitter przodownikR1
+
+image:{image-link} [role='img-circle']
+
+== Strona projektu 
+
+http://projects.spring.io/spring-boot/[spring boot]
+
+== Dokumentacja 
+
+http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/[dokumentacja]
+
+
+
+== Spring vs Spring Boot
+
+=== Podejście standardowe
+
+** Projekt webowy musi zawierać folder WEB-INF
+
+*** opjonalny plik : web.xml
+
+*** <servlet-name>-servlet.xml
+
+
+** Prosty kontroller 
+
+
+[source,java]
+----
+@Controller
+@EnableAutoConfiguration
+public class SampleController {
+
+    @RequestMapping("/")
+    @ResponseBody
+    String home() {
+        return "Hello World!";
+    }
+
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(SampleController.class, args);
+    }
+}
+----
+
