@@ -35,11 +35,22 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile 'org.springframework.boot:spring-boot-starter-logging'
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.guava:guava:19.0'
     runtime('com.h2database:h2')
-    compile 'org.projectlombok:lombok:1.16.6'
+    compile 'org.projectlombok:lombok:1+'
     compile 'javax.money:money-api:1.0'
     compile 'org.javamoney:moneta:1.0'
+    
+    
+    compile 'org.webjars:bootstrap:3.3.5'
+    compile 'org.webjars:jquery:2.1.4'
+    compile 'org.webjars:jquery-ui:1.11.4'
+    compile 'org.webjars:jquery-ui-themes:1.11.4'
+    compile ("org.webjars.bower:jquery.bootgrid:1.2.0") {
+        exclude group: 'org.webjars.bower'
+    }
+    
+    
     
     
     testCompile('org.springframework.boot:spring-boot-starter-test') 
