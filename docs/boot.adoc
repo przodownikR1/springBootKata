@@ -24,6 +24,45 @@ ifndef::imgsdir[:imgsdir: ./../img]
 
 image:{image-link} [role='img-circle']
 
+
+== Co to jest Spring Boot ?
+
+
+== Cechy
+
+** Eliminacja XML
+
+** Fluent SpringApplicationBuilder 
+
+** Wbudowany kontener Tomcat lub Jetty
+
+** ApplicationArguments
+
+** Zcentralizowana konfiguracja 
+
+*** application.properties
+
+*** application.yml
+
+** Profile
+
+** Prostota konfiguracji zależności
+
+** Prostota konfiguracji aplikacji
+
+** Monitoring
+
+*** Actuator
+
+** Microservices :)
+
+
+
+
+=== Pierwsza prosta aplikacja
+
+
+
 == Strona projektu 
 
 http://projects.spring.io/spring-boot/[spring boot]
@@ -65,4 +104,77 @@ public class SampleController {
     }
 }
 ----
+
+
+[source,java]
+----
+@RestController
+public class SimpleWebController {
+@RequestMapping("/")
+public String greetings(){
+return "Hello world";
+}
+}
+----
+
+
+== Uruchamianie 
+
+=== Maven
+----
+mvn spring-boot:run
+----
+
+=== Gradle 
+----
+gradle bootRun
+----
+
+=== Java
+
+----
+spring run *.java
+----
+
+
+== @Conditional
+
+== Konfiguracja 
+
+== CommandLineRunner
+
+== ApplicationArguments
+
+== @Enable
+
+
+
+== Narzędzia
+
+=== Spring Boot CLI
+
+=== STS
+
+=== https://start.spring.io/[Initializr]
+
+== Logowanie
+
+== Kolejki
+
+== Rest
+
+== ORM
+
+== NoSql
+
+== Using ResourceBundles for Internationalization (I18N)
+
+
+== Security
+
+
+== Actuator
+
+
+
 
