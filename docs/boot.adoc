@@ -444,6 +444,15 @@ Imports the Undertow HTTP engine (to be used as an alternative to Tomcat).
 
 == CommandLineRunner
 
+[source,java]
+----
+public  void run(String...   args){
+...
+}
+----
+Zapewnia, że Spring Boot wykona daną metodę tylko raz zaraz po starcie.
+
+
 == ApplicationArguments
 
 == @Enable
