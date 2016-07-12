@@ -35,6 +35,10 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile 'org.springframework.boot:spring-boot-starter-logging'
     compile('org.springframework.boot:spring-boot-starter-web')
+    
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
+   // compile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
+    
     compile 'com.google.guava:guava:19.0'
     runtime('com.h2database:h2')
     compile 'org.projectlombok:lombok:1+'

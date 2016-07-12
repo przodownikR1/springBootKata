@@ -251,6 +251,13 @@ spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force
 
 == NoSql
 
+=== Mongo
+
+mongo.java.driver
+
+spring-data-mongo
+
+
 == Using ResourceBundles for Internationalization (I18N)
 
 
