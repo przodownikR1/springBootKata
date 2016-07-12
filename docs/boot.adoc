@@ -219,7 +219,54 @@ spring run *.java
 
 == @Conditional
 
-== Konfiguracja 
+== Konfiguracja
+
+=== Spring Boot autoconfiguration
+
+** spring-boot-starter-*
+
+** AutoConfiguration
+
+==== Przykłady 
+
+** RepositoryRestMvcAutoConfiguration
+** JpaRepositoriesAutoConfiguration
+** JmsAutoConfiguration
+** etc
+
+** Wyłączanie danych elementów : 
+[source,java]
+----
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+----
+ 
+=== Zmiana lokacji pliku z ustawieniami
+
+spring.config.name= # config file name
+spring.config.location= # location of config file
+
+=== Własne ustawienia
+
+
+=== .yaml
+
+
+=== Wiele konfiguracji 
+
+
+=== Przykłady 
+
+-Dhost.port =9090
+
+[source,xml]
+----
+mvn -Dspring.profiles.active=prod package
+
+mvn -Dspring.profiles.active=dev package
+
+----
+** @ActiveProfiles("test") 
+ 
 
 == CommandLineRunner
 
@@ -233,6 +280,8 @@ spring run *.java
 
 === Spring Boot CLI
 
+http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/1.3.5.RELEASE/spring-boot-cli-1.3.5.RELEASE-bin.zip[ostatnia wersja]
+
 ----
 spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force
 ----
@@ -241,7 +290,53 @@ spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force
 
 === https://start.spring.io/[Initializr]
 
+== Adnotatacje
+
+** @SpringBootApplication
+
+[source,java]
+----
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Configuration
+@EnableAutoConfiguration
+@ComponentScan
+public @interface SpringBootApplication {
+
+----
+
+== Properties
+
+application.properties
+
 == Logowanie
+
+
+== WEB
+
+=== Tomcat & JETTY
+
+[source,xml]
+----
+<dependencies>
+    <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+        <exclusions>
+            <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jetty</artifactId>
+    </dependency>
+</dependencies>
+----
 
 == Kolejki
 
@@ -266,6 +361,26 @@ spring-data-mongo
 
 == Actuator
 
+== Testowanie
 
+[source,java]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = MyApp.class)
+@WebIntegrationTest
+public class ApplicationTests {
+@Test
+public void testRestService() {
+RestTemplate restTemplate = new RestTemplate();
+Hello hello = restTemplate.getForObject("http://localhost:8080", Hello.class);
+Assert.assertEquals("Hello World!", hello.getMessage());
+}
+}
+----
+
+** @WebIntegrationTest - zapewnia, że test bedzie odpalony na działającym serwerze 
+
+NOTE: Alternatywa to : @WebAppConfiguration i  @IntegrationTest
+ 
 
 
