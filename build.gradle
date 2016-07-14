@@ -86,3 +86,5 @@ sourceSets*.processResourcesTaskName.collect {
 tasks[it]
 }
 }
+
+

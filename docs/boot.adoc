@@ -631,4 +631,30 @@ spring-boot-actuator
 
 spring-boot-starter-remote-shell
 
+=== Własne metryki 
+
+** CounterService
+
+[source,java]
+----
+...
+final private CounterService counterService;
+counterService.increment("messages.total.book.added");
+
+----
+
+=== Dostrajanie portów
+
+----
+management.port=9991
+management.address=127.0.0.1
+management.context-path=/manage
+----
+
+** Tylko JMX
+
+----
+management.port=-1
+----
+
 
