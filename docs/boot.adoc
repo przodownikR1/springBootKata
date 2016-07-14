@@ -216,59 +216,229 @@ gradle bootRun
 spring run *.java
 ----
 
+== Starters
+
+** **spring-boot-starter**
+    
+Rdzeń Spring Boot. Zawiera elementy decydujące o auto-konfiguracji, logowaniu i rejestrowaniu zmian w YAML czy properties.
+
+WARNING: Zależność krytyczna
+
+** **spring-boot-starter-actuator**
+
+Pomaga monitorować i zarządzać aplikacją.
+    
+NOTE: Production ready feature
+
+** **spring-boot-starter-amqp**
+    
+Wspiera technologię opartą protokole AMPQ jak RABBIT-MQ 
+
+
+** **spring-boot-starter-aop**
+    
+Wspiera AOP
+
+
+** **spring-boot-starter-batch**
+    
+Wspiera integrację ze Spring Batch
+
+
+** **spring-boot-starter-cache**
+
+Wspiera integrację z Cache    
+
+
+** **spring-boot-starter-cloud-connectors**
+    
+Wspiera integrację z chmurą
+
+
+** **spring-boot-starter-data-elasticsearch**
+    
+Wspiera integrację z ElasticSearch
+
+** **spring-boot-starter-data-gemfire**
+    
+Wspiera integrację z GemFire 
+
+
+** **spring-boot-starter-data-jpa**
+
+Wspiera integrację z JPA oraz Spring-Data-JPA (spring-data-jpa,spring-orm)    
+
+** **spring-boot-starter-data-mongodb**
+    
+Wspiera integrację z MongoDB (spring-data-mongodb)
+
+
+** **spring-boot-starter-data-rest**
+
+Wspiera integrację z REST (spring-data-rest-webmvc)    
+
+
+** **spring-boot-starter-data-solr**
+    
+Wspiera integrację z Solr (spring-data-solr)
+
+** **spring-boot-starter-freemarker**
+    
+Wspiera integrację z FreeMarker    
+
+
+** **spring-boot-starter-groovy-templates**
+
+Wspiera integrację z Groovy    
+
+
+** **spring-boot-starter-hateoas**
+
+Wspiera integrację z HATEOAS (spring-hateoas)    
+
+
+** **spring-boot-starter-hornetq**
+    
+Wspiera integrację z HornetQ
+
+** **spring-boot-starter-integration**
+
+Wspiera integrację z Spring-integration    
+
+** **spring-boot-starter-jdbc**
+
+Wspiera integrację z JDBC    
+
+
+** **spring-boot-starter-jersey**
+
+Wspiera integrację z Jersey RESTful    
+
+
+** **spring-boot-starter-jta-atomikos**
+    
+Wspiera integrację JTA Atomikos
+
+
+** **spring-boot-starter-jta-bitronix**
+
+Wspiera integrację z JTA Bitronix    
+
+
+** **spring-boot-starter-mail**
+
+Wspiera dla wysyłki email    
+
+** **spring-boot-starter-mobile**
+
+Wspiera integrację z spring-mobile    
+
+** **spring-boot-starter-mustache**
+    
+Wspiera integrację z Mustache template    
+
+
+** **spring-boot-starter-redis**
+    
+Wspiera integrację z REDIS
+
+
+** **spring-boot-starter-security**
+    
+Wspiera integrację z Spring-Security 
+
+** **spring-boot-starter-social-facebook**
+    
+Wspiera integrację z Facebook (spring-social-facebook)
+
+
+** **spring-boot-starter-social-linkedin**
+
+Wspiera integrację z LinkedIn (spring-social-linkedin)    
+
+
+** **spring-boot-starter-social-twitter**
+
+Wspiera integrację z Twitter (spring-social-twitter)    
+
+
+** **spring-boot-starter-test**
+
+Wspiera testowanie (Junit, Hamcrest, Mockito)    
+
+
+** **spring-boot-starter-thymeleaf**
+    
+Wspiera integrację z Thymeleaf template
+
+
+** **spring-boot-starter-velocity**
+    
+Wspiera integrację z Velocity
+
+
+** **spring-boot-starter-web**
+    
+Wsparcie dla stosu webowego Springa (Tomcat, spring-webmvc)
+
+NOTE: Wbudowany Tomcat, Jackson JSON binding, JSR 303 validation, Spring Web i Spring MVC 
+
+** **spring-boot-starter-websocket**
+    
+Wspiera integrację z WebSocket
+
+
+** **spring-boot-starter-ws**
+
+Wspiera integrację z Web Service    
+
+** **spring-boot-starter-actuator**
+    
+Monitoring i metryki    
+
+** **spring-boot-starter-remote-shell**
+    
+Monitoring i metryki z poziomu ssh
+
+** **spring-boot-starter-jetty**
+    
+Integracja z Jetty (alternatywa dla Tomcat)
+
+
+** **spring-boot-starter-log4j**
+
+Wspiera integrację z Log4j    
+
+
+** **spring-boot-starter-logging**
+    
+    
+Import Spring Boot’s default logging framework (Logback).
+
+** **spring-boot-starter-tomcat**
+    
+Wspiera integrację z Tomcat (domyślne)
+
+
+** **spring-boot-starter-undertow**
+    
+Wspiera integrację z Undertow (alternatywa dla Tomcat)
+
 
 == @Conditional
 
-== Konfiguracja
-
-=== Spring Boot autoconfiguration
-
-** spring-boot-starter-*
-
-** AutoConfiguration
-
-==== Przykłady 
-
-** RepositoryRestMvcAutoConfiguration
-** JpaRepositoriesAutoConfiguration
-** JmsAutoConfiguration
-** etc
-
-** Wyłączanie danych elementów : 
-[source,java]
-----
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
-----
- 
-=== Zmiana lokacji pliku z ustawieniami
-
-spring.config.name= # config file name
-spring.config.location= # location of config file
-
-=== Własne ustawienia
-
-
-=== .yaml
-
-
-=== Wiele konfiguracji 
-
-
-=== Przykłady 
-
--Dhost.port =9090
-
-[source,xml]
-----
-mvn -Dspring.profiles.active=prod package
-
-mvn -Dspring.profiles.active=dev package
-
-----
-** @ActiveProfiles("test") 
- 
+== Konfiguracja 
 
 == CommandLineRunner
+
+[source,java]
+----
+public  void run(String...   args){
+...
+}
+----
+Zapewnia, że Spring Boot wykona daną metodę tylko raz zaraz po starcie.
+
 
 == ApplicationArguments
 
@@ -280,8 +450,6 @@ mvn -Dspring.profiles.active=dev package
 
 === Spring Boot CLI
 
-http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/1.3.5.RELEASE/spring-boot-cli-1.3.5.RELEASE-bin.zip[ostatnia wersja]
-
 ----
 spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force
 ----
@@ -290,53 +458,7 @@ spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force
 
 === https://start.spring.io/[Initializr]
 
-== Adnotatacje
-
-** @SpringBootApplication
-
-[source,java]
-----
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Inherited
-@Configuration
-@EnableAutoConfiguration
-@ComponentScan
-public @interface SpringBootApplication {
-
-----
-
-== Properties
-
-application.properties
-
 == Logowanie
-
-
-== WEB
-
-=== Tomcat & JETTY
-
-[source,xml]
-----
-<dependencies>
-    <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-        <exclusions>
-            <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
-    <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-jetty</artifactId>
-    </dependency>
-</dependencies>
-----
 
 == Kolejki
 
@@ -346,13 +468,6 @@ application.properties
 
 == NoSql
 
-=== Mongo
-
-mongo.java.driver
-
-spring-data-mongo
-
-
 == Using ResourceBundles for Internationalization (I18N)
 
 
@@ -361,26 +476,159 @@ spring-data-mongo
 
 == Actuator
 
-== Testowanie
 
+** /autoconfig -wyświetla co zostało skonfigurowane automatycznie 
+
+** /beans - wyświetla wszystkie bean'y zarejestrowane w aplikacji
+
+** /configprops - wszystkie konfiguracje properties
+
+** /dump - dump report 
+
+** /env - report o bieżących ustawieniach systemowych
+
+** /health - prosty raport funkcji życiowych aplikacji
+
+----
+curl localhost:8090/health      h                                                                                                                                                    
+{"status":"UP","diskSpace":{"status":"UP","total":219353915392,"free":127528636416,"threshold":10485760},"mongo":{"status":"UP","version":"2.6.10"}}
+----
+
+=== Własny Health endpoint
 [source,java]
 ----
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = MyApp.class)
-@WebIntegrationTest
-public class ApplicationTests {
-@Test
-public void testRestService() {
-RestTemplate restTemplate = new RestTemplate();
-Hello hello = restTemplate.getForObject("http://localhost:8080", Hello.class);
-Assert.assertEquals("Hello World!", hello.getMessage());
+@Component
+public class ActiveMQHealth implements HealthIndicator {
+private ConnectionFactory factory;
+@Autowired
+public ActiveMQHealth(ConnectionFactory factory) {
+   this.factory = factory;
+}
+@Override
+public Health health() {
+    try {
+      factory.createConnection();
+    } catch (JMSException e) {
+      return new Health.Builder().down(e).build();
+    }
+ return new Health.Builder().status(Status.UP + ": Successfully connected tothe broker").build();
 }
 }
 ----
 
-** @WebIntegrationTest - zapewnia, że test bedzie odpalony na działającym serwerze 
+** /info - serwuje informacje o bieżącej konfiguracji aplikacji
 
-NOTE: Alternatywa to : @WebAppConfiguration i  @IntegrationTest
- 
+** /metrics - metryki dotyczące punktów końcowych, sterty, wątków czy gc 
+
+----
+{
+
+    "mem": 1132031,
+    "mem.free": 485640,
+    "processors": 8,
+    "instance.uptime": 1079395,
+    "uptime": 1088537,
+    "systemload.average": 1.09,
+    "heap.committed": 1048576,
+    "heap.init": 1048576,
+    "heap.used": 561152,
+    "heap": 2097152,
+    "nonheap.committed": 84928,
+    "nonheap.init": 2496,
+    "nonheap.used": 83457,
+    "nonheap": 0,
+    "threads.peak": 42,
+    "threads.daemon": 38,
+    "threads.totalStarted": 79,
+    "threads": 42,
+    "classes": 10148,
+    "classes.loaded": 10148,
+    "classes.unloaded": 0,
+    "gc.g1_young_generation.count": 4,
+    "gc.g1_young_generation.time": 141,
+    "gc.g1_old_generation.count": 0,
+    "gc.g1_old_generation.time": 0,
+    "gauge.servo.response.health": 8.0,
+    "gauge.servo.rest.totaltime": 0.008942816666666667,
+    "gauge.servo.rest.count": 0.016666666666666666,
+    "gauge.servo.rest.min": 1.155877,
+    "gauge.servo.rest.max": 1.155877,
+    "gauge.servo.response.api.applications": 3.0,
+    "httpsessions.max": -1,
+    "httpsessions.active": 0
+
+}
+----
+
+** /mappings - wszystkie mapowania URL w aplikacji
+
+** /trace - detale wcześniejszy requestów
+
+----
+{
+
+    "timestamp": 1468504478026,
+    "info": {
+        "method": "POST",
+        "path": "/api/applications",
+        "headers": {
+            "request": {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "user-agent": "Java/1.8.0_91",
+                "host": "localhost:8090",
+                "connection": "keep-alive",
+                "content-length": "273"
+            },
+            "response": {
+                "X-Application-Context": "CEP:dev:8090",
+                "Content-Type": "application/json;charset=UTF-8",
+                "Transfer-Encoding": "chunked",
+                "Date": "Thu, 14 Jul 2016 13:54:38 GMT",
+                "status": "201"
+            }
+        }
+    }
+
+},
+{
+
+    "timestamp": 1468504468058,
+    "info": {
+        "method": "GET",
+        "path": "/api/journal",
+        "headers": {
+            "request": {
+                "host": "localhost:8090",
+                "user-agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0",
+                "accept": "text/event-stream",
+                "accept-language": "pl,en-US;q=0.7,en;q=0.3",
+                "accept-encoding": "gzip, deflate",
+                "referer": "http://localhost:8090/index.html",
+                "cookie": "__utma=111872281.2131442542.1458644832.1458644832.1461744507.2; __utmz=111872281.1458644832.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); _ga=GA1.1.2131442542.1458644832; auth_token=5b97a1d44bf087ab990369e6d6e2d55c413994d4; JSESSIONID=F70300B2C0A464FA47C28817326F8988",
+                "connection": "keep-alive",
+                "pragma": "no-cache",
+                "cache-control": "no-cache"
+            },
+            "response": {
+                "X-Application-Context": "CEP:dev:8090",
+                "Content-Type": "text/event-stream;charset=UTF-8",
+                "Transfer-Encoding": "chunked",
+                "Date": "Thu, 14 Jul 2016 13:54:28 GMT",
+                "status": "200"
+            }
+        }
+    }
+
+},...
+----
+
+=== Zależność 
+
+spring-boot-actuator
+
+=== remote shell
+
+spring-boot-starter-remote-shell
 
 
