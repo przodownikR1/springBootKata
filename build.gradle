@@ -43,7 +43,9 @@ dependencies {
     
     compile 'com.google.guava:guava:19.0'
     runtime('com.h2database:h2')
-    compile 'org.projectlombok:lombok:1+'
+    
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.10'
+
     compile 'javax.money:money-api:1.0'
     compile 'org.javamoney:moneta:1.0'
     
