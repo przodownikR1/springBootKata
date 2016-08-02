@@ -11,15 +11,20 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
+@Component
 public class SimpleFilter implements Filter{
     public static final String REQUEST_ID_KEY = "request_id";
     private  Random random = new Random(); 
+    
+    @Value("${app.id}")
+    private String appId;
     
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -29,9 +34,10 @@ public class SimpleFilter implements Filter{
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-           log.info( "req : filter ok !");
+           log.debug( "req : filter ok !");
            HttpServletRequest httpRequest = (HttpServletRequest) request;                     
            putMDC(httpRequest);           
+          
            try {
                chain.doFilter(request, response);
            } finally {
@@ -45,27 +51,35 @@ public class SimpleFilter implements Filter{
     }
 
     private void putMDC(HttpServletRequest httpRequest) {
+          if(!getReqURI(httpRequest).endsWith(".js") 
+                  && !getReqURI(httpRequest).endsWith(".css")
+                  && !getReqURI(httpRequest).endsWith(".png")
+                  && !getReqURI(httpRequest).endsWith(".jpg")
+                  && !getReqURI(httpRequest).endsWith(".gif")
+                  ){
            String uuid = UUID.randomUUID().toString();
            MDC.put(REQUEST_ID_KEY,uuid);
-           String requestURI = httpRequest.getRequestURI();
+           String requestURI = getReqURI(httpRequest);
            MDC.put("req.requestURI", requestURI);
            String queryString = httpRequest.getQueryString();
            MDC.put("req.queryString", queryString);
            String ip = getIpAddr(httpRequest);
-           MDC.put("req.remoteAddr", ip);
-           
-           log.info("request_ID_KEY : {}",uuid);
-           log.info("requestURI : {}", requestURI);
-           log.info("req.queryString : {}", queryString);
-           log.info("req.remoteAddr: {}",ip);
-           
+           MDC.put("req.remoteAddr", ip);                     
+           log.info("req_uid:{}:req_uri:{}:ip:{}:appId:{}",uuid,requestURI,ip,appId);
+                     
            if(random.nextBoolean()==true){
                MDC.put("userid","przodownik" );
-               log.info("+++ przodownik");               
+               log.debug("+++ przodownik");               
            }else{
                MDC.put("userid", "tyson");
-               log.info("+++ tyson");
+               log.debug("+++ tyson");
            }
+          }
+    }
+
+    private String getReqURI(HttpServletRequest httpRequest) {
+        String requestURI = httpRequest.getRequestURI();
+        return requestURI;
     }
     public static String getIpAddr(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
