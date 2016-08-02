@@ -3,7 +3,7 @@
 :numbered:
 :icons: font
 :pagenums:
-:imagesdir: img
+:imagesdir: images
 :iconsdir: ./icons
 :stylesdir: ./styles
 :scriptsdir: ./js
@@ -11,7 +11,7 @@
 :image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
 ifndef::sourcedir[:sourcedir: ./src/main/java/]
 ifndef::resourcedir[:resourcedir: ./src/main/resources/]
-ifndef::imgsdir[:imgsdir: ./../img]
+ifndef::imgsdir[:imgsdir: ./../images]
 :source-highlighter: coderay
 
 
@@ -59,6 +59,18 @@ image:{image-link} [role='img-circle']
 *** Actuator
 
 ** Microservices :)
+
+source: https://www.nginx.com/blog/building-microservices-inter-process-communication/
+
+image:Richardson-microservices-part1-1_monolithic-architecture.png[]
+
+image:Richardson-microservices-part2-3_api-gateway.png[]
+
+image:Richardson-microservices-part3-monolith-vs-microservices.png[]
+
+image:Richardson-microservices-part3-taxi-service.png[]
+
+image:mono-vs-mirco.png[]
 
 
 NOTE : Aktualna wersja 1.4.0.RELEASE wymaga Java 7 i Spring Framework 4.3.2.RELEASE lub wyżej
