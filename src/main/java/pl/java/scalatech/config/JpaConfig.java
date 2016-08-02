@@ -7,12 +7,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import lombok.extern.slf4j.Slf4j;
-@Configuration
-@EnableJpaRepositories(basePackages="pl.java.scalatech.repository")
+@Configuration  // <4>
+@EnableJpaRepositories(basePackages="pl.java.scalatech.repository") // <1>
 @Slf4j
-@EntityScan(basePackages="pl.java.scalatech.domain")
+@EntityScan(basePackages="pl.java.scalatech.domain") // <2>
 public class JpaConfig {
-    @PostConstruct
+    
+    @PostConstruct // <3>
     public void init(){
       log.info("+++++++++++++++++++++++++++++");  
     }

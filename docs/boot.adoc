@@ -434,6 +434,150 @@ Wspiera integrację z Undertow (alternatywa dla Tomcat)
 
 == Konfiguracja 
 
+== Banner 
+
+banner.txt
+
+banner.gif, banner.jpg or banner.png image file to your classpath, or set a banner.image.location
+
+${application.version}
+    
+
+The version number of your application as declared in MANIFEST.MF. For example Implementation-Version: 1.0 is printed as 1.0.
+
+${application.formatted-version}
+    
+
+The version number of your application as declared in MANIFEST.MF formatted for display (surrounded with brackets and prefixed with v). For example (v1.0).
+
+${spring-boot.version}
+    
+
+The Spring Boot version that you are using. For example 1.4.0.RELEASE.
+
+${spring-boot.formatted-version}
+    
+
+The Spring Boot version that you are using formatted for display (surrounded with brackets and prefixed with v). For example (v1.4.0.RELEASE).
+
+${Ansi.NAME} (or ${AnsiColor.NAME}, ${AnsiBackground.NAME}, ${AnsiStyle.NAME})
+    
+
+Where NAME is the name of an ANSI escape code. See AnsiPropertySource for details.
+
+${application.title}
+    
+
+The title of your application as declared in MANIFEST.MF. For example Implementation-Title: MyApp is printed as MyApp.
+
+
+
+NOTE: The SpringApplication.setBanner(…​) method can be used if you want to generate a banner programmatically. Use the org.springframework.boot.Banner interface and implement your own printBanner() method.
+
+spring:
+    main:
+        banner-mode: "off"
+        
+        
+        
+[source,java]
+----
+public static void main(String[] args) {
+    SpringApplication app = new SpringApplication(MySpringConfiguration.class);
+    app.setBannerMode(Banner.Mode.OFF);
+    app.run(args);
+}
+
+----
+  
+
+=== Fluent builder API
+
+----
+
+new SpringApplicationBuilder()
+    .bannerMode(Banner.Mode.OFF)
+    .sources(Parent.class)
+    .child(Application.class)
+    .run(args);
+    
+----
+ 
+ 
+ 
+== Application events and listeners
+
+
+    An ApplicationStartedEvent is sent at the start of a run, but before any processing except the registration of listeners and initializers.
+    An ApplicationEnvironmentPreparedEvent is sent when the Environment to be used in the context is known, but before the context is created.
+    An ApplicationPreparedEvent is sent just before the refresh is started, but after bean definitions have been loaded.
+    An ApplicationReadyEvent is sent after the refresh and any related callbacks have been processed to indicate the application is ready to service requests.
+    An ApplicationFailedEvent is sent if there is an exception on startup. 
+
+
+==  Accessing application arguments
+
+
+[source,java]
+----
+@Component
+public class MyBean {
+
+    @Autowired
+    public MyBean(ApplicationArguments args) {
+        boolean debug = args.containsOption("debug");
+        List<String> files = args.getNonOptionArgs();
+        // if run with "--debug logfile.txt" debug=true, files=["logfile.txt"]
+    }
+
+}
+
+
+----
+
+
+== Admin features
+
+spring.application.admin.enabled
+
+
+
+== Externalized Configuration
+
+    @TestPropertySource annotations on your tests.
+    Command line arguments.
+    Properties from SPRING_APPLICATION_JSON (inline JSON embedded in an environment variable or system property)
+    ServletConfig init parameters.
+    ServletContext init parameters.
+    JNDI attributes from java:comp/env.
+    Java System properties (System.getProperties()).
+    OS environment variables.
+    A RandomValuePropertySource that only has properties in random.*.
+    Profile-specific application properties outside of your packaged jar (application-{profile}.properties and YAML variants)
+    Profile-specific application properties packaged inside your jar (application-{profile}.properties and YAML variants)
+    Application properties outside of your packaged jar (application.properties and YAML variants).
+    Application properties packaged inside your jar (application.properties and YAML variants).
+    @PropertySource annotations on your @Configuration classes.
+    Default properties (specified using SpringApplication.setDefaultProperties).
+    
+    
+=== Random
+
+----
+Configuring random values
+
+The RandomValuePropertySource is useful for injecting random values (e.g. into secrets or test cases). It can produce integers, longs, uuids or strings, e.g.
+
+my.secret=${random.value}
+my.number=${random.int}
+my.bignumber=${random.long}
+my.uuid=${random.uuid}
+my.number.less.than.ten=${random.int(10)}
+my.number.in.range=${random.int[1024,65536]}
+----    
+
+
+
 == CommandLineRunner
 
 [source,java]
@@ -453,7 +597,7 @@ Zapewnia, że Spring Boot wykona daną metodę tylko raz zaraz po starcie.
 
 == Narzędzia
 
-=== Spring Boot CLI
+=== http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/1.4.0.RELEASE/spring-boot-cli-1.4.0.RELEASE-bin.zip[Spring Boot CLI]
 
 ----
 spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force

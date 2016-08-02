@@ -14,10 +14,10 @@ import pl.java.scalatech.domain.User;
 import pl.java.scalatech.repository.InvoiceRepository;
 import pl.java.scalatech.repository.UserRepository;
 
-@SpringBootApplication
-public class SpringBootKataApplication implements CommandLineRunner{
+@SpringBootApplication // <1>
+public class SpringBootKataApplication implements CommandLineRunner{ // <2>
 
-    @Autowired
+    @Autowired // <3>
     private StartupComponent startup;
     
     @Autowired
@@ -27,13 +27,13 @@ public class SpringBootKataApplication implements CommandLineRunner{
     
     
     Random r = new Random();
-    public static void main(String[] args) {
+    public static void main(String[] args) { // <4>
         SpringApplication.run(SpringBootKataApplication.class, args);
         
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) throws Exception { // <5>
         createUser();
         createInvoice();
         
