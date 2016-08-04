@@ -72,6 +72,49 @@ image:Richardson-microservices-part3-taxi-service.png[]
 
 image:mono-vs-mirco.png[]
 
+Za : 
+
+*** szybki deploy
+
+*** wielkie serwery aplikacyjne
+
+*** monolit - utrzymywanie i rozwijanie
+
+*** splątane zależności
+
+*** małe autonomiczne usługi
+
+*** małe autonomiczne zespoły
+
+*** łatwość zrozumienia domeny
+
+*** łatwa skalowalność
+
+*** izolacja sytuacji krytycznych
+
+*** dobór odpowiednich narzędzi i języków do danej domeny
+
+***   
+
+Przeciw : 
+
+*** testowanie
+
+*** debugowanie
+
+*** próg wejścia
+
+*** nowe wzorce architektoniczne
+
+*** zwiększona pamięciożerność
+
+
+
+
+
+ 
+
+ 
 
 NOTE : Aktualna wersja 1.4.0.RELEASE wymaga Java 7 i Spring Framework 4.3.2.RELEASE lub wyżej
 
@@ -446,6 +489,17 @@ Wspiera integrację z Undertow (alternatywa dla Tomcat)
 
 == Konfiguracja 
 
+
+** Spring java config
+
+** Spring annotation
+
+** Spring profiles
+
+** yaml/properties
+
+
+
 == Banner 
 
 banner.txt
@@ -641,6 +695,12 @@ Undertow 1.3 3.1 Java 7+
 == Kolejki
 
 == Rest
+
+=== Richardson Maturity Model
+
+source : https://technobeans.wordpress.com/
+
+image:richardson-maturity-model.png[]
 
 == ORM
 

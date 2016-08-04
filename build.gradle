@@ -39,6 +39,8 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile 'org.springframework.boot:spring-boot-starter-logging'
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-devtools')
+    
     
     //compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
    // compile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
@@ -64,7 +66,7 @@ dependencies {
     
     
     testCompile('org.springframework.boot:spring-boot-starter-test') 
-    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc:1.0.0.RC1')
+    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.2.0'
     testCompile 'com.jayway.awaitility:awaitility-java8:1.6.1'

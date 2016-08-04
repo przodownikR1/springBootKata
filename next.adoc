@@ -1,0 +1,1273 @@
+== Spring Boot 1.4 features
+
+=== Banner
+
+=== Error page
+
+===
+
+
+== DevTools
+
+[source,xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+    </dependency>
+</dependencies>
+----
+
+
+[source,groovy]
+----
+dependencies {
+    compile("org.springframework.boot:spring-boot-devtools")
+}
+----
+
+spring.thymeleaf.cache
+
+During development caching for Thymeleaf, Freemarker, Groovy Templates, Velocity and Mustache are all automatically disabled.
+
+===  LiveReload plugin
+
+
+Wyłączenie : spring.devtools.livereload.enabled=false.
+
+
+
+=== Disabling restart
+
+[source,java]
+----
+public static void main(String[] args) {
+    System.setProperty("spring.devtools.restart.enabled", "false");
+    SpringApplication.run(MyApp.class, args);
+}
+----
+
+=== Remote applications
+
+spring.devtools.remote.secret=mysecret
+
+
+org.springframework.boot.devtools.RemoteSpringApplication 
+
+
+
+
+== Creating an executable jar
+
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+----
+ 
+== Maven
+
+Inheriting the starter parent
+
+----
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.4.0.RELEASE</version>
+</parent>
+----
+
+----
+<properties>
+    <spring-data-releasetrain.version>Fowler-SR2</spring-data-releasetrain.version>
+</properties>
+----
+
+=== Using Spring Boot without the parent POM
+
+----
+<dependencyManagement>
+     <dependencies>
+        <dependency>
+            <!-- Import dependency management from Spring Boot -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>1.4.0.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+----
+
+----
+
+<dependencyManagement>
+    <dependencies>
+        <!-- Override Spring Data release train provided by Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-releasetrain</artifactId>
+            <version>Fowler-SR2</version>
+            <scope>import</scope>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>1.4.0.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+----
+
+=== Zmiana wersji javy
+
+----
+<properties>
+    <java.version>1.8</java.version>
+</properties>
+----
+
+=== Użycie pluginu Spring Boot
+
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+----
+ 
+
+== Gradle
+
+
+----
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web:1.4.0.RELEASE")
+}
+----
+
+=== spring-boot-gradle-plugin
+
+
+----
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+
+----
+
+== Konfiguracja
+
+** @Configuration
+
+** @ImportResource
+
+** @ComponentScan
+
+** @Import
+
+=== Disabling specific auto-configuration
+
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+
+=== @SpringBootApplication
+
+To samo co : @Configuration + @EnableAutoConfiguration + @ComponentScan
+
+
+== Running as a packaged application
+
+$ java -jar target/myproject-0.0.1-SNAPSHOT.jar
+
+$ java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -jar target/myproject-0.0.1-SNAPSHOT.jar
+
+
+=== Maven
+
+mvn spring-boot:run
+
+$ export MAVEN_OPTS=-Xmx1024m -XX:MaxPermSize=128M
+
+=== Gradle
+
+gradle bootRun
+
+export JAVA_OPTS=-Xmx1024m -XX:MaxPermSize=128M
+
+
+== Hot swapping
+
+** JRebel
+ 
+**  Spring Loaded
+ 
+== Fluent Builder API
+
+
+[source,java]
+----
+new SpringApplicationBuilder()
+    .bannerMode(Banner.Mode.OFF)
+    .sources(Parent.class)
+    .child(Application.class)
+    .run(args);
+----
+    
+
+== Admin features
+
+spring.application.admin.enabled
+
+Expose SpringApplicationAdminMXBean on the platform MBeanServer
+
+== Externalized Configuration
+
+    @TestPropertySource annotations on your tests.
+    Command line arguments.
+    Properties from SPRING_APPLICATION_JSON (inline JSON embedded in an environment variable or system property)
+    ServletConfig init parameters.
+    ServletContext init parameters.
+    JNDI attributes from java:comp/env.
+    Java System properties (System.getProperties()).
+    OS environment variables.
+    A RandomValuePropertySource that only has properties in random.*.
+    Profile-specific application properties outside of your packaged jar (application-{profile}.properties and YAML variants)
+    Profile-specific application properties packaged inside your jar (application-{profile}.properties and YAML variants)
+    Application properties outside of your packaged jar (application.properties and YAML variants).
+    Application properties packaged inside your jar (application.properties and YAML variants).
+    @PropertySource annotations on your @Configuration classes.
+    Default properties (specified using SpringApplication.setDefaultProperties).
+    
+
+    
+=== Placeholders in properties
+
+
+----
+app.name=MyApp
+app.description=${app.name} is a Spring Boot application
+----
+
+
+=== YAML
+
+SnakeYAML by auto spring-boot-starter
+
+----
+environments:
+    dev:
+        url: http://dev.bar.com
+        name: Developer Setup
+    prod:
+        url: http://foo.bar.com
+        name: My Cool App
+----
+
+To samo co : 
+
+----
+environments.dev.url=http://dev.bar.com
+environments.dev.name=Developer Setup
+environments.prod.url=http://foo.bar.com
+environments.prod.name=My Cool App
+
+----
+
+----
+
+my:
+   servers:
+       - dev.bar.com
+       - foo.bar.com
+       
+----
+
+
+To samo co :
+
+----
+my.servers[0]=dev.bar.com
+my.servers[1]=foo.bar.com
+----
+       
+== @ConfigurationProperties(prefix="my")
+
+=== Type-safe Configuration Properties
+
+@Value("${property}")
+
+----
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    private String username;
+
+    private InetAddress remoteAddress;
+
+    // ... getters and setters
+
+}
+
+----
+
+Zarejestrować :
+
+
+----
+@Configuration
+@EnableConfigurationProperties(ConnectionProperties.class)
+public class MyConfiguration {
+}
+----
+   
+
+----
+@Component
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    // ... getters and setters
+
+}
+
+----
+
+----
+# application.yml
+
+connection:
+    username: admin
+    remoteAddress: 192.168.1.1
+
+# additional configuration as required
+----
+
+Użycie: 
+
+[source,java]
+----
+@Service
+public class MyService {
+
+    private final ConnectionProperties connection;
+
+    @Autowired
+    public MyService(ConnectionProperties connection) {
+        this.connection = connection;
+    }
+
+     //...
+
+    @PostConstruct
+    public void openConnection() {
+        Server server = new Server();
+        this.connection.configure(server);
+    }
+
+}
+----
+
+=== Relaxed binding
+
+----
+
+@ConfigurationProperties(prefix="person")
+public class OwnerProperties {
+
+    private String firstName;
+
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+}
+
+----
+
+person.firstName camel case
+   
+person.first-name .properties / .yml
+   
+person.first_name .properties / .yml
+    
+PERSON_FIRST_NAME Upper case format. system environment variables
+
+=== @ConfigurationProperties Validation
+
+NOTE: JSR-303 javax.validation 
+
+----
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    @NotNull
+    @Valid
+    private InetAddress remoteAddress;
+
+    // ... getters and setters
+
+}
+----
+    
+== Profiles
+
+----
+@Configuration
+@Profile("production")
+public class ProductionConfiguration {
+
+    // ...
+
+}
+----
+
+----
+spring.profiles.active=dev,hsqldb
+----
+
+
+=== Programmatically setting profiles
+
+SpringApplication.setAdditionalProfiles(…​)
+
+oraz
+
+ConfigurableEnvironment
+
+
+== Logging
+
+Spring Boot uses Commons Logging for all internal logging
+
+Default configurations are provided for Java Util Logging, Log4J2 and Logback.
+
+By default, If you use the ‘Starters’, Logback will be used for logging
+
+
+    Date and Time — Millisecond precision and easily sortable.
+    Log Level — ERROR, WARN, INFO, DEBUG or TRACE.
+    Process ID.
+    A --- separator to distinguish the start of actual log messages.
+    Thread name — Enclosed in square brackets (may be truncated for console output).
+    Logger name — This is usually the source class name (often abbreviated).
+    The log message.
+    
+NOTE:Logback does not have a FATAL level (it is mapped to ERROR)
+
+=== Console
+
+ java -jar myapp.jar --debug
+ 
+ debug=true in your application.properties.
+ 
+ 
+ --debug
+ 
+ 
+===  Color-coded output
+
+
+----
+%clr(%5p)
+
+Level   Color
+
+FATAL    Red
+
+ERROR    Red
+
+WARN    Yellow
+
+INFO    Green
+
+DEBUG  Green
+
+TRACE  Green
+
+%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){yellow}
+
+    blue
+    cyan
+    faint
+    green
+    magenta
+    red
+    yellow
+----
+    
+=== File output
+By default, Spring Boot will only log to the console and will not write log files.
+
+logging.file or logging.path property (for example in your application.properties).
+
+
+logging.file    logging.path    Example Description
+
+(none)
+    
+
+(none)
+        
+
+Console only logging.
+
+Specific file
+    
+
+(none)
+    
+
+my.log
+    
+
+Writes to the specified log file. Names can be an exact location or relative to the current directory.
+
+(none)
+    
+
+Specific directory
+    
+
+/var/log
+    
+
+Writes spring.log to the specified directory. Names can be an exact location or relative to the current directory.
+
+
+
+=== Log Levels
+
+logging.level.root=WARN
+logging.level.org.springframework.web=DEBUG
+logging.level.org.hibernate=ERROR
+
+
+=== Custom log configuration
+
+
+Logback
+    
+
+logback-spring.xml, logback-spring.groovy, logback.xml or logback.groovy
+
+Log4j2
+    
+
+log4j2-spring.xml or log4j2.xml
+
+JDK (Java Util Logging)
+    
+
+logging.properties
+[Note]
+
+
+
+== WEB
+
+=== Spring MVC auto-configuration
+
+
+    Inclusion of ContentNegotiatingViewResolver and BeanNameViewResolver beans.
+    Support for serving static resources, including support for WebJars (see below).
+    Automatic registration of Converter, GenericConverter, Formatter beans.
+    Support for HttpMessageConverters (see below).
+    Automatic registration of MessageCodesResolver (see below).
+    Static index.html support.
+    Custom Favicon support.
+    Automatic use of a ConfigurableWebBindingInitializer bean (see below).
+    
+
+    
+=== Static Content
+
+spring.resources.staticLocations
+
+=== Template engines
+
+
+    FreeMarker
+    Groovy
+    Thymeleaf
+    Velocity (deprecated in 1.4)
+    Mustache
+    
+
+
+== Error Handling    
+             
+=== Custom error pages
+
+==  Security
+
+
+=== @EnableGlobalMethodSecurity
+
+The default AuthenticationManager has a single user (‘user’ username and random password, printed at INFO level when the application starts up)
+
+Using default security password: 78fa095d-3f4c-48b1-ad50-e24c31d5cf35
+
+== ORM
+
+----
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.hsqldb</groupId>
+    <artifactId>hsqldb</artifactId>
+    <scope>runtime</scope>
+</dependency>
+
+----
+
+NOTE : spring-jdbc for an embedded database to be auto-configured.
+
+NOTE :. If you’re using H2 you should use DB_CLOSE_ON_EXIT=FALSE 
+
+=== Connection to a production database
+
+
+    We prefer the Tomcat pooling DataSource for its performance and concurrency, so if that is available we always choose it.
+    Otherwise, if HikariCP is available we will use it.
+    If neither the Tomcat pooling datasource nor HikariCP are available and if Commons DBCP is available we will use it, but we don’t recommend it in production.
+    Lastly, if Commons DBCP2 is available we will use it.
+    
+    
+NOTE: spring-boot-starter-jdbc or spring-boot-starter-data-jpa ‘starters’ you will automatically get a dependency to tomcat-jdbc.
+
+
+----
+spring.datasource.url=jdbc:mysql://localhost/test
+spring.datasource.username=dbuser
+spring.datasource.password=dbpass
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+
+----
+
+Default setting
+
+----
+# Number of ms to wait before throwing an exception if no connection is available.
+spring.datasource.tomcat.max-wait=10000
+
+# Maximum number of active connections that can be allocated from this pool at the same time.
+spring.datasource.tomcat.max-active=50
+
+# Validate the connection before borrowing it from the pool.
+spring.datasource.tomcat.test-on-borrow=true
+
+----
+
+
+=== JNDI
+
+----
+spring.datasource.jndi-name=java:jboss/datasources/customers
+----
+
+=== JdbcTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public MyBean(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    // ...
+
+}
+----
+
+
+=== JPA & Spring Data
+
+    Hibernate — One of the most popular JPA implementations.
+    Spring Data JPA — Makes it easy to implement JPA-based repositories.
+    Spring ORMs — Core ORM support from the Spring Framework.
+    
+
+=== Using H2’s web console
+
+
+    You are developing a web application
+    com.h2database:h2 is on the classpath
+    You are using Spring Boot’s developer tools
+    
+    
+spring.h2.console.enabled 
+
+PATH : /h2-console
+
+=== Secure h2-console
+
+    security.user.role
+    security.basic.authorize-mode
+    security.basic.enabled
+   
+    
+== MongoDB
+
+Zależność : 
+
+----
+spring-boot-starter-data-mongodb             
+----
+
+===  MongoTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final MongoTemplate mongoTemplate;
+
+    @Autowired
+    public MyBean(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    // ...
+
+}
+----
+
+=== Spring Data MongoDB repositories
+
+----
+public interface CityRepository extends Repository<City, Long> {
+
+    Page<City> findAll(Pageable pageable);
+
+    City findByNameAndCountryAllIgnoringCase(String name, String country);
+
+}
+----
+
+
+=== Embedded Mongo
+
+Spring Boot offers auto-configuration for Embedded Mongo. To use it in your Spring Boot application add a dependency on de.flapdoodle.embed:de.flapdoodle.embed.mongo.
+
+The port that Mongo will listen on can be configured using the spring.data.mongodb.port property. To use a randomly allocated free port use a value of zero. The MongoClient created by MongoAutoConfiguration will be automatically configured to use the randomly allocated port.
+
+If you have SLF4J on the classpath, output produced by Mongo will be automatically routed to a logger named org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongo.
+
+You can declare your own IMongodConfig and IRuntimeConfig beans to take control of the Mongo instance’s configuration and logging routing.
+
+
+
+== Neo4j
+
+=== Connecting to a Neo4j database
+
+Neo4jSession, Session or Neo4jOperations 
+
+=== Neo4jTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final Neo4jTemplate neo4jTemplate;
+
+    @Autowired
+    public MyBean(Neo4jTemplate neo4jTemplate) {
+        this.neo4jTemplate = neo4jTemplate;
+    }
+
+    // ...
+
+}
+
+----
+
+----
+spring.data.neo4j.uri=http://my-server:7474
+spring.data.neo4j.username=neo4j
+spring.data.neo4j.password=secret
+----
+
+=== Using the embedded mode
+
+
+If you add org.neo4j:neo4j-ogm-embedded-driver to the dependencies of your application, Spring Boot will automatically configure an in-process embedded instance of Neo4j that will not persist any data when your application shuts down. You can explicitly disable that mode using spring.data.neo4j.embedded.enabled=false. You can also enable persistence for the embedded mode:
+
+    spring.data.neo4j.uri=file://var/tmp/graph.db
+    
+
+=== Neo4jSession
+
+By default, the lifetime of the session is scope to the application. If you are running a web application you can change it to scope or request easily:
+
+    spring.data.neo4j.session.scope=session
+    
+
+===  Spring Data Neo4j repositories
+
+@EnableNeo4jRepositories(basePackages = "com.example.myapp.repository")
+@EnableTransactionManagement
+
+----
+public interface CityRepository extends GraphRepository<City> {
+
+    Page<City> findAll(Pageable pageable);
+
+    City findByNameAndCountry(String name, String country);
+
+}
+----
+
+=== Caching
+
+
+=== Supported cache providers
+
+    Generic
+    JCache (JSR-107)
+    EhCache 2.x
+    Hazelcast
+    Infinispan
+    Couchbase
+    Redis
+    Caffeine
+    Guava
+    Simple
+
+=== CacheManager
+
+----
+@Bean
+public CacheManagerCustomizer<ConcurrentMapCacheManager> cacheManagerCustomizer() {
+    return new CacheManagerCustomizer<ConcurrentMapCacheManager>() {
+        @Override
+        public void customize(ConcurrentMapCacheManager cacheManager) {
+            cacheManager.setCacheNames(Arrays.asList("one", "two"));
+        }
+    };
+}
+----
+
+
+=== EhCache 2.x
+
+spring.cache.ehcache.config=classpath:config/another-config.xml
+
+
+=== Guava
+
+
+If Guava is present, a GuavaCacheManager is auto-configured. Caches can be created on startup using the spring.cache.cache-names property and customized by one of the following (in this order):
+
+    A cache spec defined by spring.cache.guava.spec
+    A com.google.common.cache.CacheBuilderSpec bean is defined
+    A com.google.common.cache.CacheBuilder bean is defined
+
+For instance, the following configuration creates a foo and bar caches with a maximum size of 500 and a time to live of 10 minutes
+
+spring.cache.cache-names=foo,bar
+spring.cache.guava.spec=maximumSize=500,expireAfterAccess=600s
+
+Besides, if a com.google.common.cache.CacheLoader bean is defined, it is automatically associated to the GuavaCacheManager.
+
+
+
+== Messaging
+
+
+=== JMS
+
+
+=== ActiveMQ support
+
+----
+spring-boot-starter-activemq
+----
+
+
+----
+spring.activemq.broker-url=tcp://192.168.1.210:9876
+spring.activemq.user=admin
+spring.activemq.password=secret
+----
+
+
+=== @EnableJms
+
+
+
+=== Wysyłanie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    private final JmsTemplate jmsTemplate;
+
+    @Autowired
+    public MyBean(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
+    // ...
+
+}
+----
+
+=== Odbieranie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    @JmsListener(destination = "someQueue")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+
+
+----
+
+If you need to create more JmsListenerContainerFactory instances or if you want to override the default, Spring Boot provides a DefaultJmsListenerContainerFactoryConfigurer that you can use to initialize a DefaultJmsListenerContainerFactory with the same settings as the one that is auto-configured.
+
+For instance, the following exposes another factory that uses a specific MessageConverter:
+
+@Configuration
+static class JmsConfiguration {
+
+    @Bean
+    public DefaultJmsListenerContainerFactory myFactory(
+            DefaultJmsListenerContainerFactoryConfigurer configurer) {
+        DefaultJmsListenerContainerFactory factory =
+                new DefaultJmsListenerContainerFactory();
+        configurer.configure(factory, connectionFactory());
+        factory.setMessageConverter(myMessageConverter());
+        return factory;
+    }
+
+}
+
+Then you can use in any @JmsListener-annotated method as follows:
+
+@Component
+public class MyBean {
+
+    @JmsListener(destination = "someQueue", containerFactory="myFactory")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+
+----
+
+=== AMQP
+
+----
+spring-boot-starter-amqp
+----
+
+
+=== RabbitMQ support
+
+----
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=admin
+spring.rabbitmq.password=secret
+----
+
+=== Wysyłanie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    private final AmqpAdmin amqpAdmin;
+    private final AmqpTemplate amqpTemplate;
+
+    @Autowired
+    public MyBean(AmqpAdmin amqpAdmin, AmqpTemplate amqpTemplate) {
+        this.amqpAdmin = amqpAdmin;
+        this.amqpTemplate = amqpTemplate;
+    }
+
+    // ...
+
+}
+----
+
+=== Odbieranie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    @RabbitListener(queues = "someQueue")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+
+
+----
+If you need to create more RabbitListenerContainerFactory instances or if you want to override the default, Spring Boot provides a SimpleRabbitListenerContainerFactoryConfigurer that you can use to initialize a SimpleRabbitListenerContainerFactory with the same settings as the one that is auto-configured.
+
+For instance, the following exposes another factory that uses a specific MessageConverter:
+
+@Configuration
+static class RabbitConfiguration {
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory myFactory(
+            SimpleRabbitListenerContainerFactoryConfigurer configurer) {
+        SimpleRabbitListenerContainerFactory factory =
+                new SimpleRabbitListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        factory.setMessageConverter(myMessageConverter());
+        return factory;
+    }
+
+}
+
+Then you can use in any @RabbitListener-annotated method as follows:
+
+@Component
+public class MyBean {
+
+    @RabbitListener(queues = "someQueue", containerFactory="myFactory")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+
+
+== REST
+
+=== Wywoływanie serwisu REST
+
+----
+@Service
+public class MyBean {
+
+    private final RestTemplate restTemplate;
+
+    public MyBean(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+    }
+
+    public Details someRestCall(String name) {
+        return this.restTemplate.getForObject("/{name}/details", Details.class, name);
+    }
+
+}
+----
+
+
+=== Dostrojenie RESTTemplate
+
+----
+static class ProxyCustomizer implements RestTemplateCustomizer {
+
+    @Override
+    public void customize(RestTemplate restTemplate) {
+        HttpHost proxy = new HttpHost("proxy.example.com");
+        HttpClient httpClient = HttpClientBuilder.create()
+                .setRoutePlanner(new DefaultProxyRoutePlanner(proxy) {
+
+                    @Override
+                    public HttpHost determineProxy(HttpHost target,
+                            HttpRequest request, HttpContext context)
+                                    throws HttpException {
+                        if (target.getHostName().equals("192.168.0.5")) {
+                            return null;
+                        }
+                        return super.determineProxy(target, request, context);
+                    }
+
+                }).build();
+        restTemplate.setRequestFactory(
+                new HttpComponentsClientHttpRequestFactory(httpClient));
+    }
+
+}
+----
+
+== Sending email
+
+If spring.mail.host and the relevant libraries (as defined by spring-boot-starter-mail) are available, a default JavaMailSender is created if none exists. The sender can be further customized by configuration items from the spring.mail namespace, see the MailProperties for more details.
+
+== Spring Session
+
+ Spring Session
+
+Spring Boot provides Spring Session auto-configuration for a wide range of stores:
+
+    JDBC
+    MongoDB
+    Redis
+    Hazelcast
+    HashMap
+
+If Spring Session is available, you only need to choose the StoreType that you wish to use to store the sessions. For instance to use JDBC as backend store, you’d configure your application as follows:
+
+spring.session.store-type=jdbc
+
+[Note]
+
+For backward compatibility if Redis is available Spring Session will be automatically configured to use Redis.
+[Tip]
+
+You can disable Spring Session by setting the store-type to none.
+
+Each store has specific additional settings. For instance it is possible to customize the name of the table for the jdbc store:
+
+spring.session.jdbc.table-name=SESSIONS
+
+
+== Monitoring and management over JMX
+
+ By default Spring Boot will create an MBeanServer with bean id ‘mbeanServer’ and expose any of your beans that are annotated with Spring JMX annotations (@ManagedResource, @ManagedAttribute, @ManagedOperation).
+ 
+ 
+==  Testing
+
+est support is provided by two modules; spring-boot-test contains core items, and spring-boot-test-autoconfigure supports auto-configuration for tests.
+
+Most developers will just use the spring-boot-starter-test ‘Starter’ which imports both Spring Boot test modules as well has JUnit, AssertJ, Hamcrest and a number of other useful libraries.
+
+
+If you use the spring-boot-starter-test ‘Starter’ (in the test scope), you will find the following provided libraries:
+
+    JUnit — The de-facto standard for unit testing Java applications.
+    Spring Test & Spring Boot Test — Utilities and integration test support for Spring Boot applications.
+    AssertJ — A fluent assertion library.
+    Hamcrest — A library of matcher objects (also known as constraints or predicates).
+    Mockito — A Java mocking framework.
+    JSONassert — An assertion library for JSON.
+    JsonPath — XPath for JSON.
+
+== Konfigurowanie
+
+Under the hood, auto-configuration is implemented with standard @Configuration classes. Additional @Conditional annotations are used to constrain when the auto-configuration should apply. Usually auto-configuration classes use @ConditionalOnClass and @ConditionalOnMissingBean annotations. This ensures that auto-configuration only applies when relevant classes are found and when you have not declared your own @Configuration.
+
+You can browse the source code of spring-boot-autoconfigure to see the @Configuration classes that we provide (see the META-INF/spring.factories file).
+
+
+===  Locating auto-configuration candidates
+
+
+Spring Boot checks for the presence of a META-INF/spring.factories file within your published jar. The file should list your configuration classes under the EnableAutoConfiguration key.
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.mycorp.libx.autoconfigure.LibXAutoConfiguration,\
+com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
+
+
+
+You can use the @AutoConfigureAfter or @AutoConfigureBefore annotations if your configuration needs to be applied in a specific order
+
+
+You almost always want to include one or more @Conditional annotations on your auto-configuration class. The @ConditionalOnMissingBean is one common example that is used to allow developers to ‘override’ auto-configuration if they are not happy with your defaults.
+
+Spring Boot includes a number of @Conditional annotations that you can reuse in your own code by annotating @Configuration classes or individual @Bean methods.
+
+
+===  Class conditions
+
+
+The @ConditionalOnClass and @ConditionalOnMissingClass annotations allows configuration to be included based on the presence or absence of specific classes. Due to the fact that annotation metadata is parsed using ASM you can actually use the value attribute to refer to the real class, even though that class might not actually appear on the running application classpath. You can also use the name attribute if you prefer to specify the class name using a String value.
+
+=== Bean conditions
+
+The @ConditionalOnBean and @ConditionalOnMissingBean annotations allow a bean to be included based on the presence or absence of specific beans. You can use the value attribute to specify beans by type, or name to specify beans by name. The search attribute allows you to limit the ApplicationContext hierarchy that should be considered when searching for beans.
+
+
+
+=== Property conditions
+
+The @ConditionalOnProperty annotation allows configuration to be included based on a Spring Environment property. Use the prefix and name attributes to specify the property that should be checked. By default any property that exists and is not equal to false will be matched. You can also create more advanced checks using the havingValue and matchIfMissing attributes.
+
+
+=== Web application conditions
+
+The @ConditionalOnWebApplication and @ConditionalOnNotWebApplication annotations allow configuration to be included depending on whether the application is a 'web application'. A web application is any application that is using a Spring WebApplicationContext, defines a session scope or has a StandardServletEnvironment.
+
+===  SpEL expression conditions
+
+The @ConditionalOnExpression annotation allows configuration to be included based on the result of a SpEL expression.
+
+
+=== Creating your own starter
+
+A full Spring Boot starter for a library may contain the following components:
+
+    The autoconfigure module that contains the auto-configuration code.
+    The starter module that provides a dependency to the autoconfigure module as well as the library and any additional dependencies that are typically useful. In a nutshell, adding the starter should be enough to start using that library.
+
+[Tip]
+
+You may combine the auto-configuration code and the dependency management in a single module if you don’t need to separate those two concerns.
+
+
+
+    
+
+    
