@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+import pl.java.scalatech.compoment.SomeApplicationSettings;
 import pl.java.scalatech.compoment.StartupComponent;
 import pl.java.scalatech.domain.Invoice;
 import pl.java.scalatech.domain.User;
@@ -15,10 +17,12 @@ import pl.java.scalatech.repository.InvoiceRepository;
 import pl.java.scalatech.repository.UserRepository;
 
 @SpringBootApplication // <1>
+@EnableConfigurationProperties({SomeApplicationSettings.class})
 public class SpringBootKataApplication implements CommandLineRunner{ // <2>
 
     @Autowired // <3>
     private StartupComponent startup;
+    
     
     @Autowired
     private UserRepository userRepository; 

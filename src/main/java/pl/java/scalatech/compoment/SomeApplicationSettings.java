@@ -1,18 +1,19 @@
 package pl.java.scalatech.compoment;
 
-import java.math.BigDecimal;
 import java.net.URL;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
 @Component
 @ConfigurationProperties(prefix = "app")
+@EnableConfigurationProperties
 @Data
 public class SomeApplicationSettings {
 
