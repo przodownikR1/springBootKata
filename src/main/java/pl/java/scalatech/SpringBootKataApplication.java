@@ -13,6 +13,12 @@ public class SpringBootKataApplication {
     private StartupComponent startup;
     
     public static void main(String[] args) {
-        SpringApplication.run(SpringBootKataApplication.class, args);
-    }
+        //http://patorjk.com
+      
+        }
+        
+    
 }
+//-Dbanner.location=classpath:/META-INF/banner.txt
+
+//application properties : banner.location=classpath:/META-INF/banner.txt

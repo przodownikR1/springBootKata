@@ -1,0 +1,4 @@
+12:04:31:825 | INFO  | o.s.c.s.GenericApplicationContext | Closing org.springframework.context.support.GenericApplicationContext@3bbc39f8: startup date [Thu Aug 04 12:04:31 CEST 2016]; root of context hierarchy
+12:05:54:378 | INFO  | o.s.c.s.GenericApplicationContext | Closing org.springframework.context.support.GenericApplicationContext@589b3632: startup date [Thu Aug 04 12:05:54 CEST 2016]; root of context hierarchy
+13:24:37:109 | INFO  | o.s.c.s.GenericApplicationContext | Closing org.springframework.context.support.GenericApplicationContext@8e0379d: startup date [Thu Aug 04 13:24:36 CEST 2016]; root of context hierarchy
+13:26:17:796 | INFO  | o.s.c.s.GenericApplicationContext | Closing org.springframework.context.support.GenericApplicationContext@8e0379d: startup date [Thu Aug 04 13:26:17 CEST 2016]; root of context hierarchy

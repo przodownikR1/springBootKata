@@ -1,0 +1,4 @@
+16:21:06:961 | INFO  | o.s.w.c.s.GenericWebApplicationContext | Closing org.springframework.web.context.support.GenericWebApplicationContext@24569dba: startup date [Fri Aug 05 16:20:55 CEST 2016]; root of context hierarchy
+16:21:06:976 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+16:21:06:977 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+16:21:06:989 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete

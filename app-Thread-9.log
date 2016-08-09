@@ -1,0 +1,88 @@
+09:55:12:535 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@2e1c985c: startup date [Thu Aug 04 09:50:37 CEST 2016]; root of context hierarchy
+09:55:12:553 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+09:55:12:555 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+09:55:12:557 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+09:55:12:558 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+09:55:12:561 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+09:55:12:562 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+09:55:12:570 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+13:30:53:380 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@5a55882f: startup date [Thu Aug 04 13:29:39 CEST 2016]; root of context hierarchy
+13:30:53:384 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+13:30:53:386 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:30:53:387 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+13:30:53:388 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:30:53:390 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+13:30:53:390 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+13:30:53:401 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+13:35:02:991 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@5a55882f: startup date [Thu Aug 04 13:34:15 CEST 2016]; root of context hierarchy
+13:35:02:998 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+13:35:03:001 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:35:03:002 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+13:35:03:003 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:35:03:005 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+13:35:03:005 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+13:35:03:010 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+13:36:17:700 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@3e477209: startup date [Thu Aug 04 13:35:14 CEST 2016]; root of context hierarchy
+13:36:17:703 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+13:36:17:706 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:36:17:706 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+13:36:17:707 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:36:17:710 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+13:36:17:711 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+13:36:17:721 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+13:48:06:997 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@5675a18: startup date [Thu Aug 04 13:46:35 CEST 2016]; root of context hierarchy
+13:48:07:004 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+13:48:07:011 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:48:07:012 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+13:48:07:013 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:48:07:015 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+13:48:07:016 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+13:48:07:024 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+13:54:44:743 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@5675a18: startup date [Thu Aug 04 13:54:22 CEST 2016]; root of context hierarchy
+13:54:44:748 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+13:54:44:751 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:54:44:752 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+13:54:44:753 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+13:54:44:754 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+13:54:44:755 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+13:54:44:760 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+14:11:06:792 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@3c5c9063: startup date [Thu Aug 04 14:07:10 CEST 2016]; root of context hierarchy
+14:11:06:797 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+14:11:06:800 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:11:06:801 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+14:11:06:802 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:11:06:804 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+14:11:06:804 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+14:11:06:810 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+14:12:30:461 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@5675a18: startup date [Thu Aug 04 14:12:03 CEST 2016]; root of context hierarchy
+14:12:30:468 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+14:12:30:471 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:12:30:477 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+14:12:30:478 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:12:30:480 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+14:12:30:481 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+14:12:30:495 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+14:16:10:379 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@5675a18: startup date [Thu Aug 04 14:12:41 CEST 2016]; root of context hierarchy
+14:16:10:387 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+14:16:10:391 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:16:10:392 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+14:16:10:393 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:16:10:398 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+14:16:10:400 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+14:16:10:411 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+14:20:03:911 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@3c5c9063: startup date [Thu Aug 04 14:16:21 CEST 2016]; root of context hierarchy
+14:20:03:914 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+14:20:03:918 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:20:03:919 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+14:20:03:920 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:20:03:923 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+14:20:03:923 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+14:20:03:935 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
+14:21:44:665 | INFO  | o.s.b.c.e.AnnotationConfigEmbeddedWebApplicationContext | Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@3c5c9063: startup date [Thu Aug 04 14:20:15 CEST 2016]; root of context hierarchy
+14:21:44:676 | INFO  | o.s.c.s.DefaultLifecycleProcessor | Stopping beans in phase 0
+14:21:44:682 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:21:44:688 | INFO  | o.s.b.a.e.j.EndpointMBeanExporter | Unregistering JMX-exposed beans
+14:21:44:690 | INFO  | o.s.j.e.a.AnnotationMBeanExporter | Unregistering JMX-exposed beans on shutdown
+14:21:44:693 | INFO  | o.s.o.j.LocalContainerEntityManagerFactoryBean | Closing JPA EntityManagerFactory for persistence unit 'default'
+14:21:44:693 | INFO  | o.h.t.h.SchemaExport | HHH000227: Running hbm2ddl schema export
+14:21:44:702 | INFO  | o.h.t.h.SchemaExport | HHH000230: Schema export complete
