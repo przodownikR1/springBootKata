@@ -1,0 +1,191 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Messaging
+
+
+=== JMS
+
+
+=== ActiveMQ support
+
+----
+spring-boot-starter-activemq
+----
+
+
+----
+spring.activemq.broker-url=tcp://192.168.1.210:9876
+spring.activemq.user=admin
+spring.activemq.password=secret
+----
+
+
+=== @EnableJms
+
+
+
+=== Wysyłanie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    private final JmsTemplate jmsTemplate;
+
+    @Autowired
+    public MyBean(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
+    // ...
+
+}
+----
+
+=== Odbieranie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    @JmsListener(destination = "someQueue")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+
+
+----
+
+If you need to create more JmsListenerContainerFactory instances or if you want to override the default, Spring Boot provides a DefaultJmsListenerContainerFactoryConfigurer that you can use to initialize a DefaultJmsListenerContainerFactory with the same settings as the one that is auto-configured.
+
+For instance, the following exposes another factory that uses a specific MessageConverter:
+
+@Configuration
+static class JmsConfiguration {
+
+    @Bean
+    public DefaultJmsListenerContainerFactory myFactory(
+            DefaultJmsListenerContainerFactoryConfigurer configurer) {
+        DefaultJmsListenerContainerFactory factory =
+                new DefaultJmsListenerContainerFactory();
+        configurer.configure(factory, connectionFactory());
+        factory.setMessageConverter(myMessageConverter());
+        return factory;
+    }
+
+}
+
+Then you can use in any @JmsListener-annotated method as follows:
+
+@Component
+public class MyBean {
+
+    @JmsListener(destination = "someQueue", containerFactory="myFactory")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+
+----
+
+=== AMQP
+
+----
+spring-boot-starter-amqp
+----
+
+
+=== RabbitMQ support
+
+----
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=admin
+spring.rabbitmq.password=secret
+----
+
+=== Wysyłanie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    private final AmqpAdmin amqpAdmin;
+    private final AmqpTemplate amqpTemplate;
+
+    @Autowired
+    public MyBean(AmqpAdmin amqpAdmin, AmqpTemplate amqpTemplate) {
+        this.amqpAdmin = amqpAdmin;
+        this.amqpTemplate = amqpTemplate;
+    }
+
+    // ...
+
+}
+----
+
+=== Odbieranie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    @RabbitListener(queues = "someQueue")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+
+
+
+----
+If you need to create more RabbitListenerContainerFactory instances or if you want to override the default, Spring Boot provides a SimpleRabbitListenerContainerFactoryConfigurer that you can use to initialize a SimpleRabbitListenerContainerFactory with the same settings as the one that is auto-configured.
+
+For instance, the following exposes another factory that uses a specific MessageConverter:
+
+@Configuration
+static class RabbitConfiguration {
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory myFactory(
+            SimpleRabbitListenerContainerFactoryConfigurer configurer) {
+        SimpleRabbitListenerContainerFactory factory =
+                new SimpleRabbitListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        factory.setMessageConverter(myMessageConverter());
+        return factory;
+    }
+
+}
+
+Then you can use in any @RabbitListener-annotated method as follows:
+
+@Component
+public class MyBean {
+
+    @RabbitListener(queues = "someQueue", containerFactory="myFactory")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+

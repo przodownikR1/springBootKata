@@ -1,0 +1,145 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== ORM
+
+----
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.hsqldb</groupId>
+    <artifactId>hsqldb</artifactId>
+    <scope>runtime</scope>
+</dependency>
+
+----
+
+NOTE : spring-jdbc for an embedded database to be auto-configured.
+
+NOTE :. If you’re using H2 you should use DB_CLOSE_ON_EXIT=FALSE 
+
+=== Connection to a production database
+
+
+    We prefer the Tomcat pooling DataSource for its performance and concurrency, so if that is available we always choose it.
+    Otherwise, if HikariCP is available we will use it.
+    If neither the Tomcat pooling datasource nor HikariCP are available and if Commons DBCP is available we will use it, but we don’t recommend it in production.
+    Lastly, if Commons DBCP2 is available we will use it.
+    
+    
+NOTE: spring-boot-starter-jdbc or spring-boot-starter-data-jpa ‘starters’ you will automatically get a dependency to tomcat-jdbc.
+
+
+----
+spring.datasource.url=jdbc:mysql://localhost/test
+spring.datasource.username=dbuser
+spring.datasource.password=dbpass
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+
+----
+
+Default setting
+
+----
+# Number of ms to wait before throwing an exception if no connection is available.
+spring.datasource.tomcat.max-wait=10000
+
+# Maximum number of active connections that can be allocated from this pool at the same time.
+spring.datasource.tomcat.max-active=50
+
+# Validate the connection before borrowing it from the pool.
+spring.datasource.tomcat.test-on-borrow=true
+
+----
+
+
+=== JNDI
+
+----
+spring.datasource.jndi-name=java:jboss/datasources/customers
+----
+
+=== JdbcTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public MyBean(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    // ...
+
+}
+----
+
+** Tradycyjne podejście 
+
+----
+@Bean
+public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+return new JdbcTemplate(dataSource);
+}
+
+@Bean
+public DataSource dataSource() {
+ return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScripts('schema.sql', 'data.sql').build();
+}
+----
+
+** Podejście Spring Boot
+
+Jeśli Spring Boot wykryje bibiotekę H2 w swoim classpath automatycznie skonfiguruje wbudowanę bazę. Jeśli dodatkowo wykryje JdbcTemplate w swoim classpath skonfiguruje też tę zależność za Ciebie.
+
+
+
+
+=== JPA & Spring Data
+
+
+source: http://www.slideshare.net/marius_bogoevici/developing-realtime-data-pipelines-with-spring-and-kafka 
+
+image:spring-data.jpg[]
+
+
+
+    Hibernate — One of the most popular JPA implementations.
+    Spring Data JPA — Makes it easy to implement JPA-based repositories.
+    Spring ORMs — Core ORM support from the Spring Framework.
+    
+
+=== Using H2’s web console
+
+
+    You are developing a web application
+    com.h2database:h2 is on the classpath
+    You are using Spring Boot’s developer tools
+    
+    
+spring.h2.console.enabled 
+
+PATH : /h2-console
+
+=== Secure h2-console
+
+    security.user.role
+    security.basic.authorize-mode
+    security.basic.enabled
+   

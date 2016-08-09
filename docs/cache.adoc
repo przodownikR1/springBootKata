@@ -1,0 +1,65 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Caching
+
+
+=== Możliwi dostawcy
+
+    Generic
+    JCache (JSR-107)
+    EhCache 2.x
+    Hazelcast
+    Infinispan
+    Couchbase
+    Redis
+    Caffeine
+    Guava
+    Simple
+
+=== CacheManager
+
+----
+@Bean
+public CacheManagerCustomizer<ConcurrentMapCacheManager> cacheManagerCustomizer() {
+    return new CacheManagerCustomizer<ConcurrentMapCacheManager>() {
+        @Override
+        public void customize(ConcurrentMapCacheManager cacheManager) {
+            cacheManager.setCacheNames(Arrays.asList("one", "two"));
+        }
+    };
+}
+----
+
+
+=== EhCache 2.x
+
+spring.cache.ehcache.config=classpath:config/another-config.xml
+
+
+=== Guava
+
+
+If Guava is present, a GuavaCacheManager is auto-configured. Caches can be created on startup using the spring.cache.cache-names property and customized by one of the following (in this order):
+
+    A cache spec defined by spring.cache.guava.spec
+    A com.google.common.cache.CacheBuilderSpec bean is defined
+    A com.google.common.cache.CacheBuilder bean is defined
+
+For instance, the following configuration creates a foo and bar caches with a maximum size of 500 and a time to live of 10 minutes
+
+spring.cache.cache-names=foo,bar
+spring.cache.guava.spec=maximumSize=500,expireAfterAccess=600s
+
+Besides, if a com.google.common.cache.CacheLoader bean is defined, it is automatically associated to the GuavaCacheManager.

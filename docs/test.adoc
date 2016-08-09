@@ -1,0 +1,170 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+==  Testing
+
+
+=== Moduł 
+
+----
+spring-boot-starter-test
+----
+
+
+=== Zależności dodane : 
+
+** Spring Test
+** Spring Boot Test
+** JUnit
+** AssertJ
+** Hamcrest
+** Mockito
+** JsonPath
+** JSONAssert
+
+
+=== Testy integracyjne
+
+
+===Kopia
+@RunWith(SpringRunner.class)
+@ContextConfiguration
+classes
+@Configuration
+initializers
+ApplicationContextInitializer
+loader
+ContextLoader
+
+@SpringBootTest
+webEnvironment
+MOCK
+RANDOM_PORT
+DEFINED_PORT
+NONE
+
+@TestConfiguration
+@TestComponent
+
+@MockBean
+@LocalServerPort
+
+
+
+@JsonTest
+tylko bean’y:
+ObjectMapper
+@JsonComponent
+Module
+JacksonTester<MyJsonObject> json
+json.write(...)
+json.parse(...)
+
+
+==Kontrolery
+@WebMvcTest(MyController.class)
+tylko bean’y:
+oznaczone: @Controller, @ControllerAdvice, @JsonComponent
+typu: Filter, WebMvcConfigurer, HandlerMethodArgumentResolver
+dostarcza: @Autowired MockMvc mvc
+MockMvcRequestBuilders
+MockMvcResultMatchers
+
+
+==JPA
+@DataJpaTest
+tylko klasy @Entity
+domyślnie transakcja + rollback
+@Autowired TestEntityManager
+@AutoConfigureTestDatabase
+ANY
+AUTO_CONFIGURED
+NONE
+
+
+
+Testy klientów REST
+
+@RestClientTest(MyClientService.class)
+RestTemplateBuilder
+MockRestServiceServer
+server.expect(requestTo("/...")).andRespond(...)
+
+
+
+
+
+=== Testy punktów końcowych
+
+
+=== Testy jednostkowe
+
+
+
+
+
+est support is provided by two modules; spring-boot-test contains core items, and spring-boot-test-autoconfigure supports auto-configuration for tests.
+
+Most developers will just use the spring-boot-starter-test ‘Starter’ which imports both Spring Boot test modules as well has JUnit, AssertJ, Hamcrest and a number of other useful libraries.
+
+
+If you use the spring-boot-starter-test ‘Starter’ (in the test scope), you will find the following provided libraries:
+
+    JUnit — The de-facto standard for unit testing Java applications.
+    Spring Test & Spring Boot Test — Utilities and integration test support for Spring Boot applications.
+    AssertJ — A fluent assertion library.
+    Hamcrest — A library of matcher objects (also known as constraints or predicates).
+    Mockito — A Java mocking framework.
+    JSONassert — An assertion library for JSON.
+    JsonPath — XPath for JSON.
+
+Sample
+
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = SprintBootApplication.class)
+public class SprintBootApplicationTests {
+@Test
+public void contextLoads() {
+}
+}
+----
+
+
+
+@Test(expected=...)
+• @Test(timeout=...)
+• @Timed
+• @Repeat
+• @Ignore
+• @ProfileValueSourceConfiguration
+• @IfProfileValue
+
+
+=== Web
+
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = SprintBootWebApplication.class)
+@WebAppConfiguration
+public class SpringBootWebApplicationTests {
+@Test
+public void contextLoads() {
+}
+}
+----
+
+
+
+strona 119

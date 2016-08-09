@@ -1,0 +1,183 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== WEB
+
+=== Aktualne kontenery
+
+Tomcat 8 3.1 Java 7+
+
+Tomcat 7 3.0 Java 6+
+
+Jetty 9.3 3.1  Java 8+
+
+Jetty 9.2  3.1  Java 7+
+
+Jetty 8 3.0  Java 6+
+
+Undertow 1.3 3.1 Java 7+
+
+
+=== Spring MVC auto-configuration
+
+
+** Włączenie ContentNegotiatingViewResolver & BeanViewResolver
+
+** Wsparcie dla sewrowania kontentu statycznego & webjars
+
+** Automatyczna rejestracja kowerterów i formaterów
+
+** Wsparcie dla HttpMessageConvertes
+
+** Automatyczna rejestracja MessageCodesResolver
+
+** Wsparcie dla statycznego index.html
+
+** favicon
+ 
+  
+=== Static Content
+
+spring.resources.staticLocations
+
+=== Template engines
+
+
+    FreeMarker
+    Groovy
+    Thymeleaf
+    Velocity (deprecated in 1.4)
+    Mustache
+    
+
+
+== Error Handling    
+
+@ControllerAdvice
+
+@ErrorHandler
+
+@SimpleErrorHandler
+
+
+             
+=== Custom error pages
+
+Od Spring Boot 1.4 wystarczy stworzyć plik o danym kodzie błędu i umieścić do w zasobach statycznych. Automatyczne mapowanie.
+
+
+
+== Rest
+
+=== Wywoływanie serwisu REST
+
+----
+@Service
+public class MyBean {
+
+    private final RestTemplate restTemplate;
+
+    public MyBean(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+    }
+
+    public Details someRestCall(String name) {
+        return this.restTemplate.getForObject("/{name}/details", Details.class, name);
+    }
+
+}
+----
+
+
+=== Dostrojenie RESTTemplate
+
+----
+static class ProxyCustomizer implements RestTemplateCustomizer {
+
+    @Override
+    public void customize(RestTemplate restTemplate) {
+        HttpHost proxy = new HttpHost("proxy.example.com");
+        HttpClient httpClient = HttpClientBuilder.create()
+                .setRoutePlanner(new DefaultProxyRoutePlanner(proxy) {
+
+                    @Override
+                    public HttpHost determineProxy(HttpHost target,
+                            HttpRequest request, HttpContext context)
+                                    throws HttpException {
+                        if (target.getHostName().equals("192.168.0.5")) {
+                            return null;
+                        }
+                        return super.determineProxy(target, request, context);
+                    }
+
+                }).build();
+        restTemplate.setRequestFactory(
+                new HttpComponentsClientHttpRequestFactory(httpClient));
+    }
+
+}
+----
+
+=== Richardson Maturity Model
+
+source : https://technobeans.wordpress.com/
+
+image:richardson-maturity-model.png[]
+
+
+
+=== Obsługa wyjątków
+
+** **DefaultHandlerExceptionResolver** 
+
+** **@ControllerAdvice** 
+** **@ExceptionHandler** 
+** **@ResponseStatus** 
+
+
+** **ErrorMvcAutoConfiguration** 
+
+ErrorController
+
+${error.path:/error}
+
+${error.whitelabel.enabled:true}
+
+
+=== Hateoas
+
+
+==KOPIA !!!!
+Media-Type
+@RequestMapping(produces, consumes)
+Resource
+Resources<T>
+ResourceAssembler
+PagedResourcesAssembler
+links
+ControllerLinkBuilder
+self
+
+
+==JSON
+
+==Kopia!!
+Jackson
+JacksonAutoConfiguration
+Object Mapper
+@Bean c.f.jackson.databind.Module
+JacksonProperties
+HttpMapperProperties
+MappingJackson2HttpMessageConverter
+@JsonView

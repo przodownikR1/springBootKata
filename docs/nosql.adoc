@@ -1,0 +1,127 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== NoSql
+
+== MongoDB
+
+Zależność : 
+
+----
+spring-boot-starter-data-mongodb             
+----
+
+===  MongoTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final MongoTemplate mongoTemplate;
+
+    @Autowired
+    public MyBean(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    // ...
+
+}
+----
+
+=== Spring Data MongoDB repositories
+
+----
+public interface CityRepository extends Repository<City, Long> {
+
+    Page<City> findAll(Pageable pageable);
+
+    City findByNameAndCountryAllIgnoringCase(String name, String country);
+
+}
+----
+
+
+=== Embedded Mongo
+
+Spring Boot offers auto-configuration for Embedded Mongo. To use it in your Spring Boot application add a dependency on de.flapdoodle.embed:de.flapdoodle.embed.mongo.
+
+The port that Mongo will listen on can be configured using the spring.data.mongodb.port property. To use a randomly allocated free port use a value of zero. The MongoClient created by MongoAutoConfiguration will be automatically configured to use the randomly allocated port.
+
+If you have SLF4J on the classpath, output produced by Mongo will be automatically routed to a logger named org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongo.
+
+You can declare your own IMongodConfig and IRuntimeConfig beans to take control of the Mongo instance’s configuration and logging routing.
+
+
+
+== Neo4j
+
+=== Connecting to a Neo4j database
+
+Neo4jSession, Session or Neo4jOperations 
+
+=== Neo4jTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final Neo4jTemplate neo4jTemplate;
+
+    @Autowired
+    public MyBean(Neo4jTemplate neo4jTemplate) {
+        this.neo4jTemplate = neo4jTemplate;
+    }
+
+    // ...
+
+}
+
+----
+
+----
+spring.data.neo4j.uri=http://my-server:7474
+spring.data.neo4j.username=neo4j
+spring.data.neo4j.password=secret
+----
+
+=== Using the embedded mode
+
+
+If you add org.neo4j:neo4j-ogm-embedded-driver to the dependencies of your application, Spring Boot will automatically configure an in-process embedded instance of Neo4j that will not persist any data when your application shuts down. You can explicitly disable that mode using spring.data.neo4j.embedded.enabled=false. You can also enable persistence for the embedded mode:
+
+    spring.data.neo4j.uri=file://var/tmp/graph.db
+    
+
+=== Neo4jSession
+
+By default, the lifetime of the session is scope to the application. If you are running a web application you can change it to scope or request easily:
+
+    spring.data.neo4j.session.scope=session
+    
+
+===  Spring Data Neo4j repositories
+
+@EnableNeo4jRepositories(basePackages = "com.example.myapp.repository")
+@EnableTransactionManagement
+
+----
+public interface CityRepository extends GraphRepository<City> {
+
+    Page<City> findAll(Pageable pageable);
+
+    City findByNameAndCountry(String name, String country);
+
+}
+----

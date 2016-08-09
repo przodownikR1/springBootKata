@@ -1,0 +1,155 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+exercise.txt
+
+Za pomoca narzędzia IDE lub ze strony spring.io
+
+wygeneruj szkielet aplikacji 
+
+Stwórz model Person
+
+
+Stwórz repozytorium do person
+
+
+Stwórz prosty kontroller, który wykona operacje CRUD na obiekcie domenowym Person
+
+
+
+KOPIA :Projektowanie REST-ful API ze Springiem
+
+dodaj do zależności:
+spring-boot-starter-hateoas
+dodaj proste operacje CRUD dla rezerwacji operujące na kolekcji obiektów w pamięci
+dodaj metodę wyszukiwania rezerwacji po nazwie rezerwującego
+dodaj nagłówek Location gdy tworzona jest rezerwacja wykorzystując:
+ResponseEntity#created
+ControllerLinkBuilder#linkTo
+ControllerLinkBuilder#methodOn
+
+
+
+spring-boot-starter-parent
+spring-boot-starter-data-jpa
+@EnableJpaRepositories
+schema.sql
+data.sql
+
+
+
+Abstrakcja Repository
+
+
+
+Repository
+CustomerRepository
+PagingAndSortingRepository
+JpaRepository
+@NoRepositoryBean
+
+
+
+
+findBy*
+Lastname
+LastnameAndFirstname
+LastnameOrFirstname
+AgeLessThan
+StartDateAfter
+FirstnameStartingWith
+...
+
+Specyfikacje
+
+
+JpaSpecificationExecutor
+List<T> findAll(Specification<T> spec)
+
+QueryDslJpaRepository
+List<T> findAll(Predicate predicate)
+
+
+Metody niestandardowe
+
+
+
+interface UserRepositoryCustom
+
+class UserRepositoryImpl  implements UserRepositoryCustom
+
+interface UserRepository extends CrudRepository<User, Long>, UserRepositoryCustom
+
+
+wsparcie dla Web MVC
+
+@EnableSpringDataWebSupport
+DomainClassConverter
+HandlerMethodArgumentResolvers
+Pageable
+Sort
+
+
+
+Spring Data REST
+
+
+
+spring-boot-starter-data-rest
+RepositoryRestMvcAutoConfiguration
+spring.data.rest.*
+RepositoryRestConfiguration
+@RepositoryRestResource
+ResourceProcessor
+
+
+
+odaj do zależności:
+com.h2database:h2
+spring-boot-starter-data-jpa
+spring-boot-starter-data-rest
+dodaj adnotacje JPA do modelu rezerwacji
+dodaj JpaRepository dla rezerwacji i oznacz je jako @RepositoryRestResource
+dodaj metodę wyszukiwania rezerwacji po nazwie rezerwującego
+dodaj CommandLineRunner wpisujący do bazy kilka rekordów
+dodaj ResourceProcessor<Resource<Reservation>> dodając link do zdjęcia w postaci odwołania do wyszukania w grafikach google
+
+
+
+
+
+napisz test perzystencji encji rezerwacji
+napisz test serializacji encji rezerwacji
+napisz test integracyjny MVC potwierdzający że link do zdjęcia jest zwrócony dla daej rezerwacji
+
+
+
+
+odaj zależności:
+spring-boot-starter-actuator
+org.springframework.data:spring-data-rest-hal-browser
+dodaj swój własny HealthIndicator
+dodaj wersję i nazwę artefaktu do /info
+przejrzyj API acutator’a przy pomocy przeglądarki HAL
+
+
+
+
+
+
+dodaj zależności:
+spring-boot-starter-remote-shell
+zaloguj się na swoją aplikację przez ssh
+
+

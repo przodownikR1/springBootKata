@@ -1,0 +1,153 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Logowanie
+
+
+Spring Boot domyślnie używa Commons Logging dla wszystkich wewnętrznych logowań
+
+Domyślna konfiguracja jest dostarczona dla rozwiązań typu : 
+
+** Java Util Logging
+
+**Log4J2
+
+**Logback.
+
+
+Domyślnie przez użycie 'Staters' Logback będzie użyty do logowania
+
+NOTE: Bardzo dobre rozwiązanie.
+
+NOTE: Połącz Logback z Lombok w celu eliminacji boilerplate code
+
+    Date and Time — Millisecond precision and easily sortable.
+    Log Level — ERROR, WARN, INFO, DEBUG or TRACE.
+    Process ID.
+    A --- separator to distinguish the start of actual log messages.
+    Thread name — Enclosed in square brackets (may be truncated for console output).
+    Logger name — This is usually the source class name (often abbreviated).
+    The log message.
+    
+NOTE: Logback nie używa poziomu FATAL dla niego odpowiednikiem będzie ERROR 
+
+=== Console
+
+ java -jar myapp.jar --debug
+ 
+ debug=true in your application.properties.
+ 
+ 
+ --debug
+ 
+ 
+===  Colorowanie wyjścia 
+
+
+----
+%clr(%5p)
+
+Level   Color
+
+FATAL    Red
+
+ERROR    Red
+
+WARN    Yellow
+
+INFO    Green
+
+DEBUG  Green
+
+TRACE  Green
+
+%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){yellow}
+
+    blue
+    cyan
+    faint
+    green
+    magenta
+    red
+    yellow
+----
+    
+=== Pliki z logami
+
+Domyślnie Spring Boot loguje tylko na konsole a nie zapisuje logów do żadnych plików.
+
+NOTE: Jest to słabe rozwiązanie w wielu powodów.
+
+
+logging.file or logging.path property (for example in your application.properties).
+
+
+logging.file    logging.path    Example Description
+
+(none)
+    
+
+(none)
+        
+
+Console only logging.
+
+Specific file
+    
+
+(none)
+    
+
+my.log
+    
+
+Writes to the specified log file. Names can be an exact location or relative to the current directory.
+
+(none)
+    
+
+Specific directory
+    
+
+/var/log
+    
+
+Writes spring.log to the specified directory. Names can be an exact location or relative to the current directory.
+
+
+
+=== Poziomy logowania
+
+logging.level.root=WARN
+logging.level.org.springframework.web=DEBUG
+logging.level.org.hibernate=ERROR
+
+
+=== Konfiguracja logów użytkownika
+
+
+** **Logback**
+    
+
+logback-spring.xml, logback-spring.groovy, logback.xml, logback.groovy
+
+** **Log4j2**
+    
+
+log4j2-spring.xml, log4j2.xml
+
+**  **JDK (Java Util Logging)**
+    
+
+logging.properties

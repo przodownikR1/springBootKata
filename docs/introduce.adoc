@@ -1,0 +1,217 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Co to jest Spring Boot ?
+
+source: http://www.slideshare.net/roynilanjan/spring-boot-for-buidling-microservices
+
+image:spring-modules.jpg[]
+
+== Moduły
+
+** Spring Boot
+
+** Spring Boot Autoconfigure @EnableAutoConfiguration  / tworzenie kontekstu
+
+** Spring Boot Starters / zależności
+
+** Spring Boot CLI / groovy i java command line runner
+
+** Spring Boot Actuator / production ready features 
+
+** Spring Boot Tools / budowanie jar / war
+
+** Spring Boot Samples / przykłady
+
+== Cechy i cechy
+
+** Błyskawiczne wytwarzanie
+
+** Prototypowanie
+
+** Eliminacja XML
+
+** Autokonfiguracja
+
+*** Prostota konfiguracji zależności
+
+*** Prostota konfiguracji aplikacji
+
+** Starters dependencies
+
+** Command-line interface
+
+** Wbudowany kontener Tomcat lub Jetty
+
+** Zcentralizowana konfiguracja 
+
+*** application.properties
+
+*** application.yml
+
+** Profile
+
+
+
+** Monitoring
+
+*** Actuator
+
+** Microservices :)
+
+source: https://www.nginx.com/blog/building-microservices-inter-process-communication/
+
+image:Richardson-microservices-part1-1_monolithic-architecture.png[]
+
+image:Richardson-microservices-part2-3_api-gateway.png[]
+
+image:Richardson-microservices-part3-monolith-vs-microservices.png[]
+
+image:Richardson-microservices-part3-taxi-service.png[]
+
+image:mono-vs-mirco.png[]
+
+Za : 
+
+*** łatwość wytwarzania aplikacji typu  'stand-alone' gotowych na wdrożenie produkcyjne
+
+*** szybka konfiguracja wykorzystująca model Convention over Configuration
+
+*** możliwość wyrzucenia konfiguracji poza projekt
+
+*** wczechobecny jar zamiast starego ear czy war 
+
+*** szybki deploy
+
+*** wielkie serwery aplikacyjne
+
+*** monolit - utrzymywanie i rozwijanie
+
+*** splątane zależności
+
+*** małe autonomiczne usługi
+
+*** małe autonomiczne zespoły
+
+*** łatwość zrozumienia domeny
+
+*** łatwa skalowalność
+
+*** izolacja sytuacji krytycznych
+
+*** dobór odpowiednich narzędzi i języków do danej domeny
+
+***   
+
+Przeciw : 
+
+*** testowanie
+
+*** debugowanie
+
+*** próg wejścia
+
+*** nowe wzorce architektoniczne
+
+*** zwiększona pamięciożerność
+
+
+NOTE : Aktualna wersja 1.4.0.RELEASE wymaga Java 7 i Spring Framework 4.3.2.RELEASE lub wyżej
+
+
+== Dokumentacja 
+
+http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/[dokumentacja]
+
+== Narzędzia & generowanie rusztowania Spring Boot
+
+=== http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/1.4.0.RELEASE/spring-boot-cli-1.4.0.RELEASE-bin.zip[Spring Boot CLI]
+
+----
+spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force
+----
+
+=== STS
+
+=== IDEA
+
+=== https://start.spring.io/[Initializr]
+
+
+== Spring Boot 1.4 features
+
+=== Banner
+
+=== Error page
+
+== http://projects.spring.io/spring-boot/[Strona projektu] 
+
+
+
+== Spring vs Spring Boot
+
+=== Podejście standardowe
+
+** Projekt webowy musi zawierać folder WEB-INF
+
+*** opjonalny plik : web.xml
+
+*** <servlet-name>-servlet.xml
+
+
+=== Aplikacja WEB/REST
+
+
+** Stworzenie pliku web.xml lub WebApplicationInitializer, żeby zadeklarować DispatcherServlet
+
+**  Skonfigurowanie Spring MVC
+
+** Stworzenie prostego kontrolera i zarejestrowanie go
+
+** Odpalenie aplikacji na jakimś kontenerze servletów lub serwerze aplikacyjnym
+
+
+
+*** Przykład / Prosty kontroller 
+
+
+[source,java]
+----
+@Controller
+@EnableAutoConfiguration
+public class SampleController {
+
+    @RequestMapping("/")
+    @ResponseBody
+    String home() {
+        return "Hello World!";
+    }
+
+    public static void main(String[] args) throws Exception { //configuration & bootstrapping
+        SpringApplication.run(SampleController.class, args);
+    }
+}
+----
+
+
+[source,java]
+----
+@RestController
+public class SimpleWebController {
+@RequestMapping("/")
+public String greetings(){
+return "Hello world";
+}
+}
+----

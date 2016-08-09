@@ -1,0 +1,171 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== @Conditional
+
+== Konfiguracja 
+
+** Spring java config
+
+*** Bean
+
+*** @Configuration
+
+*** @ImportResource
+
+*** @ComponentScan
+
+*** @Import
+
+** Spring annotation
+
+*** @ImportResource
+
+*** @ComponentScan
+
+*** @Import
+
+** Spring profiles
+
+** yaml/properties
+
+
+
+
+** @SpringBootApplication - umożliwia skanowanie komponentów oraz auto-konfigurację
+
+
+
+
+=== Blokowanie wybranej autokonfiguracji
+
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+
+** Przykład
+
+** @EnableAutoConfiguration(exclude=[ActiveMQAutoConfiguration.class])
+
+To samo co : 
+
+** @SpringBootApplication( exclude={ActiveMQAutoConfiguration.class} )
+
+
+
+=== @SpringBootApplication
+
+To samo co : @Configuration + @EnableAutoConfiguration + @ComponentScan
+
+
+===  Lokalizowanie kandydatów do auto-konfiguracji
+
+Spring Boot sprawdza  plik **META-INF/spring.factories**  w opublikowanych jarach. 
+Taki plik powinien zawierać listę klas konfiguracyjnych oznaczonych @EnableAutoConfiguration
+
+
+== @Enable
+
+== Konfigurowanie
+
+Under the hood, auto-configuration is implemented with standard @Configuration classes. Additional @Conditional annotations are used to constrain when the auto-configuration should apply. Usually auto-configuration classes use @ConditionalOnClass and @ConditionalOnMissingBean annotations. This ensures that auto-configuration only applies when relevant classes are found and when you have not declared your own @Configuration.
+
+You can browse the source code of spring-boot-autoconfigure to see the @Configuration classes that we provide (see the META-INF/spring.factories file).
+
+
+===  Locating auto-configuration candidates
+
+
+Spring Boot checks for the presence of a META-INF/spring.factories file within your published jar. The file should list your configuration classes under the EnableAutoConfiguration key.
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.mycorp.libx.autoconfigure.LibXAutoConfiguration,\
+com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
+
+
+
+You can use the @AutoConfigureAfter or @AutoConfigureBefore annotations if your configuration needs to be applied in a specific order
+
+
+You almost always want to include one or more @Conditional annotations on your auto-configuration class. The @ConditionalOnMissingBean is one common example that is used to allow developers to ‘override’ auto-configuration if they are not happy with your defaults.
+
+Spring Boot includes a number of @Conditional annotations that you can reuse in your own code by annotating @Configuration classes or individual @Bean methods.
+
+
+===  Class conditions
+
+
+The @ConditionalOnClass and @ConditionalOnMissingClass annotations allows configuration to be included based on the presence or absence of specific classes. Due to the fact that annotation metadata is parsed using ASM you can actually use the value attribute to refer to the real class, even though that class might not actually appear on the running application classpath. You can also use the name attribute if you prefer to specify the class name using a String value.
+
+=== Bean conditions
+
+The @ConditionalOnBean and @ConditionalOnMissingBean annotations allow a bean to be included based on the presence or absence of specific beans. You can use the value attribute to specify beans by type, or name to specify beans by name. The search attribute allows you to limit the ApplicationContext hierarchy that should be considered when searching for beans.
+
+
+
+=== Property conditions
+
+The @ConditionalOnProperty annotation allows configuration to be included based on a Spring Environment property. Use the prefix and name attributes to specify the property that should be checked. By default any property that exists and is not equal to false will be matched. You can also create more advanced checks using the havingValue and matchIfMissing attributes.
+
+
+=== Web application conditions
+
+The @ConditionalOnWebApplication and @ConditionalOnNotWebApplication annotations allow configuration to be included depending on whether the application is a 'web application'. A web application is any application that is using a Spring WebApplicationContext, defines a session scope or has a StandardServletEnvironment.
+
+===  SpEL expression conditions
+
+The @ConditionalOnExpression annotation allows configuration to be included based on the result of a SpEL expression.
+
+
+=== Creating your own starter
+
+A full Spring Boot starter for a library may contain the following components:
+
+    The autoconfigure module that contains the auto-configuration code.
+    The starter module that provides a dependency to the autoconfigure module as well as the library and any additional dependencies that are typically useful. In a nutshell, adding the starter should be enough to start using that library.
+
+[Tip]
+
+You may combine the auto-configuration code and the dependency management in a single module if you don’t need to separate those two concerns.
+
+** **@ConditionalOnClass**
+** **@ConditionalOnExpression**
+** **@ConditionalOnJava**
+** **@ConditionalOnJndi**
+** **@ConditionalOnMissingBean**
+** **@ConditionalOnMissingClass**
+** **@ConditionalOnProperty**
+** **@ConditionalOnResource**
+** **@ConditionalOnWebApplication**
+** **@ConditionalOnNotWebApplication**
+
+
+=== Ustawiamy kolejność 
+
+** **@AutoConfigureBefore**
+
+** **@AutoConfigureAfter**
+
+=== Znaczenie adnotacji
+** **META-INF/spring.factories**
+
+=== Właściwości
+
+** **@EnableConfigurationProperties**
+
+** **@ConfigurationProperties** & **prefix** & możliwa generacja json'a **META-INF/spring-configuration-metadata.json** 
+
+=== XML a  Spring Boot
+
+@ImportResource({"META-INF/services.xml","META-INF/repositories.xml"})
+
+@ImportResource("classpath:applicationContext.xml")

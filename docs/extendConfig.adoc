@@ -1,0 +1,291 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Konfigurowanie zewnętrzne
+
+===    @TestPropertySource annotations on your tests.
+===    Argumenty z linii poleceń - wywołanie
+===    Parametry z SPRING_APPLICATION_JSON 
+===    Parametry zawarte w ServletConfig init
+===    Parametry zawarte w  ServletContext init
+===    Skorzystanie z atrybutów JNDI poprzez java:comp/env.
+===    Skorzystanie z Java System properties (System.getProperties()).
+===    Skorzystanie z parametrów środowistkowych
+===    A RandomValuePropertySource that only has properties in random.*.
+===    Profile-specific znajdujące się poza jarem (application-{profile}.properties & YAML)
+===    Profile-specific znajdujące się w środku jar (application-{profile}.properties & YAML)
+===    Application properties znajdujące się poza  jar (application.properties & YAML)
+===    Application properties znajdujące się w środku jar (application.properties & YAML)
+===    @PropertySource na @Configuration
+===    Domyślne ustawienia poprzez użycie  SpringApplication.setDefaultProperties
+    
+
+NOTE: application.properties & application.yml powinni znajdować się na classpath aplikacji
+
+NOTE: Zmienne środowiskowe sprawdzą się podczas praktyki z chmurami.
+
+NOTE: Zawsze możesz użyć command-line
+
+----
+data.server=remoteserver:3030
+----
+
+=== Zmiana lokacji pliku ustawień i jego nazwy
+
+** /config umieszczony w bieżącym katalogu
+** bieżący katalog
+** /config w classpath
+** classpath
+
+
+Spring Boot kolejność wyszukiwania pliku z właściwościami to :
+** classpath
+** classpath:/config
+** file:
+** file:config/
+
+
+    
+=== Random
+
+----
+my.secret=${random.value}
+my.number=${random.int}
+my.bignumber=${random.long}
+my.uuid=${random.uuid}
+my.number.less.than.ten=${random.int(10)}
+my.number.in.range=${random.int[1024,65536]}
+----
+
+=== Placeholders w pliku properties
+
+----
+app.name=MyApp
+app.description=${app.name} is a Spring Boot application
+----
+
+
+=== YAML
+
+**SnakeYAML** jest ładowany z automatu przez  spring-boot-starter
+
+----
+environments:
+    dev:
+        url: http://dev.bar.com
+        name: Developer Setup
+    prod:
+        url: http://foo.bar.com
+        name: My Cool App
+----
+
+To samo co : 
+
+----
+environments.dev.url=http://dev.bar.com
+environments.dev.name=Developer Setup
+environments.prod.url=http://foo.bar.com
+environments.prod.name=My Cool App
+
+----
+
+----
+
+my:
+   servers:
+       - dev.bar.com
+       - foo.bar.com
+       
+----
+
+
+To samo co :
+
+----
+my.servers[0]=dev.bar.com
+my.servers[1]=foo.bar.com
+----
+
+
+=== ConfigurationProperties
+
+** Przykład
+
+**@ConfigurationProperties(prefix="my")**
+
+=== Type-safe Configuration Properties
+
+----
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    private String username;
+
+    private InetAddress remoteAddress;
+
+    // ... getters and setters
+
+}
+
+----
+
+Zarejestrować :
+
+
+----
+@Configuration
+@EnableConfigurationProperties(ConnectionProperties.class)
+public class MyConfiguration {
+}
+----
+   
+
+----
+@Component
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    // ... getters and setters
+
+}
+
+----
+
+----
+# application.yml
+
+connection:
+    username: admin
+    remoteAddress: 192.168.1.1
+
+# additional configuration as required
+----
+
+Użycie: 
+
+[source,java]
+----
+@Service
+public class MyService {
+
+    private final ConnectionProperties connection;
+
+    @Autowired
+    public MyService(ConnectionProperties connection) {
+        this.connection = connection;
+    }
+
+     //...
+
+    @PostConstruct
+    public void openConnection() {
+        Server server = new Server();
+        this.connection.configure(server);
+    }
+
+}
+----
+
+=== Relaxed binding
+
+----
+
+@ConfigurationProperties(prefix="person")
+public class OwnerProperties {
+
+    private String firstName;
+
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+}
+
+----
+
+person.firstName camel case
+   
+person.first-name .properties / .yml
+   
+person.first_name .properties / .yml
+    
+PERSON_FIRST_NAME Upper case format. system environment variables
+
+
+=== @ConfigurationProperties Validation
+
+NOTE: JSR-303 javax.validation 
+
+----
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    @NotNull
+    @Valid
+    private InetAddress remoteAddress;
+
+    // ... getters and setters
+
+}
+----
+
+=== Value
+
+** @Value
+
+=== PropertySource
+
+** @PropertySource
+
+== Profile
+
+** application-{profile}.properties
+
+*** Przykład 
+
+----
+application-qa.properties
+server.ip=localhost
+
+application-prod.properties
+server.ip=http://my-remote.server.com
+
+spring-boot:run -Dspring.profiles.active=prod
+
+----
+
+
+----
+@Configuration
+@Profile("production")
+public class ProductionConfiguration {
+
+    // ...
+
+}
+----
+
+----
+spring.profiles.active=dev,hsqldb
+----
+
+
+=== Programowalne ustawianie profilu
+
+**SpringApplication.setAdditionalProfiles(…​)** &   **ConfigurableEnvironment**
+
