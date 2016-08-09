@@ -46,9 +46,14 @@
     </appender>
 
 
+  <logger name="org.springframework.data.rest.webmvc.RepositoryRestHandlerMapping" level="warn" />
+  <logger name="org.springframework.data.rest.webmvc.BasePathAwareHandlerMapping" level="warn"/>
+  <logger name="org.springframework.context.support.PostProcessorRegistrationDelegate" level="warn"/>
+  <logger name="org.springframework.beans.factory.support.DefaultListableBeanFactory" level="warn"/>
+  <logger name="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" level="warn"/>
 	<root level="INFO">
 	    <appender-ref ref="console"/>
-	    <appender-ref ref="USER_SIFT"/>
-	    <appender-ref ref="SIFT"/>
+	 <!--    <appender-ref ref="USER_SIFT"/>
+	    <appender-ref ref="SIFT"/> -->
 	</root>
 </configuration>

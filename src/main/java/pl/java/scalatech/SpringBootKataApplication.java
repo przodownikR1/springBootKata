@@ -6,8 +6,14 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.metrics.Metric;
+import org.springframework.boot.actuate.metrics.repository.InMemoryMetricRepository;
+import org.springframework.boot.actuate.metrics.repository.MetricRepository;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
 
+import lombok.extern.slf4j.Slf4j;
 import pl.java.scalatech.compoment.StartupComponent;
 import pl.java.scalatech.domain.Invoice;
 import pl.java.scalatech.domain.User;
@@ -15,8 +21,15 @@ import pl.java.scalatech.repository.InvoiceRepository;
 import pl.java.scalatech.repository.UserRepository;
 
 @SpringBootApplication // <1>
+@Slf4j
 public class SpringBootKataApplication implements CommandLineRunner{ // <2>
 
+    @Autowired
+    private MetricRepository metricRepository;
+    
+    @Autowired
+    private ApplicationEventPublisher publisher;
+    
     @Autowired // <3>
     private StartupComponent startup;
     
@@ -36,8 +49,18 @@ public class SpringBootKataApplication implements CommandLineRunner{ // <2>
     public void run(String... args) throws Exception { // <5>
         createUser();
         createInvoice();
-        
+        metricRepository.set(new Metric("slawek", 123));
+        metricRepository.findAll().forEach(m->log.info("++++        {}",m));               
     }
+   
+    
+    
+    @Bean
+    InMemoryMetricRepository inMemoryMetricRepository() {
+        return new InMemoryMetricRepository();
+    }
+
+    
 
     private void createInvoice() {
         for(int i=0;i<35;i++){

@@ -1,0 +1,37 @@
+package pl.java.scalatech.health;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.metrics.Metric;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Component
+@Slf4j
+public class ApplicationContextMetrics implements PublicMetrics {
+    private ApplicationContext context;
+
+    @Autowired
+    public ApplicationContextMetrics(ApplicationContext context) {
+        this.context = context;
+        log.info("+++++++++++++++++++++++++++++++++++++++++++++++ Metrics");  
+    }
+
+    @Override
+    public Collection<Metric<?>> metrics() {
+        log.info("????????????????????????????????");
+        List<Metric<?>> metrics = new ArrayList<>();
+        metrics.add(new Metric<>("spring.context.startup-date", context.getStartupDate()));
+        metrics.add(new Metric<>("spring.beans.definitions", context.getBeanDefinitionCount()));
+        metrics.add(new Metric<>("spring.beans", context.getBeanNamesForType(Object.class).length));
+        metrics.add(new Metric<>("spring.controllers", context.getBeanNamesForAnnotation(Controller.class).length));
+        return metrics;
+    }
+
+}

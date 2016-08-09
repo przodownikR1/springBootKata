@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration  // <4>
 @EnableJpaRepositories(basePackages="pl.java.scalatech.repository") // <1>
 @Slf4j
-@EntityScan(basePackages="pl.java.scalatech.domain") // <2>
 public class JpaConfig {
     
     @PostConstruct // <3>
