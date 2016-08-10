@@ -31,16 +31,32 @@ dependencies {
 }
 ----
 
-spring.thymeleaf.cache
+spring.thymeleaf.cache  
 
-During development caching for Thymeleaf, Freemarker, Groovy Templates, Velocity and Mustache are all automatically disabled.
+podobnie dla :
+
+spring.thymeleaf.cache
+spring.freemarker.cache
+spring.velocity.cache
+spring.mustache.cache
+spring.groovy.template.cache
+
+
+=== Tuning
+
+spring:
+devtools:
+  restart:
+     exclude: /static/**,/templates/**
+
+
 
 ===  LiveReload plugin
 
 
 Wyłączenie : spring.devtools.livereload.enabled=false.
 
-=== Disabling restart
+=== Uniemożliwienie restartów
 
 [source,java]
 ----
@@ -50,7 +66,7 @@ public static void main(String[] args) {
 }
 ----
 
-=== Remote applications
+=== Zdalne aplikacje
 
 spring.devtools.remote.secret=mysecret
 

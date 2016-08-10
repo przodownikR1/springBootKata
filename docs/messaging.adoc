@@ -18,11 +18,27 @@ ifndef::imgsdir[:imgsdir: ./../images]
 === JMS
 
 
+If Boot spots
+JmsTemplate.class on the classpath, it's an indication that
+the developer has added spring-jms. In this situation, Boot will
+automatically create an instance of JmsTemplate and make it
+available for injection to other Spring beans. The developer must
+still provide a ConnectionFactory bean
+
+
+
 === ActiveMQ support
 
 ----
 spring-boot-starter-activemq
 ----
+
+----
+compile("org.springframework.boot:spring-boot-starter")
+compile("org.springframework:spring-jms")
+compile("org.apache.activemq:activemq-broker")
+----
+
 
 
 ----

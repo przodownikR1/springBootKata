@@ -14,6 +14,7 @@ ifndef::imgsdir[:imgsdir: ./../images]
 
 == ORM
 
+[source,xml]
 ----
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -26,6 +27,21 @@ ifndef::imgsdir[:imgsdir: ./../images]
 </dependency>
 
 ----
+
+
+** Przykład z H2
+
+[source,groovy]
+----
+dependencies {
+compile("org.springframework.boot:spring-boot-starter-data-jpa")
+compile("com.h2database:h2")
+}
+----
+
+
+TIP: Jeśli używasz H2 i devTools to domyślnie aktywuje się konsola webowa /h2-console
+
 
 NOTE : spring-jdbc for an embedded database to be auto-configured.
 
@@ -65,6 +81,64 @@ spring.datasource.tomcat.test-on-borrow=true
 
 ----
 
+
+=== Ładowanie danych z skryptu SQL
+
+----
+spring.datasource.platform: h2
+----
+
+Spring szuka sktyptu **data.sql** oraz dla innej platformy **db data-${platform}.sql**
+
+
+----
+src/main/resources/data-h2.sql
+
+insert into Person
+(id, name)
+values
+(1, 'przodownik');
+
+----
+
+
+=== Ładowanie danych programowe poprzez repozytoria 
+
+@PostConstruct lub @CommandLineRunner
+
+=== www.liquibase.org[Liquibase]
+
+Gradle
+
+----
+compile("org.liquibase:liquibase-core")
+----
+
+Maven
+
+----
+<dependency>
+<groupId>org.liquibase</groupId>
+<artifactId>liquibase-core</artifactId>
+</dependency>
+----
+
+=== http://flywaydb.org[Flyway]
+
+Gradle
+
+----
+compile("org.flywaydb:flyway-core")
+----
+
+Maven
+
+----
+<dependency>
+<groupId>org.flywayfb</groupId>
+<artifactId>flyway-core</artifactId>
+</dependency>
+----
 
 === JNDI
 

@@ -22,6 +22,33 @@ Zależność :
 spring-boot-starter-data-mongodb             
 ----
 
+
+=== Przykładowa encja
+
+[source,java]
+----
+@Document()
+public class Person {
+@Id
+private String id;
+private String name;
+@DBRef
+private List<Invoice> invoices;
+----
+
+The @DBRef annotation indicates that the collection is stored in a separate
+MongoDB collection instead of being nested directly inside teams .
+
+
+=== Parametryzacja
+
+----
+spring.data.mongodb.host= # the db host
+spring.data.mongodb.port=27017 # the connection port
+spring.data.mongodb.uri=mongodb://localhost/test # connection URL
+spring.data.mongo.repositories.enabled=true # if SD enabled
+----
+
 ===  MongoTemplate
 
 ----

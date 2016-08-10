@@ -248,6 +248,15 @@ public class ConnectionProperties {
 
 ** @Value
 
+Default values can be supplied directly with @Value("${propertyName:def
+aultValue}")
+•	 @Value defaults can be overridden in an application.properties file,
+which gets bundled with the app in a JAR file
+•	 Bundled properties can be overridden in an auxiliary application.
+properties file adjacent to the deployed JAR
+
+
+
 === PropertySource
 
 ** @PropertySource

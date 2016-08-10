@@ -149,6 +149,85 @@ You may combine the auto-configuration code and the dependency management in a s
 ** **@ConditionalOnNotWebApplication**
 
 
+=== Przykład 
+
+
+[source,java]
+----
+@Configuration
+@ConditionalOnClass(JmsTemplate.class)
+@ConditionalOnBean(ConnectionFactory.class)
+@EnableConfigurationProperties(JmsProperties.class)
+@AutoConfigureAfter({ HornetQAutoConfiguration.class,
+ActiveMQAutoConfiguration.class })
+public class JmsAutoConfiguration {
+@Autowired
+private JmsProperties properties;
+@Autowired
+private ConnectionFactory connectionFactory;
+...
+
+@Bean
+@ConditionalOnMissingBean
+public JmsTemplate jmsTemplate() {
+JmsTemplate jmsTemplate = new
+JmsTemplate(this.connectionFactory);
+jmsTemplate.setPubSubDomain(this.properties.isPubSubDomain());
+return jmsTemplate;
+}
+----
+
+
+----
+@Configuration : This class contains beans to be added to the
+application context
+•	 @ConditionOnClass : This class won't activate unless it detects JmsTemplate
+on the classpath (a tell-tale sign of spring-jms )
+•	 @ConditionalOnBean : This class won't activate unless a bean exists of type
+javax.jms.ConnectionFactory
+•	 @EnableConfigurationProperties : This class looks at JmsProperties
+for a set of property values
+•	 @AutoConfigureAfter : Only do this one after checking HornetQ and
+ActiveMQ auto-configuration settings to avoid a configuration race condition
+
+
+----
+
+=== Weryfikacja
+
+Inside your IDE, add --debug as a program argument. Then run it.
+•	 From the command line, execute ./gradlew clean build && java -jar
+build/libs/network-monitor-0.0.1-SNAPSHOT.jar --debug
+
+
+=== Health
+
+----
+@Component
+public class ActiveMQHealth implements HealthIndicator {
+private ConnectionFactory factory;
+@Autowired
+public ActiveMQHealth(ConnectionFactory factory) {
+this.factory = factory;
+}
+@Override
+public Health health() {
+try {
+factory.createConnection();
+} catch (JMSException e) {
+return new Health.Builder()
+.down(e)
+.build();
+}
+return new Health.Builder()
+.status(Status.UP + ": Successfully connected to
+the broker")
+.build();
+}
+}
+----
+
+
 === Ustawiamy kolejność 
 
 ** **@AutoConfigureBefore**
@@ -169,3 +248,7 @@ You may combine the auto-configuration code and the dependency management in a s
 @ImportResource({"META-INF/services.xml","META-INF/repositories.xml"})
 
 @ImportResource("classpath:applicationContext.xml")
+
+
+
+

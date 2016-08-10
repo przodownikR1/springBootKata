@@ -12,6 +12,31 @@ spring-boot-actuator
 
 *** http endpoints jak : /actuator, /info, /health etc
 
+*** Jolokia
+
+
+Zależność :
+
+----
+<dependency>
+    <groupId>org.jolokia</groupId>
+    <artifactId>jolokia-core</artifactId>
+ </dependency>
+----
+
+Endpoint :
+
+----
+ /jolokia 
+----
+
+
+Dezaktywacja :
+
+----
+endpoints.jolokia.enabled=false
+----
+
 ** JMX
 
 *** Monitoring i zarządzanie przez JMX
@@ -29,7 +54,128 @@ spring-boot-actuator
 *** remote shell 
 
 
+=== Co możemy zrobić z actuator endpoints ?
+
+** Zmienić nazwę
+** uaktywnić/deaktywować endpoint
+
+----
+endpoints:
+  enabled: false
+metrics:
+  enabled: true
+----
+
+
+----
+
+endpoints.beans.id=springbeans
+endpoints.beans.sensitive=false
+endpoints.beans.enabled=true
+
+----
+
+
+** Zdefiniować swoje własne metryki
+** Stworzyć własne repozytorium do przechowywania danych
+** Stworzyć swoje własne identyfikatory 
+
+[source,java]
+----
+@Component
+public class CustomEndpoint implements Endpoint<List<String>> {
+     
+    @Override
+    public String getId() {
+        return "myEndpoint";
+    }
+ 
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+ 
+    @Override
+    public boolean isSensitive() {
+        return true;
+    }
+ 
+    @Override
+    public List<String> invoke() {
+        List<String> messages = new ArrayList<>();
+        messages.add("test one");
+        messages.add("test 2");
+        return messages;
+    }
+}
+----
+
+
 === HealthEndpoint   [TODO/uzupelnic]
+
+
+Aktywne to : 
+
+CassandraHealthIndicator
+	
+
+Checks that a Cassandra database is up.
+
+DiskSpaceHealthIndicator
+	
+
+Checks for low disk space.
+
+DataSourceHealthIndicator
+	
+
+Checks that a connection to DataSource can be obtained.
+
+ElasticsearchHealthIndicator
+	
+
+Checks that an Elasticsearch cluster is up.
+
+JmsHealthIndicator
+	
+
+Checks that a JMS broker is up.
+
+MailHealthIndicator
+	
+
+Checks that a mail server is up.
+
+MongoHealthIndicator
+	
+
+Checks that a Mongo database is up.
+
+RabbitHealthIndicator
+	
+
+Checks that a Rabbit server is up.
+
+RedisHealthIndicator
+	
+
+Checks that a Redis server is up.
+
+SolrHealthIndicator
+	
+
+Checks that a Solr server is up.
+
+
+=== Deaktywacja wszystkich domyślnych 
+
+----
+management.health.defaults.enabled
+----
+
+=== Sortowanie
+
+management.health.status.order=DOWN, OUT_OF_SERVICE, UNKNOWN, UP
 
 ===  Własny Health endpoint / HealthIndicator
 
@@ -54,6 +200,24 @@ public Health health() {
 }
 ----
 
+
+----
+@Component
+public class MyHealthIndicator implements HealthIndicator {
+
+    @Override
+    public Health health() {
+        int errorCode = check(); // perform some specific health check
+        if (errorCode != 0) {
+            return Health.down().withDetail("Error Code", errorCode).build();
+        }
+        return Health.up().build();
+    }
+
+}
+----
+
+
 === InfoEndpoint  [TODO/uzupelnic]
 
 
@@ -67,6 +231,8 @@ public Health health() {
 
 ** **/env **- report o bieżących ustawieniach systemowych
 
+*** /env/{key} przykład http://localhost:9991/env/path.separator - pobranie separatora
+
 ** **/health** - prosty raport funkcji życiowych aplikacji
 
 ----
@@ -75,6 +241,75 @@ curl localhost:8090/health      h
 ----
 
 ** **/info** - serwuje informacje o bieżącej konfiguracji aplikacji
+
+*** Parametryzacja / prefix info.
+
+info.name=App test
+info.project=Camp Spring Boot
+info.manuscript.raw=asciidoctor
+info.desc=A Little introduce to Spring Boot world
+
+
+*** Wynik : 
+
+[source,json]
+----
+{
+
+    "name": "App test",
+    "build": {
+        "gradleVersion": "2.14",
+        "artifact": "kataBoot",
+        "version": "0.0.1-SNAPSHOT"
+    },
+    "desc": "A Little introduce to Spring Boot world",
+    "project": "Camp Spring Boot",
+    "manuscript": {
+        "raw": "asciidoctor"
+    }
+
+}
+----
+
+=== InfoContributors
+
+** **EnvironmentInfoContributor** - info ze środowiska
+
+** **GitInfoContributor** = jeśli plik  git.properties jest dostępny
+
+*** git.branch
+
+*** git.commit.id
+
+*** git.commit.time
+
+** **BuildInfoContributor** = informacje z  META-INF/build-info.properties jeśli plik jest dostępny
+
+=== Zmienne aktywne w czasie budowanie projektu
+
+----
+info.app.encoding=@project.build.sourceEncoding@
+info.app.java.source=@java.version@
+info.app.java.target=@java.version@
+----
+
+==== Własna implementacja
+
+** Przykład
+
+[source,java]
+----
+@Component
+public class ExampleInfoContributor implements InfoContributor {
+
+    @Override
+    public void contribute(Info.Builder builder) {
+        builder.withDetail("example",Collections.singletonMap("key", "value"));
+    }
+
+}
+
+----
 
 ** **/metrics** - metryki dotyczące punktów końcowych, sterty, wątków, gc, class loading etc
 
@@ -183,6 +418,49 @@ Dodatkowo dla każdej strony trzyma statusy HTTP, licznik wywołań, gauge.respo
 },...
 ----
 
+*** Przykład
+
+NOTE: /trace domyślnie przechowuje 100 wpisów jeśli chcemy to zwiększyć należy skorzystać z kodu poniżej
+
+----
+@Configuration
+public class ActuatorConfig {
+@Bean
+public InMemoryTraceRepository traceRepository() {
+InMemoryTraceRepository traceRepo = new InMemoryTraceRepository();
+traceRepo.setCapacity(1000);
+return traceRepo;
+}
+}
+----
+
+*** Utrwalanie wyników w mongo
+
+----
+@Service
+public class MongoTraceRepository implements TraceRepository {
+private MongoOperations mongoOps;
+
+@Autowired
+public MongoTraceRepository(MongoOperations mongoOps) {
+this.mongoOps = mongoOps;
+}
+
+@Override
+public List<Trace> findAll() {
+  return mongoOps.findAll(Trace.class);
+}
+@Override
+public void add(Map<String, Object> traceInfo) {
+   mongoOps.save(new Trace(new Date(), traceInfo));
+}
+
+}
+----
+
+
+
+
 === remote shell
 
 ----
@@ -205,6 +483,7 @@ shell.auth.simple.user.password
 
 ** CounterService
 
+
 [source,java]
 ----
 ...
@@ -219,19 +498,124 @@ counterService.increment("messages.total.book.added");
 
 *** reset
 
-** GaugeService
+** GaugeService 
+
+Zapisuje pojedyńczą własność oraz jej parametr
+
+----
+public interface GaugeService {
+  void submit(String metricName, double value);
+}
+----
+
+
+*** Przykład
+
+[source,java]
+----
+
+@Controller
+@RequestMapping("/person")
+@ConfigurationProperties("person")
+public class PersonController {
+...
+private CounterService counterService;
+@Autowired
+
+public ReadingListController(PersonRepository personRepository,PersonProperties personProperties,
+CounterService counterService, GaugeService gaugeService) {
+....
+}
+...
+@RequestMapping(method=RequestMethod.POST)
+public String addNewInvoiceToPerson(@Valid Invoice invoice, @Valid Long personId) {
+
+personRepository.findBy(personId).addInvoice(invoice);
+
+counterService.increment("invoice.saved");
+gaugeService.submit("invoice.last.saved", System.currentTimeMillis());
+return "redirect:/";
+}
+}
+
+----
 
 
 === Trwałe metryki 
 
 
-** MetricRepository
+** MetricRepository - programowy dostęp do metryk	
 
 ** MetricReader
 
 ** MetricWriter
 
 Dostarczene przez  : **InMemoryMetricRepository**, **RedisMetricRepository**
+
+** Przykład 1
+----
+       @Bean
+	InMemoryMetricRepository inMemoryMetricRepository() {
+		return new InMemoryMetricRepository();
+	}
+
+----
+
+
+** Przykład 2
+
+----
+@Autowired
+private ApplicationContext context;
+
+        @Bean
+	protected MetricWriter writer() {
+		RedisMetricRepository repository = new RedisMetricRepository(connectionFactory);
+		repository.setPrefix("spring.metrics.collector." + context.getId() + "." + ObjectUtils.getIdentityHexString(context) + ".");
+		repository.setKey("keys.spring.metrics.collector");
+		return repository;
+}
+
+        @Bean
+	@Primary
+	protected MetricRepository reader() {
+		return new InMemoryMetricRepository();
+}
+
+//redis setting connection
+
+
+@Bean(name="org.springframework.autoconfigure.redis.RedisAutoConfiguration$RedisProperties")
+	@Primary
+	public RedisProperties redisProperties() throws UnknownHostException {
+		RedisProperties properties = new RedisProperties();
+		try {
+			CloudFactory cloud = new CloudFactory();
+			RedisServiceInfo serviceInfo = (RedisServiceInfo) cloud.getCloud()
+					.getServiceInfo("redis");
+			if (serviceInfo != null) {
+				properties.setHost(serviceInfo.getHost());
+				properties.setPassword(serviceInfo.getPassword());
+				properties.setPort(serviceInfo.getPort());
+			}
+		} catch (CloudException e) {
+			// ignore
+		}
+		return properties;
+}
+
+
+----
+
+
+----
+@Bean
+	@ExportMetricWriter
+	MetricWriter metricWriter(MetricExportProperties export) {
+		return new RedisMetricRepository(connectionFactory,
+		     export.getRedis().getPrefix(), export.getRedis().getKey());
+}
+----
 
 === Dostrajanie portów
 
@@ -248,12 +632,21 @@ management.port=-1
 ----
 
 
+** Wyłączenie JMX
+
+----
+endpoints.jmx.enabled=false
+----
+
+=== Zmiana nazwy endpointu
+
+endpoints.info.id=campInfo
+
 === Rozszerzenia : 
 
 ** http://www.dropwizard.io/[Dropwizard]
 
 ** io.dropwizard.metrics:metrics-graphite
-
 
 === Inspekcja  [TODO/uzupelnic]
 
@@ -268,3 +661,111 @@ management.port=-1
 ** **TraceRepository**
 
 ** **ApplicationPidFileWriter**
+
+=== Zamykanie aplikacji
+
+curl -X POST http://localhost:8080/shutdown
+
+----
+endpoints:
+shutdown:
+enabled: true
+----
+
+=== Zabezpiecznie / Security
+
+----
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+http
+	.authorizeRequests()
+	.antMatchers("/").access("hasRole('USER')")
+	.antMatchers("/info").access("hasRole('ROOT')")
+	.antMatchers("/metrics").access("hasRole('ROOT')")
+        ...
+	.antMatchers("/shutdown").access("hasRole('ADMIN')")
+	.antMatchers("/**").permitAll()
+	.and()
+	.formLogin()
+	.loginPage("/login")
+	.failureUrl("/login?error=true");
+}
+----
+
+----
+
+management.context-path=/reports
+
+
+.antMatchers("/reports/**").access("hasRole('ADMIN')")
+
+
+----
+
+
+=== Security / denial of service
+
+endpoints.health.time-to-live=1000  //ms
+
+
+=== Spring Boot Admin
+
+Zależność  : 
+
+----
+    compile group: 'de.codecentric', name: 'spring-boot-admin-server', version: '1.3.4'
+    compile group: 'de.codecentric', name: 'spring-boot-admin-server-ui', version: '1.3.4'
+    compile group: 'de.codecentric', name: 'spring-boot-admin-starter-client', version: '1.3.4'
+----
+
+Konfiguracja
+
+----
+@Configuration
+public class AdminBootConfig extends WebMvcConfigurerAdapter{
+    
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("index.html").addResourceLocations("classpath:/META-INF/spring-boot-admin-server-ui/");        
+    }
+}
+----
+
+
+Aktywacja : 
+
+----
+@SpringBootApplication
+@EnableAdminServer
+public class MyBooApp	{
+		public static void main(String[] args)	{
+				SpringApplication.run(MyBootApp.class,	args);
+		}
+}
+----
+
+application.properties
+
+----
+server.port:8090
+spring.application.name:Spring Boot Admin Web
+spring.boot.admin.url:http://localhost:${server.port}
+----
+
+======
+
+
+The report also lists gauges for each endpoint,
+reporting the last response time.
+
+
+help : This gets a listing of available commands
+
+dashboard : This gets a graphic, text-based display of all the threads, environment properties, memory, and other things
+
+autoconfig : This prints out a report of which Spring Boot auto-configuration rules were applied and which were skipped (and why
+
+
+
+docker run -v /var/lib/gmonitor/graphite:/var/lib/graphite/storage/whisper -v /var/lib/gmonitor/grafana/data:/usr/share/grafana/data -p 2003:2003 -p 3000:3000  -d alexmercer/graphite-grafana
+

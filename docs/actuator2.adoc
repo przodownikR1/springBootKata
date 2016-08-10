@@ -1,0 +1,233 @@
+actuator
+
+Garbage
+collector gc.* The count of garbage collections that have occurred and the
+elapsed garbage collection time for both the mark-sweep and
+scavenge garbage collectors (from java.lang
+.management.GarbageCollectorMXBean )
+
+
+Memory mem.* The amount of memory allotted to the application and the
+amount of memory that is free (from java.lang.Runtime )
+
+Heap heap.* The current memory usage (from java.lang
+.management.MemoryUsage )
+
+
+Class loader classes.* The number of classes that have been loaded and unloaded by
+the JVM class loader (from java.lang.management.ClassLoadingMXBean )
+
+
+System
+
+ processors  uptime
+instance.uptime
+systemload.average 
+
+System information such as the number of processors (from
+java.lang.Runtime ), uptime (from java.lang
+.management.RuntimeMXBean ), and average system
+load (from java.lang.management
+.OperatingSystemMXBean )
+
+
+Thread
+pool threads.* The number of threads, daemon threads, and the peak count
+of threads since the JVM started (from java.lang
+.management.ThreadMXBean )
+
+Data source datasource.* The number of data source connections (from the data
+source’s metadata and only available if there are one or more
+DataSource beans in the Spring application context)
+
+
+Tomcat
+sessions httpsessions.* The active and maximum number of sessions in Tomcat (from
+the embedded Tomcat bean and only available if the applica-
+tion is served via an embedded Tomcat server)
+
+
+HTTP counter.status.*
+gauge.response.* Various gauges and counters for HTTP requests that the appli-
+cation has served
+
+
+ApplicationHealthIndicator none Always “UP”
+
+DataSourceHealthIndicator db “UP” and database type if the database can be
+contacted; “DOWN” status otherwise
+
+DiskSpaceHealthIndicator diskSpace “UP” and available disk space, and “UP” if avail-
+able space is above a threshold; “DOWN” if there
+isn’t enough disk space
+
+JmsHealthIndicator jms “UP” and JMS provider name if the message bro-
+ker can be contacted; “DOWN” otherwise
+
+MailHealthIndicator mail “UP” and the mail server host and port if the mail
+server can be contacted; “DOWN” otherwise
+
+MongoHealthIndicator mongo “UP” and the MongoDB server version; “DOWN”
+otherwise
+
+RabbitHealthIndicator rabbit “UP” and the RabbitMQ broker version; “DOWN”
+otherwise
+
+
+RedisHealthIndicator redis “UP” and the Redis server version; “DOWN”
+otherwise
+
+SolrHealthIndicator solr “UP” if the Solr server can be contacted; “DOWN”
+otherwise
+
+
+
+
+
+actuator
+	
+
+Provides a hypermedia-based “discovery page” for the other endpoints. Requires Spring HATEOAS to be on the classpath.
+	
+
+true
+
+autoconfig
+	
+
+Displays an auto-configuration report showing all auto-configuration candidates and the reason why they ‘were’ or ‘were not’ applied.
+	
+
+true
+
+beans
+	
+
+Displays a complete list of all the Spring beans in your application.
+	
+
+true
+
+configprops
+	
+
+Displays a collated list of all @ConfigurationProperties.
+	
+
+true
+
+dump
+	
+
+Performs a thread dump.
+	
+
+true
+
+env
+	
+
+Exposes properties from Spring’s ConfigurableEnvironment.
+	
+
+true
+
+flyway
+	
+
+Shows any Flyway database migrations that have been applied.
+	
+
+true
+
+health
+	
+
+Shows application health information (when the application is secure, a simple ‘status’ when accessed over an unauthenticated connection or full message details when authenticated).
+	
+
+false
+
+info
+	
+
+Displays arbitrary application info.
+	
+
+false
+
+liquibase
+	
+
+Shows any Liquibase database migrations that have been applied.
+	
+
+true
+
+metrics
+	
+
+Shows ‘metrics’ information for the current application.
+	
+
+true
+
+mappings
+	
+
+Displays a collated list of all @RequestMapping paths.
+	
+
+true
+
+shutdown
+	
+
+Allows the application to be gracefully shutdown (not enabled by default).
+	
+
+true
+
+trace
+	
+
+Displays trace information (by default the last few HTTP requests).
+	
+
+true
+
+
+docs
+	
+
+Displays documentation, including example requests and responses, for the Actuator’s endpoints. Requires spring-boot-actuator-docs to be on the classpath.
+	
+
+false
+
+heapdump
+	
+
+Returns a GZip compressed hprof heap dump file.
+	
+
+true
+
+jolokia
+	
+
+Exposes JMX beans over HTTP (when Jolokia is on the classpath).
+	
+
+true
+
+logfile
+	
+
+Returns the contents of the logfile (if logging.file or logging.path properties have been set). Supports the use of the HTTP Range header to retrieve part of the log file’s content.
+	
+
+true
+
+
+
