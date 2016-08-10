@@ -2,8 +2,8 @@ package pl.java.scalatech.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -17,7 +17,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
-@Profile("rest")
+//@Profile("rest")
 public class SwaggerConfig extends WebMvcConfigurerAdapter{                                    
     @Bean
     Docket api() { 
@@ -41,6 +41,11 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter{
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");                
 }
+    
+   /* @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/swagger").setViewName("swagger-ui.html");
+    }*/
 }
