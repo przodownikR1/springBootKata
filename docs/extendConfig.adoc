@@ -31,6 +31,7 @@ ifndef::imgsdir[:imgsdir: ./../images]
 ===    Domyślne ustawienia poprzez użycie  SpringApplication.setDefaultProperties
     
 
+
 NOTE: application.properties & application.yml powinni znajdować się na classpath aplikacji
 
 NOTE: Zmienne środowiskowe sprawdzą się podczas praktyki z chmurami.
@@ -48,14 +49,7 @@ data.server=remoteserver:3030
 ** /config w classpath
 ** classpath
 
-
-Spring Boot kolejność wyszukiwania pliku z właściwościami to :
-** classpath
-** classpath:/config
-** file:
-** file:config/
-
-
+NOTE: Kolejność wyszukiwania jak wyżej
     
 === Random
 
@@ -218,6 +212,9 @@ public class OwnerProperties {
 
 ----
 
+Plik z właściwościami
+
+----
 person.firstName camel case
    
 person.first-name .properties / .yml
@@ -225,9 +222,16 @@ person.first-name .properties / .yml
 person.first_name .properties / .yml
     
 PERSON_FIRST_NAME Upper case format. system environment variables
+----
 
 
-=== @ConfigurationProperties Validation
+NOTE:  @ConfigurationProperties nie powinnia działać dopóki nie ma @EnableConfigurationProperties na jednej z klas w projekcie. 
+
+NOTE: Jeśli używasz SpringBoot :) to prawie na pewno, jakaś klasa pod spodem jest oznaczona tą adnotacją.
+
+
+
+=== @ConfigurationProperties walidacje
 
 NOTE: JSR-303 javax.validation 
 
@@ -248,8 +252,7 @@ public class ConnectionProperties {
 
 ** @Value
 
-Default values can be supplied directly with @Value("${propertyName:def
-aultValue}")
+Default values can be supplied directly with @Value("${propertyName:defaultValue}")
 •	 @Value defaults can be overridden in an application.properties file,
 which gets bundled with the app in a JAR file
 •	 Bundled properties can be overridden in an auxiliary application.

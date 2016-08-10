@@ -61,24 +61,386 @@ spring.resources.staticLocations
     Mustache
     
 
+=== favicon
+
+
+Zasób: 
+
+----
+src/main/resource/static/favicon.ico
+----
+
+
+HTML:
+
+[source,html]
+----
+   <link rel="icon" type="image/x-icon" href="/favicon.ico">
+----
+
+
+
+== Defiowanie filtrów
+
+----
+@Configuration
+public class WebConfiguration{
+	@Bean
+	MyFilter myFilter(){
+   	 return	new MyFilter();
+	}
+}
+----
+
+NOTE: Automatyczna detekcja : javax.servlet.Filter
+
+
+== Interceptory
+
+
+** HandlerInterceptor
+
+[source,java]
+----
+public class WebConfiguration extends WebMvcConfigurerAdapter	{  //krok 1
+
+@Bean
+LocaleChangeInterceptor localeChangeInterceptor() { //krok 2
+		return new LocaleChangeInterceptor();
+}
+
+@Override 
+public void addInterceptors(InterceptorRegistry registry){ //krok 3
+ registry.addInterceptor(localeChangeInterceptor());
+}
+}
+----
+
+
+Wywołanie : 
+
+----
+http://{host}:{port}/{someUrl}?locale={locale_name}
+----
+
+
+== PropertyEditors
+
+[source,java]
+----
+//tODO
+----
+
+Dowiązanie :
+
+----
+@InitBinder
+public	void initBinder(WebDataBinder binder)	{
+  binder.registerCustomEditor(Person.class, new PersonEditor());
+}
+----
+
+Kontroler :
+
+----
+@RequestMapping(value ="/person/{login}", method = RequestMethod.GET)
+public Person getPerson(@PathVariable Person person)
+{
+   return personRepository.findBookByLogin(person.getLogin());
+}
+----
+
+Wywołanie
+
+----
+http://{host}:{port}/person/przodownik
+----
+
+
+WARNING: Nie jest to Thread-safe
+
+
+== Formatter
+
+
+----
+person Formatter TODO
+
+----
+
+
+Now	that	we	have	our	formatter,	we	will	add	it	to	the	registry	by	overriding	an
+addFormatters(FormatterRegistry	registry) 	method	in	the	 WebConfiguration
+class:
+@Autowired	
+private	BookRepository	bookRepository;
+
+
+----
+@Override
+public void addFormatters(FormatterRegistry registry)	{ 
+  registry.addFormatter(new PersonFormatter(personRepo));
+}
+----
+
+
+
+----
+@RequestMapping(value ="/person/{login}", method = RequestMethod.GET)
+public Person getPerson(@PathVariable Person person)
+{
+   return personRepository.findBookByLogin(person.getLogin());
+}
+----
+
+
+== Defiowanie ścieżek do własnych zasobów statycznych
+
+
+[source,java]
+----
+@Override
+public void addResourceHandlers(ResourceHandlerRegistry	registry){
+  registry.addResourceHandler("/resource/**").addResourceLocations("classpath:/");
+}
+----
+
+** Przykład wywołania
+
+----
+http://{host}:{port}/resource/application.properties
+----
+
+
+== Jetty zamiast Tomcat'a
+
+Zależność Gradle : 
+
+----
+compile("org.springframework.boot:spring-boot-starter-jetty")
+
+configurations	{
+  compile.exclude	module:	"spring-boot-starter-tomcat"
+}
+----
+
 
 == Error Handling    
 
 @ControllerAdvice
 
+
+** Przykład
+
+[source,java]
+----
+@ControllerAdvice(basePackageClasses = FooController.class)
+public class FooControllerAdvice extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(YourException.class)
+    @ResponseBody
+    ResponseEntity<?> handleControllerException(HttpServletRequest request, Throwable ex) {
+        HttpStatus status = getStatus(request);
+        return new ResponseEntity<>(new CustomErrorType(status.value(), ex.getMessage()), status);
+    }
+
+    private HttpStatus getStatus(HttpServletRequest request) {
+        Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+        if (statusCode == null) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return HttpStatus.valueOf(statusCode);
+    }
+
+}
+
+----
+
+
 @ErrorHandler
+
+** Przykład
+
+[source,java]
+----
+    @ExceptionHandler({ NotFoundException.class })
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public BadRequest handleException(NotFoundException e, HttpServletRequest request) {
+        log(String.format(LOG_RESPONSE_FORMAT, HttpStatus.NOT_FOUND.value(), request.getRequestURI()), e.getMessage());
+        return new BadRequest(e.getMessage());
+    }
+
+
+    @ExceptionHandler({ RuntimeException.class })
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public BadRequest handleException(RuntimeException e, HttpServletRequest request) {
+        log(String.format(LOG_RESPONSE_FORMAT, HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI()), e.getMessage());
+        return new BadRequest(e.toString());
+    }
+
+    @ExceptionHandler({ IllegalArgumentException.class })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public BadRequest handleException(IllegalArgumentException e, HttpServletRequest request) {
+        log(String.format(LOG_RESPONSE_FORMAT, HttpStatus.BAD_REQUEST.value(), request.getRequestURI()), e.getMessage());
+        return new BadRequest(e.getMessage());
+    }
+
+
+    /**
+     *  more informative message than a generic HTTP-400 Bad Request
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BadRequest handleException(HttpMessageNotReadableException e, HttpServletRequest request) {
+        ...
+        return new BadRequest(e.getMessage());
+}
+----
+
 
 @SimpleErrorHandler
 
 
+@ResponseStatus
+
+** Przykład
+
+[source,java]
+----
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+public class BadRequest extends RuntimeException {
+    public BadRequest(String message) {
+        super(message);
+    }
+}
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public static class NotFound extends RuntimeException {
+
+}
+}
+
+
+----
+
              
-=== Custom error pages
+=== Definiowanie stron błędów
 
-Od Spring Boot 1.4 wystarczy stworzyć plik o danym kodzie błędu i umieścić do w zasobach statycznych. Automatyczne mapowanie.
 
+NOTE: Od Spring Boot 1.4 wystarczy stworzyć plik o danym kodzie błędu i umieścić do w zasobach statycznych. Automatyczne mapowanie.
+
+** Przykład : 4..
+
+----
+src/
+ +- main/
+     +- java/
+     |   + <source code>
+     +- resources/
+         +- public/
+             +- error/
+             |   +- 404.html
+             +- <other public assets>
+
+----
+
+
+** Przykład : 5..
+
+----
+src/
+ +- main/
+     +- java/
+     |   + <source code>
+     +- resources/
+         +- templates/
+             +- error/
+             |   +- 5xx.ftl
+             +- <other templates>
+----
+
+
+===  ErrorViewResolver [TODO]
+
+
+** Przykład
+
+
+[source,java]
+----
+public class MyErrorViewResolver implements ErrorViewResolver {
+
+    @Override
+    public ModelAndView resolveErrorView(HttpServletRequest request,
+            HttpStatus status, Map<String, Object> model) {
+        // Use the request or status to optionally return a ModelAndView
+        return ...
+    }
+
+}
+----
 
 
 == Rest
+
+=== Adnotacje 
+
+
+** @Controller 	
+
+** @RestController
+
+** @ResponseBody 	
+
+** @PathVariable
+
+** Przykład metody kontrolera
+
+[source,java]
+----
+@RequestMapping("/user/{id}/{field}")
+public void showUserField(@PathVariable("id") Long userId, @PathVariable("field") String field) {
+...
+----
+
+
+=== Prefix usługi
+
+** Przykład
+
+[source,java]
+----
+@Controller
+@RequestMapping("/user")
+public class UserController {
+...
+}
+----
+
+=== Spring Data REST
+
+Zależność : 
+
+----
+compile("org.springframework.boot:spring-boot-starter-data-rest")
+----
+
+
+** @RepositoryRestResource - oznaczenie danego repozytiorium
+
+----
+
+@RepositoryRestResource(collectionResourceRel="person",path="persons")
+
+----
+
+
+
+
 
 === Wywoływanie serwisu REST
 

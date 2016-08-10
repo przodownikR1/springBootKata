@@ -164,6 +164,37 @@ public  void run(String...   args){
 Zapewnia, że Spring Boot wykona daną metodę tylko raz zaraz po starcie
 
 
+NOTE:  InitializingBean jako analogia
+
+** Przykład
+
+[source,java]
+----
+ @Autowired
+    private Environment env;
+    
+    @Bean
+    InitializingBean bean(){
+        return () -> log.info("!!!!  application.user : {}",env.getProperty(APPLICATION_USER));
+        
+    }
+----
+
+
+** Przykład 2 / @Autowired repository
+
+[source,java]
+----
+@Bean
+	InitializingBean populateDatabase(CarRepository repository) {
+		return () -> {
+			repository.save(new Car("Honda", "Civic", "red"));
+			repository.save(new Car("Fiat", "Uno", "black"));
+			repository.save(new Car("Ford", "Escort", "black"));
+		};
+}
+----
+
 == ApplicationArguments
 
 
