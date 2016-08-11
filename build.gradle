@@ -60,7 +60,11 @@ dependencies {
     
     
     
-    testCompile('org.springframework.boot:spring-boot-starter-test') 
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.boot:spring-boot-test-autoconfigure') 
+     // https://mvnrepository.com/artifact/com.google.code.gson/gson
+compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+     
     testCompile('org.springframework.restdocs:spring-restdocs-mockmvc:1.1.1.RELEASE')
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.2.0'

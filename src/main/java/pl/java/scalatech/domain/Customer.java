@@ -6,6 +6,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +15,19 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Customer {
 
     @Id @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;  
     private String firstName;
     private String lastName;
+    public Customer(String firstName, String lastName) {
+        super();
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+    
+    
 
 }
