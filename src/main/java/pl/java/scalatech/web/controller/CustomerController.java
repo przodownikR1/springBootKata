@@ -6,6 +6,8 @@ import static java.util.function.Function.identity;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
@@ -41,7 +43,7 @@ public class CustomerController {
 
     @GetMapping(path = "/")
     ResponseEntity<Page<Customer>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(customerRepository.findAll(pageable));
+        return ok(customerRepository.findAll(pageable));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -71,7 +73,7 @@ public class CustomerController {
     public ResponseEntity<?> updateResource(@Valid @RequestBody Customer customer, @PathVariable Long id) {
         verify(id);
         Customer loaded = customerRepository.save(checkNotNull(customer));
-        return ResponseEntity.ok(loaded);
+        return ok(loaded);
     }
 
     @DeleteMapping("/{id}")
@@ -79,5 +81,11 @@ public class CustomerController {
     public HttpHeaders deleteResource(@PathVariable Long id) {
         customerRepository.delete(verify(id));
         return new HttpHeaders();
+    }
+    
+    
+    @GetMapping(path="/firstname/{firstName}")
+    ResponseEntity<List<Customer>> findByName(@PathVariable("firstName") String firstname){
+        return ok(customerRepository.findByFirstNameLike(firstname));
     }
 }

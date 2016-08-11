@@ -42,6 +42,10 @@ dependencies {
     //compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
    // compile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
     
+    compile 'org.springframework.boot:spring-boot-starter-cache'    
+    compile 'com.github.ben-manes.caffeine:caffeine'
+    
+    
     compile 'com.google.guava:guava:19.0'
     runtime('com.h2database:h2')
     compile 'org.projectlombok:lombok:1+'
