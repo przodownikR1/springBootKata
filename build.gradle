@@ -30,29 +30,23 @@ repositories {
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-aop')
     compile('org.springframework.boot:spring-boot-configuration-processor')
-    // compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    //compile('org.springframework.boot:spring-boot-starter-data-rest')
-    //compile('org.springframework.data:spring-data-rest-hal-browser')
-    //compile('org.springframework.boot:spring-boot-starter-hateoas')
+    compile('org.springframework.boot:spring-boot-starter-data-rest')
+    compile('org.springframework.data:spring-data-rest-hal-browser')
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
     //compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile 'org.springframework.boot:spring-boot-starter-logging'
     compile('org.springframework.boot:spring-boot-starter-web')
     
     //compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
-   // compile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
+    // compile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
     
     compile 'org.springframework.boot:spring-boot-starter-cache'    
     compile 'com.github.ben-manes.caffeine:caffeine'
-    
-    
     compile 'com.google.guava:guava:19.0'
     runtime('com.h2database:h2')
     compile 'org.projectlombok:lombok:1+'
-    compile 'javax.money:money-api:1.0'
-    compile 'org.javamoney:moneta:1.0'
-    
-    
     compile 'org.webjars:bootstrap:3.3.5'
     compile 'org.webjars:jquery:2.1.4'
     compile 'org.webjars:jquery-ui:1.11.4'
@@ -61,20 +55,16 @@ dependencies {
         exclude group: 'org.webjars.bower'
     }
     
-    
-    
-    
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.boot:spring-boot-test-autoconfigure') 
-     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+     
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
      
     testCompile('org.springframework.restdocs:spring-restdocs-mockmvc:1.1.1.RELEASE')
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.2.0'
     testCompile 'com.jayway.awaitility:awaitility-java8:1.6.1'
     testCompile 'com.jayway.awaitility:awaitility:1.6.5'
-    testCompile 'org.springframework:spring-test'
     
 }
 

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
@@ -18,6 +19,7 @@ import pl.java.scalatech.repository.CustomerRepository;
 
 @SpringBootApplication
 @Slf4j
+@EnableCaching
 public class SpringBootKataApplication implements CommandLineRunner{
 
     private static final String APPLICATION_USER = "application.user";
