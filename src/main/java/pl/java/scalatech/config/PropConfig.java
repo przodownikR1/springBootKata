@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Configuration
+//@Configuration
 @EnableAutoConfiguration
 // @Profile(value={"dev","test"})
 @Slf4j
