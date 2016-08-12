@@ -26,12 +26,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
 import pl.java.scalatech.domain.Customer;
 import pl.java.scalatech.repository.CustomerRepository;
+import pl.java.scalatech.web.controller.exception.CustomerFoundException;
 import pl.java.scalatech.web.controller.exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/customer")
+@Slf4j
 public class CustomerController {
 
     private final CustomerRepository customerRepository;    
@@ -83,9 +86,10 @@ public class CustomerController {
         return new HttpHeaders();
     }
     
-    
     @GetMapping(path="/firstname/{firstName}")
     ResponseEntity<List<Customer>> findByName(@PathVariable("firstName") String firstname){
-        return ok(customerRepository.findByFirstNameLike(firstname));
+        return ok(customerRepository.findByFirstNameLike(firstname).orElseThrow(()-> new CustomerFoundException(firstname)));
     }
+    
+  
 }

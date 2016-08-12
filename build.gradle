@@ -55,6 +55,9 @@ dependencies {
         exclude group: 'org.webjars.bower'
     }
     
+    compile 'com.github.javafaker:javafaker:0.7'
+     
+    
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.boot:spring-boot-test-autoconfigure') 
      

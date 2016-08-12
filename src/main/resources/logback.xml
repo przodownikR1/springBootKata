@@ -16,6 +16,8 @@
 			<pattern></pattern>
 		</encoder>
 	</appender>
+	
+	<logger name="pl.java.scalatech" level="info"/>
 
 	<root level="INFO">
 	    <appender-ref ref="console"/>
