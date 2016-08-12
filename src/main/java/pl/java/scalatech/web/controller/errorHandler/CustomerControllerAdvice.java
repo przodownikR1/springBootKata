@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.extern.slf4j.Slf4j;
 import pl.java.scalatech.web.controller.exception.CustomerException;
+import pl.java.scalatech.web.controller.exception.DuplicateException;
 
 @ControllerAdvice//(basePackageClasses = CustomerController.class)
 @Slf4j
-public class CustomerControllerAdvice implements ErrorController{
+public class CustomerControllerAdvice {//implements ErrorController{
     
     @ExceptionHandler(CustomerException.class)
     @ResponseBody
@@ -25,7 +26,11 @@ public class CustomerControllerAdvice implements ErrorController{
         log.info("customerContollerAdvice -----------");
         return new ResponseEntity(new CustomerException(ex.getMessage()),HttpStatus.BAD_REQUEST);
     }
-    
+    @ExceptionHandler(DuplicateException.class)
+    public String handleDuplicateSpittle() {
+        return "error/duplicate";
+    }
+
     
     @RequestMapping(path = "/error")
     public HttpEntity<?> handleError() {
@@ -39,10 +44,7 @@ public class CustomerControllerAdvice implements ErrorController{
         return new ResponseEntity<>("null poiner exception", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Override
-    public String getErrorPath() {
-        return "/error";
-}
+  
     
     @ExceptionHandler(value=IllegalArgumentException.class)
     public String illegalArgs(Model model,IllegalArgumentException iea){

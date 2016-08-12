@@ -15,10 +15,6 @@ public class CustomerException extends RuntimeException{
         super();
     }
 
-    public CustomerException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
     public CustomerException(String message, Throwable cause) {
         super(message, cause);
     }
