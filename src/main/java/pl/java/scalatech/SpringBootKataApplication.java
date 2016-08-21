@@ -1,64 +1,56 @@
 package pl.java.scalatech;
 
-import java.math.BigDecimal;
-import java.util.Random;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.context.annotation.Bean;
 
-import pl.java.scalatech.compoment.StartupComponent;
-import pl.java.scalatech.domain.Invoice;
-import pl.java.scalatech.domain.User;
-import pl.java.scalatech.repository.InvoiceRepository;
-import pl.java.scalatech.repository.UserRepository;
+import com.thoughtworks.xstream.XStream;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @SpringBootApplication // <1>
-public class SpringBootKataApplication implements CommandLineRunner{ // <2>
+public class SpringBootKataApplication { // <2>
 
-    @Autowired // <3>
-    private StartupComponent startup;
-    
-    @Autowired
-    private UserRepository userRepository; 
-    @Autowired
-    private InvoiceRepository invoiceRepository;
-    
-    
-    Random r = new Random();
+ 
     public static void main(String[] args) { // <4>
         SpringApplication.run(SpringBootKataApplication.class, args);
         
-    }
-
-    @Override
-    public void run(String... args) throws Exception { // <5>
-        createUser();
-        createInvoice();
+        
         
     }
-
-    private void createInvoice() {
-        for(int i=0;i<35;i++){
-            Invoice invoice = new Invoice();
-            invoice.setName("i_"+i);
-            if(i%2==0){
-            invoice.setOwner("przodownik");
-            }else{
-                invoice.setOwner("tyson");
-            }
-            invoice.setPayment(new BigDecimal(""+r.nextInt(100)));
-            invoiceRepository.save(invoice);
-        }
-    }
-
-    private void createUser() {
-        for(int i = 0; i< 30 ; i++){
-            User user = new User();
-            user.setName("przodownik"+"_ "+i);
-            userRepository.save(user);
+    @Bean
+    CommandLineRunner command(XStream xstream){
+        return args -> {
+           
+            Dog dog = new Dog("przodownik", 23);
+            String result  = xstream.toXML(dog);
             
-        }
+            log.info("{}",result);
+        };
     }
+      
+    
+    @Bean
+    @ConditionalOnMissingClass(value="pl.java.scalatech.compoment.One1")
+    String generateHello(){
+      log.info("_+++ hello boot");
+      return "hello boot";
+    }
+    @RequiredArgsConstructor    
+    @ToString
+    public static class Dog{
+        @Getter
+        private final String name;
+        @Getter
+        private final int age;
+        
+        
+    }
+    
 }

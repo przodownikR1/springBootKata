@@ -16,13 +16,13 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Configuration
-@EnableAutoConfiguration
+//@Configuration
+//@EnableAutoConfiguration
 // @Profile(value={"dev","test"})
 @Slf4j
 public class PropConfig {
 
-    @Configuration
+    //@Configuration
     @PropertySources({ @PropertySource(value = { "classpath:app-dev.properties" }) })
     @Profile({ "dev", "dev_test"})
     static class PropertiesLoaderForDev {
@@ -33,7 +33,7 @@ public class PropConfig {
         }
     }
 
-    @Configuration
+   // @Configuration
     @PropertySources({ @PropertySource(value = { "classpath:app-prod.properties" }) })
     @Profile("prod")
     static class PropertiesLoaderForProd {

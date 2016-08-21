@@ -72,6 +72,49 @@ image:Richardson-microservices-part3-taxi-service.png[]
 
 image:mono-vs-mirco.png[]
 
+Za : 
+
+*** szybki deploy
+
+*** wielkie serwery aplikacyjne
+
+*** monolit - utrzymywanie i rozwijanie
+
+*** splątane zależności
+
+*** małe autonomiczne usługi
+
+*** małe autonomiczne zespoły
+
+*** łatwość zrozumienia domeny
+
+*** łatwa skalowalność
+
+*** izolacja sytuacji krytycznych
+
+*** dobór odpowiednich narzędzi i języków do danej domeny
+
+***   
+
+Przeciw : 
+
+*** testowanie
+
+*** debugowanie
+
+*** próg wejścia
+
+*** nowe wzorce architektoniczne
+
+*** zwiększona pamięciożerność
+
+
+
+
+
+ 
+
+ 
 
 NOTE : Aktualna wersja 1.4.0.RELEASE wymaga Java 7 i Spring Framework 4.3.2.RELEASE lub wyżej
 
@@ -444,9 +487,55 @@ Wspiera integrację z Undertow (alternatywa dla Tomcat)
 
 == @Conditional
 
+Rdzeń i główna cecha pozwalająca na definiowanie i scalanie automatycznych komponentów wraz z konfiguracją.
+
+
 == Konfiguracja 
 
-== Banner 
+
+** Spring java config
+
+** Spring annotation
+
+** Spring profiles
+
+** yaml/properties
+
+
+== http://patorjk.com[Banner]
+
+Używany jako element informacyjny na temat odpalonej aplikacji Spring Boot
+
+
+banner.location=classpath:/META-INF/banner.txt
+
+spring.main.banner-mode=off
+
+
+----
+
+public static void main(String[] args) {
+SpringApplication app = new SpringApplication(SpringBootSimpleApplication.class);
+app.setBannerMode(Mode.OFF);
+app.run(args);
+}
+
+
+----
+
+----
+public static void main(String[] args) {
+new SpringApplicationBuilder()
+.bannerMode(Banner.Mode.OFF)
+.sources(SpringBootSimpleApplication.class)
+.run(args);
+}
+
+----
+
+----
+
+TIP: Od wersji 1.4 istnieje możliwość dynamicznej konwersji rysunków w kody ASCII. 
 
 banner.txt
 
@@ -498,6 +587,22 @@ public static void main(String[] args) {
     SpringApplication app = new SpringApplication(MySpringConfiguration.class);
     app.setBannerMode(Banner.Mode.OFF);
     app.run(args);
+}
+
+----
+
+
+----
+
+SpringApplication app = new SpringApplication(SpringBootSimpleApplication.class);
+app.setBanner(new Banner() {
+@Override
+public void printBanner(Environment environment, Class<?> sourceClass,
+PrintStream out) {
+out.print("\n\n\tThis is my own banner!\n\n".toUpperCase());
+}
+});
+app.run(args);
 }
 
 ----
@@ -575,29 +680,37 @@ spring.application.admin.enabled
     
 === Random
 
+** Przykład
+
 ----
-Configuring random values
-
-The RandomValuePropertySource is useful for injecting random values (e.g. into secrets or test cases). It can produce integers, longs, uuids or strings, e.g.
-
 my.secret=${random.value}
 my.number=${random.int}
 my.bignumber=${random.long}
 my.uuid=${random.uuid}
 my.number.less.than.ten=${random.int(10)}
 my.number.in.range=${random.int[1024,65536]}
-----    
-
-
+----
 
 == CommandLineRunner
 
+** Przykład
+
 [source,java]
 ----
-public  void run(String...   args){
-...
-}
+ public  void run(String...   args){
+ ...
+ }
 ----
+
+== InitializingBean
+
+@Bean
+InitializingBean savePerson(PersonRepository repo){
+return () -> {
+repo.save(new Person("przodownik","01/01/2016");
+};
+}
+
 Zapewnia, że Spring Boot wykona daną metodę tylko raz zaraz po starcie.
 
 
@@ -624,6 +737,54 @@ spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force
 
 == WEB
 
+** Przykład zależności
+
+[source,groovy]
+----
+dependencies    {            
+        compile("org.springframework.boot:spring-boot-starter-web")        
+        testCompile("org.springframework.boot:spring-boot-starter-test")
+        compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+}
+----
+
+
+
+** Zadanie 
+
+*** Stworzyć prosty kontroler REST. Skorzystać wbudowanego kontenera Tomcata.
+
+
+=== Adnotacje
+
+@Controller    
+
+@Repository
+    
+@ResponseBody
+
+@RestController
+
+@RequestMapping
+
+=== Tworzenie własnych filtrów WEB
+
+** Przykład
+
+----
+    @Bean
+    MyFilter  myFilter()    {
+         return  new  MyFilter();
+    }
+        
+----
+        
+Sprawdzenie
+
+----
+..FilterRegistrationBean        :   Mapping filter: 'myFilter'    to: [/*]
+----
+
 === Aktualne kontenery
 
 Tomcat 8 3.1 Java 7+
@@ -642,9 +803,38 @@ Undertow 1.3 3.1 Java 7+
 
 == Rest
 
+=== Rest Data Model
+
+
+=== @RepositoryRestResource
+
+----
+compile("org.springframework.boot:spring-boot-starter-data-rest")
+----
+
+=== Richardson Maturity Model
+
+source : https://technobeans.wordpress.com/
+
+image:richardson-maturity-model.png[]
+
 == ORM
 
 == NoSql
+
+== Auto-Configuration
+
+Disabling a Specific Auto-Configuration
+
+@EnableAutoConfiguration(exclude=[ActiveMQAutoConfiguration.class])
+
+@SpringBootApplication( exclude={ActiveMQAutoConfiguration.class,DataSourceAutoConfiguration.class} )
+
+
+Snippet of spring-boot-autoconfigure-<version>.jar#META-INF/spring.factories
+
+
+
 
 == Using ResourceBundles for Internationalization (I18N)
 
