@@ -1,4 +1,4 @@
-package pl.java.scalatech.compoment;
+package pl.java.scalatech.component;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

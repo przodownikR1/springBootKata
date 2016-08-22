@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import pl.java.scalatech.compoment.StartupComponent;
+import pl.java.scalatech.component.StartupComponent;
 
 @SpringBootApplication
 public class SpringBootKataApplication {
-
+    public static final String MY_QUEUE = "myQueue";
     @Autowired
     private StartupComponent startup;
     
