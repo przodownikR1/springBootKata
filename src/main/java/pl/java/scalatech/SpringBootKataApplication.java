@@ -15,4 +15,8 @@ public class SpringBootKataApplication {
     public static void main(String[] args) {
         SpringApplication.run(SpringBootKataApplication.class, args);
     }
+    
+  
+    
+
 }
