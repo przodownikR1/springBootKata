@@ -11,29 +11,32 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import lombok.extern.slf4j.Slf4j;
 import pl.java.scalatech.web.controller.exception.CustomerException;
 import pl.java.scalatech.web.controller.exception.DuplicateException;
 
-@ControllerAdvice//(basePackageClasses = CustomerController.class)
+@ControllerAdvice// (basePackageClasses = CustomerController.class)
 @Slf4j
-public class CustomerControllerAdvice {//implements ErrorController{
-    
+public class CustomerControllerAdvice {// implements ErrorController{
+
     @ExceptionHandler(CustomerException.class)
     @ResponseBody
     ResponseEntity<?> handleControllerException(HttpServletRequest request, Throwable ex) {
         log.info("customerContollerAdvice -----------");
-        return new ResponseEntity(new CustomerException(ex.getMessage()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(new CustomerException(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(DuplicateException.class)
     public String handleDuplicateSpittle() {
+        log.info("customerContollerAdvice -----------");
         return "error/duplicate";
     }
 
-    
     @RequestMapping(path = "/error")
     public HttpEntity<?> handleError() {
+        log.info("customerContollerAdvice -----------");
         log.info("++++++   /error");
         return new ResponseEntity<>("Resource not found", HttpStatus.NOT_FOUND);
     }
@@ -41,15 +44,16 @@ public class CustomerControllerAdvice {//implements ErrorController{
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<?> handleNullPointerException(NullPointerException npe) {
         log.info("null pointer exception resolver !!!!");
+        log.info("customerContollerAdvice -----------");
         return new ResponseEntity<>("null poiner exception", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-  
-    
-    @ExceptionHandler(value=IllegalArgumentException.class)
-    public String illegalArgs(Model model,IllegalArgumentException iea){
-        model.addAttribute("error",new Error(iea.getMessage()));
-        log.info("++++ {}",model);
-         return "errors";
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public String illegalArgs(Model model, IllegalArgumentException iea) {
+        model.addAttribute("error", new Error(iea.getMessage()));
+        log.info("++++ {}", model);
+        log.info("customerContollerAdvice -----------");
+        return "errors";
     }
+
 }

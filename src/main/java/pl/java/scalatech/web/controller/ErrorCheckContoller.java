@@ -47,10 +47,15 @@ public class ErrorCheckContoller {
           throw new DuplicateException();
       }
       else if (errorStatus == 6) {
+          log.info("++++ 6");
           throw new NullPointerException();
       }
       else if (errorStatus == 7) {
+          log.info("++++ 7");
           throw new Exception("my simple exception");
+      }else if (errorStatus == 8 ){
+          log.info("++++ 8");
+          throw new pl.java.scalatech.web.controller.exception.NotFoundException("my simple resource exception", 23l);
       }
       
     return "ok";
@@ -63,11 +68,11 @@ public class ErrorCheckContoller {
         return ResponseEntity.badRequest().body("duplicate transaction id"));
     }*/
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
+ /*   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
     @ExceptionHandler(Exception.class)
     public void handleGeneralError(Exception ex) {
         log.error("An error occurred procesing request", ex);
-}
+}*/
 
     @ExceptionHandler(IOException.class)
     public ResponseEntity<?> handleArgumentException() {
