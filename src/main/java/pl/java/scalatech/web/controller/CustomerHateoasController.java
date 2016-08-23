@@ -18,6 +18,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,8 +54,8 @@ public class CustomerHateoasController {
     }
     
     @GetMapping(path="/second",produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagedResources<Customer> page(Pageable pageable,PagedResourcesAssembler pagedResourcesAssembler) {        
-        return pagedResourcesAssembler.toResource(customerRepository.findAll(pageable),customerAssembler );
+    public HttpEntity<PagedResources<Customer>> page(Pageable pageable,PagedResourcesAssembler pagedResourcesAssembler) {                      
+        return ResponseEntity.ok((pagedResourcesAssembler.toResource(customerRepository.findAll(pageable),customerAssembler )));
 }
     
 
