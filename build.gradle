@@ -25,7 +25,7 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
 }
-
+configurations { springLoaded }
 
 dependencies {
    // compile('org.springframework.boot:spring-boot-starter-aop')
@@ -51,6 +51,11 @@ compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '3.1.2'
     compile('org.springframework.boot:spring-boot-starter-web')
     //compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
    // compile 'org.springframework.data:spring-data-mongodb:1.9.2.RELEASE'
+   
+   // https://mvnrepository.com/artifact/org.springframework/springloaded
+    compile group: 'org.springframework', name: 'springloaded', version: '1.2.6.RELEASE'
+   
+   
     compile 'com.google.guava:guava:19.0'
     runtime('com.h2database:h2')
     compile 'org.projectlombok:lombok:1+'
@@ -68,13 +73,25 @@ compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '3.1.2'
     testCompile 'com.jayway.awaitility:awaitility-java8:1.6.1'
     testCompile 'com.jayway.awaitility:awaitility:1.6.5'
     testCompile 'org.springframework:spring-test'
-    
+    springLoaded 'org.springframework:springloaded:1.2.6.RELEASE'
 }
 
 
 task wrapper(type: Wrapper) {
 }
 
+
+
+
+bootRun {
+   def springLoadedFile = configurations.springLoaded.find
+            { it.name == "springloaded-1.2.6.RELEASE.jar" }
+    println springLoadedFile
+    systemProperty 'server.port', '9994'
+    systemProperty 'spring.profiles.active', 'dev'
+    jvmArgs "-javaagent:$springLoadedFile", "-noverify"
+ }
+ 
 import org.apache.tools.ant.filters.*
 
 afterEvaluate {
