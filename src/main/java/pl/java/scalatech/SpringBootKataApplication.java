@@ -22,7 +22,11 @@ public class SpringBootKataApplication implements CommandLineRunner{
 
     @Override
     public void run(String... args) throws Exception {
-         Customer customer = new Customer();
+         //createAndRetrieveCustomer();
+    }
+
+    private void createAndRetrieveCustomer() {
+        Customer customer = new Customer();
          customer.setFirstName("slawek");
          customer.setLastName("borowiec");
          pl.java.scalatech.domain.Address address = pl.java.scalatech.domain.Address.builder().addressLine1("polna 12").city("warszawa").country("polska").build();

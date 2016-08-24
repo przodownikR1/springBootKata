@@ -2,8 +2,9 @@ package pl.java.scalatech.domain;
 
 import java.util.List;
 
-import org.assertj.core.util.Lists;
 import org.springframework.data.annotation.Id;
+
+import com.google.common.collect.Lists;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
