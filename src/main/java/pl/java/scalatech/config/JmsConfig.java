@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class JmsConfig {
 
-    public static final String SAMPLE_QUEUE = "sample.queue";
+    public static final String SAMPLE_QUEUE = "sample1.queue";
 
     @Bean
     public Queue queue() {
