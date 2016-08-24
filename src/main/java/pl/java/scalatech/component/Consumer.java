@@ -11,9 +11,9 @@ import pl.java.scalatech.config.JmsConfig;
 @Slf4j
 public class Consumer {
 
-	@JmsListener(destination = JmsConfig.SAMPLE_QUEUE)
+	@JmsListener(destination = JmsConfig.SAMPLE_QUEUE,concurrency="8")
 	public void receiveQueue(String text) {
-		log.info("receive text : {}",text);
+		log.info("receive text from 1: {}",text);
 	}
 
 }
