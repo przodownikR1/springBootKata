@@ -34,8 +34,8 @@ import pl.java.scalatech.web.controller.exception.ResourceNotFoundException;
 @RequestMapping("/customer")
 public class CustomerController {
 
-    private final CustomerRepository customerRepository;    
-    
+    private final CustomerRepository customerRepository;
+
     public CustomerController(CustomerRepository customerRepository) {
         super();
         this.customerRepository = customerRepository;
@@ -82,10 +82,14 @@ public class CustomerController {
         customerRepository.delete(verify(id));
         return new HttpHeaders();
     }
-    
-    
-    @GetMapping(path="/firstname/{firstName}")
-    ResponseEntity<List<Customer>> findByName(@PathVariable("firstName") String firstname){
+
+    @GetMapping(path = "/firstname/{firstName}")
+    ResponseEntity<List<Customer>> findByName(@PathVariable("firstName") String firstname) {
         return ok(customerRepository.findByFirstNameLike(firstname));
+    }
+
+    @GetMapping(value = "/formatter/{firstName}")
+    public Customer getByNameFormatterUse(@PathVariable("firstName") Customer customer) {
+        return customer;
     }
 }
