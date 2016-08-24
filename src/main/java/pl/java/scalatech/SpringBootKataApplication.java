@@ -25,6 +25,10 @@ public class SpringBootKataApplication implements CommandLineRunner{
          Customer customer = new Customer();
          customer.setFirstName("slawek");
          customer.setLastName("borowiec");
+         pl.java.scalatech.domain.Address address = pl.java.scalatech.domain.Address.builder().addressLine1("polna 12").city("warszawa").country("polska").build();
+         pl.java.scalatech.domain.Address address2 = pl.java.scalatech.domain.Address.builder().addressLine1("zielna 12").city("radom").country("polska").build();
+         customer.getAddresses().add(address);
+         customer.getAddresses().add(address2);
          customerRepository.save(customer);
       
          log.info("+++  {}",customerRepository.findAll());
