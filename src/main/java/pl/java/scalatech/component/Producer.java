@@ -27,7 +27,7 @@ public class Producer implements CommandLineRunner {
 	    send("Sample message");
 		log.info("Message was sent to the Queue");
 	}
-	@Scheduled(fixedDelay=2000)
+	@Scheduled(fixedDelay=20000)
 	public void schedulerSend(){
 	    send("Sample message " + UUID.randomUUID().toString());
 	    log.info("+++++ send");  

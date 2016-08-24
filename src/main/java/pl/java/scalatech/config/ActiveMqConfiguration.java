@@ -16,8 +16,9 @@ import org.springframework.context.annotation.Configuration;
 //@Configuration
 public class ActiveMqConfiguration {
 
-    public static final String ADDRESS = "vm://localhost";
-
+    public static final String ADDRESS = "vm://localhost";  
+    //public static final String ADDRESS ="tcp://localhost:61616";
+    
     private BrokerService broker;
 
     @Bean(name = "myQueueDestination")
@@ -31,7 +32,7 @@ public class ActiveMqConfiguration {
         broker.setBrokerName("activemq-broker");
         broker.setDataDirectory("target");
         broker.addConnector(ADDRESS);
-        broker.setUseJmx(false);
+        broker.setUseJmx(true);
         broker.setUseShutdownHook(false);
         broker.start();
     }

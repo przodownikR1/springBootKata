@@ -1,13 +1,10 @@
 package pl.java.scalatech.config;
 
 import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.BeanFactoryDestinationResolver;
