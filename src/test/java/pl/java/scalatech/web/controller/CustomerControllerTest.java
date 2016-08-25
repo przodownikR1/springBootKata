@@ -48,7 +48,7 @@ public class CustomerControllerTest {
     @Test
     // @formatter:off
     public void shouldRetrieveCustomer() throws Exception {
-        given(customerRepository.findOne(1L)).willReturn(new Customer("slawek", "borowiec"));
+        given(customerRepository.findOne(1L)).willReturn(new Customer(1l,"slawek", "borowiec"));
         mvc.perform(get("/customer/{id}", 1L)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -56,7 +56,7 @@ public class CustomerControllerTest {
                 .andExpect(jsonPath("$.firstName", is("slawek")))
                 .andExpect(jsonPath("$.lastName", is("borowiec")))
                 .andExpect(content()
-                .json("{'id':null,'firstName':'slawek','lastName':'borowiec'}"));
+                .json("{'id':1,'firstName':'slawek','lastName':'borowiec'}"));
     }
    // @formatter:on
 
@@ -69,6 +69,7 @@ public class CustomerControllerTest {
     }
 
     @Test
+    //TODO
     @Ignore
     // @formatter:off
     public void shouldSaveCustomer() throws Exception {

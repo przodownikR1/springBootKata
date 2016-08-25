@@ -89,6 +89,8 @@ public class CustomerController {
     @GetMapping(path = "/firstname/{firstName}")
     ResponseEntity<List<Customer>> findByName(@PathVariable("firstName") String firstname) {
         log.info("+++ firstName : {}",firstname);
-        return ok(customerRepository.findByFirstName(firstname));
+        List<Customer> customers = customerRepository.findByFirstName(firstname);
+        log.info("+++ firstName : {}  : customers :  {}",firstname,customers);
+        return ok(customers);
     }
 }
