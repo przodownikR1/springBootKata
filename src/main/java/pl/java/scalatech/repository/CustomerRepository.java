@@ -11,5 +11,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>{
 
     @Cacheable("customer")
     List<Customer> findByFirstNameLike(String name);
+    List<Customer> findByFirstName(String name);
     
 }
