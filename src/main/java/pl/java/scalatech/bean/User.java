@@ -1,12 +1,14 @@
 package pl.java.scalatech.bean;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
-import org.assertj.core.util.Lists;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.google.common.collect.Lists;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +23,7 @@ public class User {
     public int id;
     public String name;
     @JsonBackReference
-    public List<Item> userItems = Lists.newArrayList();
+    public List<Item> userItems = newArrayList();
     
     public void addItem(Item item){
         this.userItems.add(item);
