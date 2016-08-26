@@ -1,2 +1,1 @@
-# springBootKata
-boot , mvc , rest , new spring features 
+include::docs/boot.adoc[]
