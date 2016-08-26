@@ -1,0 +1,1119 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Messaging
+
+== JMS
+
+=== Rodzaje : 
+
+** **Point-to-point messaging:**
+
+Wiadomość dostaje tylko jeden odbiorca
+
+
+** **Publish-Subscribe messaging:**
+
+Kopie wiadomość dostaje wiele konsumentów
+
+=== Typy konsumentów :
+
+** **Message listeners**
+
+Model asynchroniczny
+
+** **receive** 
+
+Model synchroniczny
+
+
+=== JmsTemplate
+
+
+
+== ActiveMQ support
+
+Zależność
+
+----
+compile('org.springframework.boot:spring-boot-starter-activemq')
+----
+
+Dodajemy możliwość korzystania z puli: 
+
+----
+ compile group: 'org.apache.activemq', name: 'activemq-pool', version: '5.14.0'
+----
+
+
+NOTE: ActiveMQAutoConfiguration.class
+
+
+Ustawienia : 
+
+----
+spring.activemq.*
+----
+
+Przyklad : 
+
+----
+
+spring.activemq.in-memory=false
+spring.activemq.pool.enabled=true
+spring.activemq.broker-url=tcp://localhost:61616
+spring.activemq.pool.configuration.max-connections=10
+spring.activemq.password=admin
+spring.activemq.user=admin
+spring.jms.listener.concurrency=10
+management.health.jms.enabled=true
+
+----
+
+
+Health status:
+
+----
+{
+  "status": "UP",
+  "jms": {
+    "status": "UP",
+    "provider": "ActiveMQ"
+  },
+  "diskSpace": {
+    "status": "UP",
+    "total": 219353915392,
+    "free": 121812205568,
+    "threshold": 10485760
+  }
+}
+
+----
+
+
+
+** Programowe tworzenie brokera
+
+----
+@Configuration
+public class ActiveMqConfiguration {
+
+    public static final String ADDRESS = "vm://localhost";
+
+    private BrokerService broker;
+
+    @Bean(name = "myQueueDestination")
+    public Destination bookMgrQueueDestination(@Value("${jms.myqueue.name}") String myQueueName) throws JMSException {
+        return new ActiveMQQueue(myQueueName);
+    }
+
+    @PostConstruct
+    public void startActiveMQ() throws Exception {
+        broker = new BrokerService();
+        broker.setBrokerName("activemq-broker");
+        broker.setDataDirectory("target");
+        broker.addConnector(ADDRESS);
+        broker.setUseJmx(false);
+        broker.setUseShutdownHook(false);
+        broker.start();
+    }
+
+    @PreDestroy
+    public void stopActiveMQ() throws Exception {
+        broker.stop();
+    }
+
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        return new ActiveMQConnectionFactory(ADDRESS + "?broker.persistent=false");
+    }
+}
+
+----
+
+** Programowe tworzenie listenera i JmsTemplate
+
+----
+@EnableJms
+@Configuration
+public class JmsConfiguration {
+
+    @Bean
+    JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
+    JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
+    jmsTemplate.setSessionTransacted(true);
+    return jmsTemplate ;
+    }
+
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        return new CachingConnectionFactory(new ActiveMQConnectionFactory("tcp://localhost:61616"));
+    }
+    
+    @Bean
+    public PlatformTransactionManager transactionManager() throws NamingException {
+        return new JmsTransactionManager(connectionFactory());
+}
+    
+    @Bean(name = "DefaultJmsListenerContainerFactory")
+    public DefaultJmsListenerContainerFactory provideJmsListenerContainerFactory(PlatformTransactionManager transactionManager) {
+        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory());
+        factory.setTransactionManager(transactionManager);
+        factory.setConcurrency("5-10");
+        factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
+        factory.setSessionTransacted(true);
+        return factory;
+}
+
+}
+----
+
+
+** Tworzenie odbiorcy 
+
+----
+@Component
+public class Consumer {
+	@JmsListener(destination = "sample.queue")
+	public void receiveQueue(String text) {
+		System.out.println(text);
+	}
+
+}
+----
+
+
+** Tworzenie producenta
+
+----
+@Component
+public class Producer implements CommandLineRunner {
+
+	@Autowired
+	private JmsMessagingTemplate jmsMessagingTemplate;
+
+	@Autowired
+	private Queue queue;
+
+	@Override
+	public void run(String... args) throws Exception {
+		send("Sample message");
+		System.out.println("Message was sent to the Queue");
+	}
+
+	public void send(String msg) {
+		this.jmsMessagingTemplate.convertAndSend(this.queue, msg);
+	}
+
+}
+----
+
+Przykład 2: 
+
+----
+public class JmsQueueSender {
+
+    private JmsTemplate jmsTemplate;
+    private Queue queue;
+
+    public void setConnectionFactory(ConnectionFactory cf) {
+        this.jmsTemplate = new JmsTemplate(cf);
+    }
+
+    public void setQueue(Queue queue) {
+        this.queue = queue;
+    }
+
+    public void simpleSend() {
+        this.jmsTemplate.send(this.queue, new MessageCreator() {
+            public Message createMessage(Session session) throws JMSException {
+                return session.createTextMessage("hello queue world");
+            }
+        });
+    }
+}
+----
+
+
+** Tworzenie kolejki
+
+----
+@Bean
+	public Queue queue() {
+		return new ActiveMQQueue("sample.queue");
+}
+----
+
+
+
+
+
+** Tworzenie fabryki (czysty Spring)
+
+----
+<bean id="connectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory" p:brokerURL="tcp://localhost:61616"/>
+----
+
+i ponawianie jeśli to konieczne : 
+
+----
+<property name="redeliveryPolicy">
+<bean class="org.apache.activemq.RedeliveryPolicy">
+<property name="maximumRedeliveries" value="3"/>
+</bean>
+</property>
+----
+
+
+NOTE : https://github.com/przodownikR1/springBatchJmsKata/blob/74cbfae69c6fb53a3b9a624cc05733cfe25a07c7/src/main/java/pl/java/scalatech/config/ActiveMQConfig.java[redelivery_programming_way]
+
+lub za pomocą ActiveMq namespace
+
+----
+<?xml version="1.0" encoding="UTF-8"?>
+  <beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jms="http://www.springframework.org/schema/jms"
+    xmlns:amq="http://activemq.apache.org/schema/core"
+    xsi:schemaLocation="http://activemq.apache.org/schema/core
+      http://activemq.apache.org/schema/core/activemq-core.xsd
+      http://www.springframework.org/schema/jms
+      http://www.springframework.org/schema/jms/spring-jms.xsd
+      http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <amq:connectionFactory id="connectionFactory"  brokerURL="tcp://localhost:61616"/>
+
+</beans>
+----
+
+
+** Deklaracja kolejki 
+
+----
+<bean id="queue" class="org.apache.activemq.command.ActiveMQQueue" c:_="my.queue" />
+
+
+----
+
+lub namespace:
+
+----
+<amq:queue id="myQueue" physicalName="my.queue" />
+----
+
+
+** Deklaracja tematu
+
+----
+<bean id="topic" class="org.apache.activemq.command.ActiveMQTopic" c:_="myTopic.queue" />
+----
+
+lub namespace:
+
+----
+<amq:topic id="myTopic" physicalName="my.topic" />
+----
+
+
+** JmsTemplate
+
+----
+<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate" c:_-ref="connectionFactory" />
+----
+
+----
+<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+<property name="connectionFactory"  ref="connectionFactory" />
+<property name="defaultDestination" ref="destination" />
+</bean>
+
+----
+
+
+*** Wysyłanie wiadomości  (send())
+
+----
+jmsTemplate.send(
+   new MessageCreator() {
+   ...
+   }
+);
+----
+
+*** Wysyłanie wiadomości (convertAndSend())
+
+** **MessageConverter**
+
+
+** **MappingJacksonMessageConverter (JSON)**
+
+----
+<bean id="messageConverter" class="org.springframework.jms.support.converter.MappingJacksonMessageConverter" />
+
+<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate"
+      c:_-ref="connectionFactory"
+      p:defaultDestinationName="my.queue"
+      p:messageConverter-ref="messageConverter" />
+----
+
+
+** **MappingJackson2MessageConverter (JSON)**
+
+** **MarshallingMessageConverter (JAXB)**
+
+** **SimpleMessageConverter (String->TextMessage)**
+
+
+Przykład : 
+
+----
+public void sendWithConversion() {
+    Map map = new HashMap();
+    map.put("Name", "Mark");
+    map.put("Age", new Integer(47));
+    jmsTemplate.convertAndSend("testQueue", map, new MessagePostProcessor() {
+        public Message postProcessMessage(Message message) throws JMSException {
+            message.setIntProperty("AccountID", 1234);
+            message.setJMSCorrelationID("123-00001");
+            return message;
+        }
+    });
+}
+----
+ 
+
+*** Odbieranie wiadomości 
+
+----
+public Alert receiveMyAlert() {
+  try {
+    ObjectMessage receivedMessage = (ObjectMessage) jmsOperations.receive();   
+    return (Alert) receivedMessage.getObject();   
+  } catch (JMSException jmsException) {
+       throw JmsUtils.convertJmsAccessException(jmsException);    
+  }
+}
+----
+
+
+=== Sterowanie komunikatami **@MessageDriven**
+
+----
+@MessageDriven(mappedName="jms/my.alert.queue")
+  public class AlertHandler implements MessageListener {
+
+  @Resource
+  private MessageDrivenContext mdc;
+
+  public void onMessage(Message message) {
+    ...
+  }
+
+  public void handleAlert(Alert alert){
+  }
+}
+----
+
+NOTE: MessageListener nie jest konieczny
+
+----
+<jms:listener-container connection-factory="connectionFactory">
+  <jms:listener destination="my.alert.queue"
+        ref="spittleHandler" method="handleAlert" />
+</jms:listener-container>
+----
+
+
+Zależność:
+
+----
+spring-boot-starter-activemq
+----
+
+----
+compile("org.springframework.boot:spring-boot-starter")
+compile("org.springframework:spring-jms")
+compile("org.apache.activemq:activemq-broker")
+----
+
+
+
+----
+spring.activemq.broker-url=tcp://192.168.1.210:9876
+spring.activemq.user=admin
+spring.activemq.password=secret
+----
+
+
+=== @EnableJms
+
+
+
+=== Wysyłanie wiadomości
+
+
+----
+@Component
+public class MyBean {
+
+    private final JmsTemplate jmsTemplate;
+
+    @Autowired
+    public MyBean(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
+    // ...
+
+}
+----
+
+=== Odbieranie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    @JmsListener(destination = "someQueue")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+
+
+=== Własny JmsListenerContainer
+
+----
+@Configuration
+static class JmsConfiguration {
+
+    @Bean
+    public DefaultJmsListenerContainerFactory myFactory(
+            DefaultJmsListenerContainerFactoryConfigurer configurer) {
+        DefaultJmsListenerContainerFactory factory =
+                new DefaultJmsListenerContainerFactory();
+        configurer.configure(factory, connectionFactory());
+        factory.setMessageConverter(myMessageConverter());
+        return factory;
+    }
+
+}
+
+
+@Component
+public class MyBean {
+
+    @JmsListener(destination = "someQueue", containerFactory="myFactory")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+
+----
+
+
+=== Monitoring 
+
+
+** JMX
+
+** Hawtio
+
+
+Zależności : 
+
+----
+ compile group: 'io.hawt', name: 'hawtio-springboot', version: '1.4.65'
+ compile group: 'io.hawt', name: 'hawtio-core', version: '1.4.65'
+ compile group: 'org.jolokia', name: 'jolokia-core', version: '1.3.4'
+----
+
+Przykładowa konfiguracja:
+
+----
+@Configuration
+@EnableHawtio
+public class HawtioConfiguration  {
+    static {
+        System.setProperty(AuthenticationFilter.HAWTIO_AUTHENTICATION_ENABLED, "false");
+}
+}
+
+----
+
+
+== AMQP
+
+** **Protokoł warstwy połączenia (wire-level protocol)**
+
+NOTE: JMS -> API
+
+** **Wieloplatformość**
+
+** **Utrwalanie wiadomość**
+
+** **Potwierdzenie odbioru**
+
+** **Skalowalność**
+
+** **Popularność**
+
+** **Modelowanie różnych schematów kierowanie**
+
+NOTE: W JMS tylko  punkt-punkt oraz publikacja-subskrypcja
+
+image:rabbitFanout.png[]
+
+
+=== Wymiana komunikatów 
+
+** **Producent**
+
+Wysyła wiadomość do exchange.
+
+NOTE : Producent nie publikuje 
+
+
+** **Wymiana (exchange)**
+
+Kieruje komunikaty do odpowiedniej kolejki lub kolejek
+
+NOTE: Routing agent
+
+NOTE: Trasowanie  i filtrowanie komunikatów
+
+*** Może być trafały - przeżyje restart brokera
+
+*** Może być tymczasowy
+
+*** Może być auto-kasowalny - skasowany jeśli żadna kolejka nie będzie z nim dłużej powiązana
+
+** Kolejka
+
+** Konsument
+
+
+=== Komponenty
+
+** **Kanał**  
+
+logiczna reprezentacja połączenia 
+
+** **Binding**
+
+relacja pomiędzy queue a exchange 
+
+** **Message**
+
+Wiadomość
+
+** **Broker** 
+
+Zarządza exchange'ami , kolejkami etc
+
+** **Kolejka**
+
+Odbiera wiadomość wysłaną z exchange
+
+
+=== Exchange Type
+
+** **direct** 
+
+  Komunikat zostaje bezpośrednio skierowany do kolejki jeśli klucz trasowania zgadza się z kluczem w powiązaniu
+
+** **fanout** 
+
+wszystkie wiadomości trafiają do wszystkich kolejek, routing key dowiązania jest ignorowany
+
+NOTE: Loadbalancing
+
+** **topic** 
+
+  Komunikat zostaje bezpośrednio skierowany do kolejki jeśli klucz trasowania zgadza się z kluczem w powiązaniu przy wykorzystaniu dopasowania z użyciem wzorców wieloznacznych
+
+** **headers** 
+
+Komunikat zostaje bezpośrednio skierowany do kolejki jeśli nagłówki i wartości umieszczone w tablicy argumentów będą odpowiadać nagłówkom i wartościom dostępnym w tablicy argumentów 
+ powiązania
+
+
+
+----
+spring-boot-starter-amqp
+----
+
+powoduje to załadowanie jara : **org.springframework.amqp:spring-rabbit:{someVersion}.RELEASE**
+
+
+Przykład tworzenie połączenia i wywołania klienta imperatywnie : 
+
+----
+ConnectionFactory connectionFactory = new CachingConnectionFactory();
+AmqpAdmin admin = new RabbitAdmin(connectionFactory);
+admin.declareQueue(new Queue("myqueue"));
+AmqpTemplate template = new RabbitTemplate(connectionFactory);
+template.convertAndSend("myqueue", "foo");
+String foo = (String) template.receiveAndConvert("myqueue");
+----
+
+lub XML : 
+
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/rabbit
+           http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <rabbit:connection-factory id="connectionFactory"/>
+
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory"/>
+
+    <rabbit:admin connection-factory="connectionFactory"/>
+
+    <rabbit:queue name="myqueue"/>
+
+</beans>
+----
+
+
+----
+ApplicationContext context = new GenericXmlApplicationContext("classpath:/rabbit-context.xml");
+AmqpTemplate template = context.getBean(AmqpTemplate.class);
+template.convertAndSend("myqueue", "foo");
+String foo = (String) template.receiveAndConvert("myqueue");
+----
+
+
+lub JavaConfig : 
+
+----
+@Configuration
+public class RabbitConfiguration {
+
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        return new CachingConnectionFactory("localhost");
+    }
+
+    @Bean
+    public AmqpAdmin amqpAdmin() {
+        return new RabbitAdmin(connectionFactory());
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate() {
+        return new RabbitTemplate(connectionFactory());
+    }
+
+    @Bean
+    public Queue myQueue() {
+       return new Queue("myqueue");
+    }
+}
+
+----
+
+
+=== RabbitMQ support
+
+----
+RabbitMQ jest popularnym, otwartym brokerem komunikatów implementującym AMQP.
+----
+
+----
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=admin
+spring.rabbitmq.password=secret
+----
+
+
+Czysty Spring : 
+
+** **Tworzenie connectionFactory**
+
+----
+<bean id="connectionFactory"
+      class="org.springframework.amqp.rabbit.connection.CachingConnectionFactory">
+    <constructor-arg value="somehost"/>
+    <property name="username" value="guest"/>
+    <property name="password" value="guest"/>
+    <property name="channelCacheSize" value="50"/>
+</bean>
+----
+
+lub z namespace:
+
+----
+<rabbit:connection-factory id="connectionFactory" channel-cache-size="50"/>
+
+<rabbit:connection-factory  id="connectionFactory" addresses="host1:5672,host2:5672"/>
+
+<rabbit:connection-factory  id="connectionFactory" host="somehost" port="5672"/>
+----
+
+** **Retry (Usługa ponawiania)**
+
+----
+<rabbit:template id="template" connection-factory="connectionFactory" retry-template="retryTemplate"/>
+
+<bean id="retryTemplate" class="org.springframework.retry.support.RetryTemplate">
+    <property name="backOffPolicy">
+        <bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
+            <property name="initialInterval" value="500" />
+            <property name="multiplier" value="10.0" />
+            <property name="maxInterval" value="10000" />
+        </bean>
+    </property>
+</bean>
+----
+
+lub JavaConfig: 
+
+----
+@Bean
+public AmqpTemplate rabbitTemplate();
+    RabbitTemplate template = new RabbitTemplate(connectionFactory());
+    RetryTemplate retryTemplate = new RetryTemplate();
+    ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+    backOffPolicy.setInitialInterval(500);
+    backOffPolicy.setMultiplier(10.0);
+    backOffPolicy.setMaxInterval(10000);
+    retryTemplate.setBackOffPolicy(backOffPolicy);
+    template.setRetryTemplate(retryTemplate);
+    return template;
+}
+----
+
+lub bezpośrednio w kodzie :
+
+----
+retryTemplate.execute(
+    new RetryCallback<Object, Exception>() {
+
+        @Override
+        public Object doWithRetry(RetryContext context) throws Exception {
+            context.setAttribute("message", message);
+            return rabbitTemplate.convertAndSend(exchange, routingKey, message);
+        }
+    }, new RecoveryCallback<Object>() {
+
+        @Override
+        public Object recover(RetryContext context) throws Exception {
+            Object message = context.getAttribute("message");
+            Throwable t = context.getLastThrowable();
+            // Do something with message
+            return null;
+        }
+    });
+}
+----
+
+** **Wysyłanie wiadomości** 
+
+----
+void send(Message message) throws AmqpException;
+
+void send(String routingKey, Message message) throws AmqpException;
+
+void send(String exchange, String routingKey, Message message) throws AmqpException;
+----
+
+----
+amqpTemplate.send("marketData.topic", "quotes.nasdaq.FOO", new Message("12.34".getBytes(), someProperties));
+----
+
+*** **RabbitTemplate**
+
+----
+RabbitTemplate template = new RabbitTemplate(); // using default no-name Exchange
+template.send("queue.helloWorld", new Message("Hello World".getBytes(), someProperties));
+
+//
+
+RabbitTemplate template = new RabbitTemplate(); // using default no-name Exchange
+template.setRoutingKey("queue.helloWorld"); // but we'll always send to this Queue
+template.send(new Message("Hello World".getBytes(), someProperties));
+
+----
+
+*** **MessageBuilder**
+
+----
+Message message = MessageBuilder.withBody("foo".getBytes())
+    .setContentType(MessageProperties.CONTENT_TYPE_TEXT_PLAIN)
+    .setMessageId("123")
+    .setHeader("bar", "baz")
+    .build();
+
+//
+
+MessageProperties props = MessagePropertiesBuilder.newInstance()
+    .setContentType(MessageProperties.CONTENT_TYPE_TEXT_PLAIN)
+    .setMessageId("123")
+    .setHeader("bar", "baz")
+    .build();
+
+Message message = MessageBuilder.withBody("foo".getBytes())
+    .andProperties(props)
+    .build();
+
+
+----
+
+** **Odbieranie wiadomości**
+
+----
+Message receive() throws AmqpException;
+
+Message receive(String queueName) throws AmqpException;
+
+Message receive(long timeoutMillis) throws AmqpException;
+
+Message receive(String queueName, long timeoutMillis) throws AmqpException;
+----
+
+----
+boolean received =
+        this.template.receiveAndReply(ROUTE, new ReceiveAndReplyCallback<Order, Invoice>() {
+
+                public Invoice handle(Order order) {
+                        return processOrder(order);
+                }
+        });
+if (received) {
+        log.info("We received an order!");
+}
+----
+
+
+*** **Asynchronicznie**
+
+----
+public interface MessageListener {
+    void onMessage(Message message);
+}
+
+----
+
+*** **Kontener**
+
+----
+SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+container.setConnectionFactory(rabbitConnectionFactory);
+container.setQueueNames("some.queue");
+container.setMessageListener(new MessageListenerAdapter(somePojo));
+
+----
+
+lub XML : 
+
+----
+<rabbit:listener-container connection-factory="rabbitConnectionFactory">
+    <rabbit:listener queues="some.queue" ref="somePojo" method="handle"/>
+</rabbit:listener-container>	
+
+
+<rabbit:listener-container connection-factory="rabbitConnectionFactory">
+    <rabbit:listener queues="some.queue" ref="somePojo" method="handle" priority="10" />
+</rabbit:listener-container>
+----
+
+lub JavaConfig:
+
+----
+@Configuration
+public class ExampleAmqpConfiguration {
+
+    @Bean
+    public SimpleMessageListenerContainer messageListenerContainer() {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(rabbitConnectionFactory());
+        container.setQueueName("some.queue");
+        container.setMessageListener(exampleListener());
+        return container;
+    }
+
+    @Bean
+    public ConnectionFactory rabbitConnectionFactory() {
+        CachingConnectionFactory connectionFactory =
+            new CachingConnectionFactory("localhost");
+        connectionFactory.setUsername("guest");
+        connectionFactory.setPassword("guest");
+        return connectionFactory;
+    }
+
+    @Bean
+    public MessageListener exampleListener() {
+        return new MessageListener() {
+            public void onMessage(Message message) {
+                System.out.println("received: " + message);
+            }
+        };
+    }
+}
+----
+
+
+*** **AutoListener @RabbitListener**
+
+
+Aktywacja : @EnableRabbit
+
+----
+@Configuration
+@EnableRabbit
+public class AppConfig {
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory());
+        factory.setConcurrentConsumers(3);
+        factory.setMaxConcurrentConsumers(10);
+        return factory;
+    }
+}
+----
+
+lub XML : 
+
+----
+<rabbit:annotation-driven/>
+
+<bean id="rabbitListenerContainerFactory"
+      class="org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory">
+    <property name="connectionFactory" ref="connectionFactory"/>
+    <property name="concurrentConsumers" value="3"/>
+    <property name="maxConcurrentConsumers" value="10"/>
+</bean>
+----
+
+**Listener : @RabbitListener**
+
+----
+@Component
+public class MyService {
+
+    @RabbitListener(queues = "myQueue")
+    public void processOrder(String data) {
+        ...
+    }
+
+}
+//
+@Component
+public class MyService {
+
+  @RabbitListener(bindings = @QueueBinding(
+        value = @Queue(value = "myQueue", durable = "true"),
+        exchange = @Exchange(value = "auto.exch", ignoreDeclarationExceptions = "true"),
+        key = "orderRoutingKey")
+  )
+  public void processOrder(String data) {
+    ...
+  }
+
+  @RabbitListener(bindings = @QueueBinding(
+        value = @Queue,
+        exchange = @Exchange(value = "auto.exch"),
+        key = "invoiceRoutingKey")
+  )
+  public void processInvoice(String data) {
+    ...
+  }
+
+}
+----
+ 
+
+
+=== Wysyłanie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    private final AmqpAdmin amqpAdmin;
+    private final AmqpTemplate amqpTemplate;
+
+    @Autowired
+    public MyBean(AmqpAdmin amqpAdmin, AmqpTemplate amqpTemplate) {
+        this.amqpAdmin = amqpAdmin;
+        this.amqpTemplate = amqpTemplate;
+    }
+
+    // ...
+
+}
+----
+
+=== Odbieranie wiadomości
+
+----
+@Component
+public class MyBean {
+
+    @RabbitListener(queues = "someQueue")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+
+
+=== Własny RabbitListenerContainerFactory
+
+----
+@Configuration
+static class RabbitConfiguration {
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory myFactory(
+            SimpleRabbitListenerContainerFactoryConfigurer configurer) {
+        SimpleRabbitListenerContainerFactory factory =
+                new SimpleRabbitListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        factory.setMessageConverter(myMessageConverter());
+        return factory;
+    }
+
+}
+----
+
+Wykorzytanie : 
+
+----
+@Component
+public class MyBean {
+
+    @RabbitListener(queues = "someQueue", containerFactory="myFactory")
+    public void processMessage(String content) {
+        // ...
+    }
+
+}
+----
+
+

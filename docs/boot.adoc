@@ -3,7 +3,7 @@
 :numbered:
 :icons: font
 :pagenums:
-:imagesdir: img
+:imagesdir: images
 :iconsdir: ./icons
 :stylesdir: ./styles
 :scriptsdir: ./js
@@ -11,7 +11,7 @@
 :image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
 ifndef::sourcedir[:sourcedir: ./src/main/java/]
 ifndef::resourcedir[:resourcedir: ./src/main/resources/]
-ifndef::imgsdir[:imgsdir: ./../img]
+ifndef::imgsdir[:imgsdir: ./../images]
 :source-highlighter: coderay
 
 
@@ -25,409 +25,141 @@ ifndef::imgsdir[:imgsdir: ./../img]
 image:{image-link} [role='img-circle']
 
 
-== Co to jest Spring Boot ?
+include::introduce.adoc[]
 
+include::maven.adoc[]
 
-== Cechy
+include::gradle.adoc[]
 
-** Eliminacja XML
-
-** Fluent SpringApplicationBuilder 
-
-** Wbudowany kontener Tomcat lub Jetty
-
-** ApplicationArguments
-
-** Zcentralizowana konfiguracja 
-
-*** application.properties
-
-*** application.yml
-
-** Profile
-
-** Prostota konfiguracji zależności
-
-** Prostota konfiguracji aplikacji
-
-** Monitoring
-
-*** Actuator
-
-** Microservices :)
-
-
-
-
-=== Pierwsza prosta aplikacja
-
-
-
-== Strona projektu 
-
-http://projects.spring.io/spring-boot/[spring boot]
-
-== Dokumentacja 
-
-http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/[dokumentacja]
-
-
-
-== Spring vs Spring Boot
-
-=== Podejście standardowe
-
-** Projekt webowy musi zawierać folder WEB-INF
-
-*** opjonalny plik : web.xml
-
-*** <servlet-name>-servlet.xml
-
-
-** Prosty kontroller 
-
-
-[source,java]
-----
-@Controller
-@EnableAutoConfiguration
-public class SampleController {
-
-    @RequestMapping("/")
-    @ResponseBody
-    String home() {
-        return "Hello World!";
-    }
-
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(SampleController.class, args);
-    }
-}
-----
-
-
-[source,java]
-----
-@RestController
-public class SimpleWebController {
-@RequestMapping("/")
-public String greetings(){
-return "Hello world";
-}
-}
-----
-
-
-== Uruchamianie 
-
-=== Maven
-
-** Konfiguracja 
-
-[source,xml]
-----
-
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-<modelVersion>4.0.0</modelVersion>
-<groupId>com.example</groupId>
-<artifactId>myapp</artifactId>
-<version>0.0.1-SNAPSHOT</version>
-
-<parent>
-   <groupId>org.springframework.boot</groupId>
-   <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.3.6.RELEASE</version>
-</parent>
-
-<dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        ...
-</dependencies>
-
-<build>
-<plugins>
-  <plugin>
-     <groupId>org.springframework.boot</groupId>
-     <artifactId>spring-boot-maven-plugin</artifactId>
-   </plugin>
-</plugins>
-</build>
-</project>
-----
-
-----
-mvn spring-boot:run
-----
-
-=== Gradle
-
-** Konfiguracja 
-
-[source,groovy]
-----
-buildscript {
-repositories {
-jcenter()
-maven { url "http://repo.spring.io/snapshot" }
-maven { url "http://repo.spring.io/milestone" }
-}
-dependencies {
-classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE")
-}
-}
-
-apply plugin: 'java'
-apply plugin: 'spring-boot'
-jar {
-   baseName = 'mySimpleApp'
-   version = '0.0.1-SNAPSHOT'
-}
-repositories {
-   jcenter()
-   ...
-}
-dependencies {
-   compile 'org.springframework.boot:spring-boot-starter' 
-   compile("org.springframework.boot:spring-boot-starter-web")
-   testCompile("org.springframework.boot:spring-boot-starter-test")
-}
-----
- 
-----
-gradle bootRun
-----
-
-
-
-=== Java
+== Java
 
 ----
 spring run *.java
 ----
 
-== Starters
 
-** **spring-boot-starter**
+== Uruchamianie jako jar package
+
+$ java -jar target/myproject-0.0.1-SNAPSHOT.jar
+
+$ java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -jar target/myproject-0.0.1-SNAPSHOT.jar
+
+
+include::starters.adoc[]
+
+
+include::conditional.adoc[]
+
+== Debug mode
+
+----
+debug=true
+----
+
+
+== Hot swapping
+
+** JRebel
+ 
+**  Spring Loaded
+
+
+== Banner
+
+Podłącznie baneru będzie wykonywane automatycznie gdy plik **banner.txt, banner.gif, banner.jpg czy banner.png** 
+znajdą się na classpath lub zostaną jawnie określone przez zmienną  **banner.image.location** 
+
+
+**${application.version}**  - wesja aplikacji zadeklarowana w MANIFEST.MF 
+
+----
+Implementation-Version: 1.0 wyświetli 1.0.
+----
+
+
+**${spring-boot.version}** - wesja Spring Boot użytego w aplikacji
+
+**${application.title}**  - tytył aplikacji zadeklarowany w MANIFEST.MF.
+
+----
+Implementation-Title: MyApp wyślietli  MyApp.
+----
+ 
     
-Rdzeń Spring Boot. Zawiera elementy decydujące o auto-konfiguracji, logowaniu i rejestrowaniu zmian w YAML czy properties.
 
-WARNING: Zależność krytyczna
+NOTE: SpringApplication.setBanner(…​) Generowanie banneru programowalnie. (org.springframework.boot.Banner -> printBanner() method)
 
-** **spring-boot-starter-actuator**
+----
+spring:
+    main:
+        banner-mode: "off"
+        
+----
 
-Pomaga monitorować i zarządzać aplikacją.
+
+               
+[source,java]
+----
+public static void main(String[] args) {
+    SpringApplication app = new SpringApplication(MySpringConfiguration.class);
+    app.setBannerMode(Banner.Mode.OFF);
+    app.run(args);
+}
+
+----
+  
+=== Fluent builder API
+
+----
+
+new SpringApplicationBuilder()
+    .bannerMode(Banner.Mode.OFF)
+    .sources(Parent.class)
+    .child(Application.class)
+    .run(args);
     
-NOTE: Production ready feature
+----
+ 
+ 
+ 
+== Application events and listeners
 
-** **spring-boot-starter-amqp**
-    
-Wspiera technologię opartą protokole AMPQ jak RABBIT-MQ 
+**ApplicationStartedEvent** - odpalany podczas startu aplikacji, przed procesowaniem z wyjątkiem rejestracji słuchaczy czy initializerów.
 
+**ApplicationEnvironmentPreparedEvent** - kiedy Environment zostanie użyty w kontekscie, ale przed stworzeniem kontekstu   
 
-** **spring-boot-starter-aop**
-    
-Wspiera AOP
+**ApplicationPreparedEvent** -   wywoływany przed odświeżeniem  aplikacji ale po załadowaniu wszystkich definicji modułów.
 
+**ApplicationReadyEvent** - wywoływany po odświeżeniu lub wywołaniu jakiegokolwiek wywołania zwrotnego które zostało przeprocesowane w aplikacji 
 
-** **spring-boot-starter-batch**
-    
-Wspiera integrację ze Spring Batch
+**ApplicationFailedEvent** - wywołany podczas wystąpienie wyjątku na starcie
 
+  
+==  Argumenty wywołania
 
-** **spring-boot-starter-cache**
 
-Wspiera integrację z Cache    
+[source,java]
+----
+@Component
+public class MyBean {
 
+    @Autowired
+    public MyBean(ApplicationArguments args) {
+        boolean debug = args.containsOption("debug");
+        List<String> files = args.getNonOptionArgs();
+        // if run with "--debug logfile.txt" debug=true, files=["logfile.txt"]
+    }
 
-** **spring-boot-starter-cloud-connectors**
-    
-Wspiera integrację z chmurą
+}
 
+----
 
-** **spring-boot-starter-data-elasticsearch**
-    
-Wspiera integrację z ElasticSearch
 
-** **spring-boot-starter-data-gemfire**
-    
-Wspiera integrację z GemFire 
+== Admin features
 
+spring.application.admin.enabled
 
-** **spring-boot-starter-data-jpa**
-
-Wspiera integrację z JPA oraz Spring-Data-JPA (spring-data-jpa,spring-orm)    
-
-** **spring-boot-starter-data-mongodb**
-    
-Wspiera integrację z MongoDB (spring-data-mongodb)
-
-
-** **spring-boot-starter-data-rest**
-
-Wspiera integrację z REST (spring-data-rest-webmvc)    
-
-
-** **spring-boot-starter-data-solr**
-    
-Wspiera integrację z Solr (spring-data-solr)
-
-** **spring-boot-starter-freemarker**
-    
-Wspiera integrację z FreeMarker    
-
-
-** **spring-boot-starter-groovy-templates**
-
-Wspiera integrację z Groovy    
-
-
-** **spring-boot-starter-hateoas**
-
-Wspiera integrację z HATEOAS (spring-hateoas)    
-
-
-** **spring-boot-starter-hornetq**
-    
-Wspiera integrację z HornetQ
-
-** **spring-boot-starter-integration**
-
-Wspiera integrację z Spring-integration    
-
-** **spring-boot-starter-jdbc**
-
-Wspiera integrację z JDBC    
-
-
-** **spring-boot-starter-jersey**
-
-Wspiera integrację z Jersey RESTful    
-
-
-** **spring-boot-starter-jta-atomikos**
-    
-Wspiera integrację JTA Atomikos
-
-
-** **spring-boot-starter-jta-bitronix**
-
-Wspiera integrację z JTA Bitronix    
-
-
-** **spring-boot-starter-mail**
-
-Wspiera dla wysyłki email    
-
-** **spring-boot-starter-mobile**
-
-Wspiera integrację z spring-mobile    
-
-** **spring-boot-starter-mustache**
-    
-Wspiera integrację z Mustache template    
-
-
-** **spring-boot-starter-redis**
-    
-Wspiera integrację z REDIS
-
-
-** **spring-boot-starter-security**
-    
-Wspiera integrację z Spring-Security 
-
-** **spring-boot-starter-social-facebook**
-    
-Wspiera integrację z Facebook (spring-social-facebook)
-
-
-** **spring-boot-starter-social-linkedin**
-
-Wspiera integrację z LinkedIn (spring-social-linkedin)    
-
-
-** **spring-boot-starter-social-twitter**
-
-Wspiera integrację z Twitter (spring-social-twitter)    
-
-
-** **spring-boot-starter-test**
-
-Wspiera testowanie (Junit, Hamcrest, Mockito)    
-
-
-** **spring-boot-starter-thymeleaf**
-    
-Wspiera integrację z Thymeleaf template
-
-
-** **spring-boot-starter-velocity**
-    
-Wspiera integrację z Velocity
-
-
-** **spring-boot-starter-web**
-    
-Wsparcie dla stosu webowego Springa (Tomcat, spring-webmvc)
-
-NOTE: Wbudowany Tomcat, Jackson JSON binding, JSR 303 validation, Spring Web i Spring MVC 
-
-** **spring-boot-starter-websocket**
-    
-Wspiera integrację z WebSocket
-
-
-** **spring-boot-starter-ws**
-
-Wspiera integrację z Web Service    
-
-** **spring-boot-starter-actuator**
-    
-Monitoring i metryki    
-
-** **spring-boot-starter-remote-shell**
-    
-Monitoring i metryki z poziomu ssh
-
-** **spring-boot-starter-jetty**
-    
-Integracja z Jetty (alternatywa dla Tomcat)
-
-
-** **spring-boot-starter-log4j**
-
-Wspiera integrację z Log4j    
-
-
-** **spring-boot-starter-logging**
-    
-    
-Import Spring Boot’s default logging framework (Logback).
-
-** **spring-boot-starter-tomcat**
-    
-Wspiera integrację z Tomcat (domyślne)
-
-
-** **spring-boot-starter-undertow**
-    
-Wspiera integrację z Undertow (alternatywa dla Tomcat)
-
-
-== @Conditional
-
-== Konfiguracja 
+include::extendConfig.adoc[]
 
 == CommandLineRunner
 
@@ -437,224 +169,87 @@ public  void run(String...   args){
 ...
 }
 ----
-Zapewnia, że Spring Boot wykona daną metodę tylko raz zaraz po starcie.
 
+Zapewnia, że Spring Boot wykona daną metodę tylko raz zaraz po starcie
+
+
+NOTE:  InitializingBean jako analogia
+
+** Przykład
+
+[source,java]
+----
+ @Autowired
+    private Environment env;
+    
+    @Bean
+    InitializingBean bean(){
+        return () -> log.info("!!!!  application.user : {}",env.getProperty(APPLICATION_USER));
+        
+    }
+----
+
+
+** Przykład 2 / @Autowired repository
+
+[source,java]
+----
+@Bean
+	InitializingBean populateDatabase(CarRepository repository) {
+		return () -> {
+			repository.save(new Car("Honda", "Civic", "red"));
+			repository.save(new Car("Fiat", "Uno", "black"));
+			repository.save(new Car("Ford", "Escort", "black"));
+		};
+}
+----
 
 == ApplicationArguments
 
-== @Enable
+
+include::devtools.adoc[]
 
 
+include::logging.adoc[]
 
-== Narzędzia
+include::web.adoc[]
 
-=== Spring Boot CLI
+include::orm.adoc[]
 
-----
-spring init -dweb,data-jpa,h2,thymeleaf --build gradle mySimpleApp --force
-----
-
-=== STS
-
-=== https://start.spring.io/[Initializr]
-
-== Logowanie
-
-== Kolejki
-
-== Rest
-
-== ORM
-
-== NoSql
+include::nosql.adoc[]
 
 == Using ResourceBundles for Internationalization (I18N)
 
 
-== Security
+include::security.adoc[]
 
 
-== Actuator
+include::cache.adoc[]
 
 
-** /autoconfig -wyświetla co zostało skonfigurowane automatycznie 
+include::messaging.adoc[]
 
-** /beans - wyświetla wszystkie bean'y zarejestrowane w aplikacji
 
-** /configprops - wszystkie konfiguracje properties
+include::actuator.adoc[] 
 
-** /dump - dump report 
-
-** /env - report o bieżących ustawieniach systemowych
-
-** /health - prosty raport funkcji życiowych aplikacji
-
-----
-curl localhost:8090/health      h                                                                                                                                                    
-{"status":"UP","diskSpace":{"status":"UP","total":219353915392,"free":127528636416,"threshold":10485760},"mongo":{"status":"UP","version":"2.6.10"}}
-----
-
-=== Własny Health endpoint
-[source,java]
-----
-@Component
-public class ActiveMQHealth implements HealthIndicator {
-private ConnectionFactory factory;
-@Autowired
-public ActiveMQHealth(ConnectionFactory factory) {
-   this.factory = factory;
-}
-@Override
-public Health health() {
-    try {
-      factory.createConnection();
-    } catch (JMSException e) {
-      return new Health.Builder().down(e).build();
-    }
- return new Health.Builder().status(Status.UP + ": Successfully connected tothe broker").build();
-}
-}
-----
-
-** /info - serwuje informacje o bieżącej konfiguracji aplikacji
-
-** /metrics - metryki dotyczące punktów końcowych, sterty, wątków czy gc 
-
-----
-{
-
-    "mem": 1132031,
-    "mem.free": 485640,
-    "processors": 8,
-    "instance.uptime": 1079395,
-    "uptime": 1088537,
-    "systemload.average": 1.09,
-    "heap.committed": 1048576,
-    "heap.init": 1048576,
-    "heap.used": 561152,
-    "heap": 2097152,
-    "nonheap.committed": 84928,
-    "nonheap.init": 2496,
-    "nonheap.used": 83457,
-    "nonheap": 0,
-    "threads.peak": 42,
-    "threads.daemon": 38,
-    "threads.totalStarted": 79,
-    "threads": 42,
-    "classes": 10148,
-    "classes.loaded": 10148,
-    "classes.unloaded": 0,
-    "gc.g1_young_generation.count": 4,
-    "gc.g1_young_generation.time": 141,
-    "gc.g1_old_generation.count": 0,
-    "gc.g1_old_generation.time": 0,
-    "gauge.servo.response.health": 8.0,
-    "gauge.servo.rest.totaltime": 0.008942816666666667,
-    "gauge.servo.rest.count": 0.016666666666666666,
-    "gauge.servo.rest.min": 1.155877,
-    "gauge.servo.rest.max": 1.155877,
-    "gauge.servo.response.api.applications": 3.0,
-    "httpsessions.max": -1,
-    "httpsessions.active": 0
-
-}
-----
-
-** /mappings - wszystkie mapowania URL w aplikacji
-
-** /trace - detale wcześniejszy requestów
-
-----
-{
-
-    "timestamp": 1468504478026,
-    "info": {
-        "method": "POST",
-        "path": "/api/applications",
-        "headers": {
-            "request": {
-                "accept": "application/json",
-                "content-type": "application/json",
-                "user-agent": "Java/1.8.0_91",
-                "host": "localhost:8090",
-                "connection": "keep-alive",
-                "content-length": "273"
-            },
-            "response": {
-                "X-Application-Context": "CEP:dev:8090",
-                "Content-Type": "application/json;charset=UTF-8",
-                "Transfer-Encoding": "chunked",
-                "Date": "Thu, 14 Jul 2016 13:54:38 GMT",
-                "status": "201"
-            }
-        }
-    }
-
-},
-{
-
-    "timestamp": 1468504468058,
-    "info": {
-        "method": "GET",
-        "path": "/api/journal",
-        "headers": {
-            "request": {
-                "host": "localhost:8090",
-                "user-agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0",
-                "accept": "text/event-stream",
-                "accept-language": "pl,en-US;q=0.7,en;q=0.3",
-                "accept-encoding": "gzip, deflate",
-                "referer": "http://localhost:8090/index.html",
-                "cookie": "__utma=111872281.2131442542.1458644832.1458644832.1461744507.2; __utmz=111872281.1458644832.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); _ga=GA1.1.2131442542.1458644832; auth_token=5b97a1d44bf087ab990369e6d6e2d55c413994d4; JSESSIONID=F70300B2C0A464FA47C28817326F8988",
-                "connection": "keep-alive",
-                "pragma": "no-cache",
-                "cache-control": "no-cache"
-            },
-            "response": {
-                "X-Application-Context": "CEP:dev:8090",
-                "Content-Type": "text/event-stream;charset=UTF-8",
-                "Transfer-Encoding": "chunked",
-                "Date": "Thu, 14 Jul 2016 13:54:28 GMT",
-                "status": "200"
-            }
-        }
-    }
-
-},...
-----
+== Sending email
 
 === Zależność 
 
-spring-boot-actuator
-
-=== remote shell
-
-spring-boot-starter-remote-shell
-
-=== Własne metryki 
-
-** CounterService
-
-[source,java]
 ----
-...
-final private CounterService counterService;
-counterService.increment("messages.total.book.added");
-
+spring-boot-starter-mail
 ----
 
-=== Dostrajanie portów
+Jeśli jest dostępna zależność i ustawiony parametr spring.mail.host JavaMailSender jest tworzony jeśli nie istnieje. 
+
+=== Parametryzacja 
 
 ----
-management.port=9991
-management.address=127.0.0.1
-management.context-path=/manage
+prefix : spring.mail namespace
 ----
+ 
 
-** Tylko JMX
+include::test.adoc[]
 
-----
-management.port=-1
-----
 
 

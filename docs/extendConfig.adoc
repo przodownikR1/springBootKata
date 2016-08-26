@@ -1,0 +1,457 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Konfigurowanie zewnętrzne
+
+**    **@TestPropertySource - na teście**
+**    **Argumenty z linii poleceń - wywołanie**
+**    **Parametry z SPRING_APPLICATION_JSON **
+**    **Parametry zawarte w ServletConfig init**
+**    **Parametry zawarte w  ServletContext init**
+**    **Skorzystanie z atrybutów JNDI poprzez java:comp/env.**
+**    **Skorzystanie z Java System properties (System.getProperties()).**
+**    **Skorzystanie z parametrów środowistkowych**
+**    **RandomValuePropertySource**
+**    **Profile-specific znajdujące się poza jarem (application-{profile}.properties & YAML)**
+**    **Profile-specific znajdujące się w środku jar (application-{profile}.properties & YAML)**
+**    **Application properties znajdujące się poza  jar (application.properties & YAML)**
+**    **Application properties znajdujące się w środku jar (application.properties & YAML)**
+**    **@PropertySource na @Configuration**
+**    **Domyślne ustawienia poprzez użycie  SpringApplication.setDefaultProperties**
+    
+
+
+NOTE: application.properties & application.yml powinni znajdować się na classpath aplikacji
+
+NOTE: Zmienne środowiskowe sprawdzą się podczas praktyki z chmurami.
+
+NOTE: Zawsze możesz użyć command-line
+
+----
+data.server=remoteserver:3030
+----
+
+=== Zmiana lokacji pliku ustawień i jego nazwy
+
+** /config umieszczony w bieżącym katalogu
+** bieżący katalog
+** /config w classpath
+** classpath
+
+NOTE: Kolejność wyszukiwania jak wyżej
+
+NOTE: ConfigFileApplicationListener 
+
+----
+private static final String DEFAULT_SEARCH_LOCATIONS = "classpath:/,classpath:/config/,file:./,file:./config/";
+----
+
+    
+=== Random
+
+----
+my.secret=${random.value}
+my.number=${random.int}
+my.bignumber=${random.long}
+my.uuid=${random.uuid}
+my.number.less.than.ten=${random.int(10)}
+my.number.in.range=${random.int[1024,65536]}
+----
+
+=== Placeholders w pliku properties
+
+----
+app.name=MyApp
+app.description=${app.name} is a Spring Boot application
+----
+
+
+=== Automatyczne wstawianie danych przez proces budujący -> Maven
+
+** Przykład
+
+----
+app.encoding=@project.build.sourceEncoding@
+app.java.version=@java.version@
+----
+
+----
+<resources>
+    <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+    </resource>
+</resources>
+
+
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-resources-plugin</artifactId>
+    <version>2.7</version>
+    <configuration>
+        <delimiters>
+            <delimiter>@</delimiter>
+        </delimiters>
+        <useDefaultDelimiters>false</useDefaultDelimiters>
+    </configuration>
+</plugin>
+
+----
+
+=== Automatyczne wstawianie danych przez proces budujący -> Gradle
+
+** Przykład
+
+----
+app.name=${name}
+app.description=${description}
+---- 
+
+
+----
+processResources {
+    expand(project.properties)
+}
+
+----
+
+=== YAML
+
+**SnakeYAML** jest ładowany z automatu przez  spring-boot-starter
+
+----
+environments:
+    dev:
+        url: http://dev.bar.com
+        name: Developer Setup
+    prod:
+        url: http://foo.bar.com
+        name: My Cool App
+----
+
+To samo co : 
+
+----
+environments.dev.url=http://dev.bar.com
+environments.dev.name=Developer Setup
+environments.prod.url=http://foo.bar.com
+environments.prod.name=My Cool App
+
+----
+
+----
+
+my:
+   servers:
+       - dev.bar.com
+       - foo.bar.com
+       
+----
+
+
+To samo co :
+
+----
+my.servers[0]=dev.bar.com
+my.servers[1]=foo.bar.com
+----
+
+
+=== ConfigurationProperties
+
+** Przykład
+
+
+----
+@ConfigurationProperties(prefix="my")
+
+@ConfigurationProperties(locations = "classpath:tomcat.properties", ignoreUnknownFields = false, prefix = "tomcat")
+
+----
+
+=== Type-safe Configuration Properties
+
+[source,java]
+----
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    private String username;
+
+    private InetAddress remoteAddress;
+
+    // ... getters and setters
+
+}
+
+----
+
+Zarejestrować :
+
+[source,java]
+----
+@Configuration
+@EnableConfigurationProperties(ConnectionProperties.class)
+public class MyConfiguration {
+}
+----
+   
+[source,java]
+----
+@Component
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    // ... getters and setters
+    private Resource location;  //connection.location=classpath:myfile.xml
+    private boolean skip = true
+
+}
+
+----
+
+
+----
+# application.yml
+
+connection:
+    username: admin
+    remoteAddress: 192.168.1.1
+
+# additional configuration as required
+----
+
+Użycie: 
+
+[source,java]
+----
+@Service
+public class MyService {
+
+    private final ConnectionProperties connection;
+
+    @Autowired
+    public MyService(ConnectionProperties connection) {
+        this.connection = connection;
+    }
+
+     //...
+
+    @PostConstruct
+    public void openConnection() {
+        Server server = new Server();
+        this.connection.configure(server);
+    }
+
+}
+----
+
+=== Relaxed binding
+
+[source,java]
+----
+
+@ConfigurationProperties(prefix="person")
+public class OwnerProperties {
+    //Setter // Getter
+    private String firstName;
+
+}
+
+----
+
+Plik z właściwościami
+
+----
+person.firstName camel case
+   
+person.first-name .properties / .yml
+   
+person.first_name .properties / .yml
+    
+PERSON_FIRST_NAME Upper case format. system environment variables
+----
+
+
+NOTE:  @ConfigurationProperties nie powinnia działać dopóki nie ma @EnableConfigurationProperties na jednej z klas w projekcie. 
+
+NOTE: Jeśli używasz SpringBoot :) to prawie na pewno, jakaś klasa pod spodem jest oznaczona tą adnotacją.
+
+
+
+=== @ConfigurationProperties walidacje
+
+NOTE: JSR-303 javax.validation 
+
+[source,java]
+----
+@ConfigurationProperties(prefix="connection")
+public class ConnectionProperties {
+
+    @NotNull
+    @Valid
+    private InetAddress remoteAddress;
+
+    // ... getters and setters
+
+}
+----
+
+=== Meta-dane / Wsparcje dla IDE
+
+Zależność:
+
+[source,groovy]
+----
+compile('org.springframework.boot:spring-boot-configuration-processor')
+----
+
+=== Value
+
+** @Value
+
+
+----
+@Value("${propertyName:defaultValue}")
+
+----
+
+----
+java jar myapp.jar --propertyName=test
+----
+
+
+** Przykład
+
+
+[source,java]
+----
+  @PropertySource("classpath:/config.properties}")
+  @Configuration
+---- 
+
+lub 
+
+[source,java]
+----
+  @Bean
+  public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
+    return new PropertySourcesPlaceholderConfigurer();
+  }
+----
+
+
+[source,java]
+----
+@Configuration
+@ComponentScan(basePackages = { "pl.java.scalatech.setting" }, useDefaultFilters = false, includeFilters = { @Filter(Component.class) })
+@Slf4j
+public class PropConfig {
+    @Configuration
+    @PropertySources({ @PropertySource(value = { "file:./conf/app.properties" }), @PropertySource(value = { "file:./conf/app-dev.properties" }) })
+    @Profile({ "dev", "dev_test"})
+    static class PropertiesLoaderForDev {
+        @Bean
+        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+            log.info("+++    dev profile launch");
+            return new PropertySourcesPlaceholderConfigurer();
+        }
+    }
+
+    @Configuration
+    @PropertySources({ @PropertySource(value = { "file:./conf/app.properties" }), @PropertySource(value = { "file:./conf/app-prod.properties" }) })
+    @Profile("prod")
+    static class PropertiesLoaderForProd {
+        @Bean
+        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+            log.info("+++  prod profile launch");
+            return new PropertySourcesPlaceholderConfigurer();
+        }
+    }
+
+    @Bean
+    public MessageSource messageSource() {
+        ResourceBundleMessageSource source = new ResourceBundleMessageSource();
+        source.setBasename("i18n/messages");
+        source.setUseCodeAsDefaultMessage(true);
+        return source;
+    }
+
+}
+----
+
+
+
+
+=== PropertySource
+
+Podanie dokładnej lokalizacji pliku z właściwościami
+
+** @PropertySource
+
+** Przykład 
+
+----
+@PropertySource("file:${app.home}/app.properties")
+
+
+@PropertySources({
+	@PropertySource("classpath:tomcat.properties"),
+	@PropertySource("classpath:db.properties")
+})
+
+
+@PropertySource(value="classpath:miss.properties", ignoreResourceNotFound=true)
+----
+
+== Profile
+
+** application-{profile}.properties
+
+*** Przykład 
+
+
+[source,txt]
+----
+application-qa.properties
+server.ip=localhost
+
+application-prod.properties
+server.ip=http://my-remote.server.com
+
+spring-boot:run -Dspring.profiles.active=prod
+
+----
+
+[source,java]
+----
+@Configuration
+@Profile("production")
+public class ProductionConfiguration {
+
+    // ...
+
+}
+----
+
+[source,txt]
+----
+spring.profiles.active=dev,hsqldb
+----
+
+
+=== Programowalne ustawianie profilu
+
+**SpringApplication.setAdditionalProfiles(…​)** &   **ConfigurableEnvironment**
+

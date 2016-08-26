@@ -1,0 +1,335 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+==  Testing
+
+
+=== Moduł 
+
+----
+spring-boot-starter-test
+----
+
+
+=== Zależności dodane : 
+
+** Spring Test
+** Spring Boot Test
+** JUnit
+** AssertJ
+** Hamcrest
+** Mockito
+** JsonPath
+** JSONAssert
+
+
+=== Testy integracyjne
+
+Przykład:
+
+[source,java]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes=MyApp.class, loader=SpringApplicationContextLoader.class)
+public class MyTest {
+
+----
+
+Przykład:
+
+[source,java]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(MyApp.class)
+public class MyTest {
+
+    // ...
+
+}
+----
+
+Przykład:
+
+[source,java]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(MyApp.class)
+@IntegrationTest
+public class MyTest {
+
+}
+----
+
+Przykład:
+
+[source,java]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(MyApp.class)
+@WebIntegrationTest
+public class MyTest {
+
+    // ...
+
+}
+----
+
+
+
+== Spring 1.4 usprawnienia
+
+=== @RunWith(SpringRunner.class)
+
+Zamiennik dla SpringJUnit4ClassRunner
+
+Przykład:
+
+[source,java]
+----
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
+public class MyTest {
+
+    // ...
+    
+}
+----
+
+Przykład:
+
+[source,java]
+----
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
+public class MyTest {
+    
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Test
+    public void test() {
+        this.restTemplate.getForEntity(
+            "/{username}/vehicle", String.class, "Phil");
+    }
+
+}
+----
+
+=== Mock
+
+Przykład:
+
+[source,java]
+----
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class SampleTestApplicationWebIntegrationTests {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @MockBean
+    private VehicleDetailsService vehicleDetailsService;
+
+    @Before
+    public void setup() {
+        given(this.vehicleDetailsService.
+            getVehicleDetails("123")
+        ).willReturn(
+            new VehicleDetails("Honda", "Civic"));
+    }
+
+    @Test
+    public void test() {
+        this.restTemplate.getForEntity("/{username}/vehicle", 
+            String.class, "sframework");
+    }
+
+}
+----
+
+
+
+=== @JsonTest
+
+
+NOTE: ObjectMapper
+
+
+** **@JsonComponent**
+
+Przykład:
+
+
+[source,java]
+----
+
+public class VehicleDetailsJsonTests {
+
+    private JacksonTester<VehicleDetails> json;
+
+    @Before
+    public void setup() {
+        ObjectMapper objectMappper = new ObjectMappper(); 
+        // Possibly configure the mapper
+        JacksonTester.initFields(this, objectMappper);
+    }
+
+    @Test
+    public void serializeJson() {
+        VehicleDetails details = 
+            new VehicleDetails("Honda", "Civic");
+
+        assertThat(this.json.write(details)).isEqualToJson("vehicledetails.json");
+
+        assertThat(this.json.write(details)).hasJsonPathStringValue("@.make");
+
+        assertThat(this.json.write(details)).extractingJsonPathStringValue("@.make").isEqualTo("Honda");
+    }
+
+    @Test
+    public void deserializeJson() {
+        String content = "{\"make\":\"Ford\",\"model\":\"Focus\"}";
+
+        assertThat(this.json.parse(content)).isEqualTo(new VehicleDetails("Ford", "Focus"));
+
+        assertThat(this.json.parseObject(content).getMake()).isEqualTo("Ford");
+    }
+
+}
+
+----
+
+
+
+=== Kontrolery
+
+----
+@WebMvcTest(MyController.class)
+----
+
+
+** @Controller
+
+** @ControllerAdvice
+
+** @JsonComponent
+
+** Filter
+
+** WebMvcConfigurer
+
+** HandlerMethodArgumentResolver
+
+Dostarcza : 
+
+---- 
+MockMvc mvc
+
+MockMvcRequestBuilders
+
+MockMvcResultMatchers
+
+----
+
+=== Dodanie filtrów
+
+----
+mockMvc = standaloneSetup(new PersonController()).addFilters(new CharacterEncodingFilter()).build();
+----
+
+
+Przykład :
+
+[source,java]
+----
+@RunWith(SpringRunner.class)
+@WebMvcTest(UserVehicleController.class)
+public class UserVehicleControllerTests {
+
+    @Autowired
+    private MockMvc mvc;
+
+    @MockBean
+    private UserVehicleService userVehicleService;
+
+    @Test
+    public void getVehicleShouldReturnMakeAndModel() {
+        given(this.userVehicleService.getVehicleDetails("sboot")).willReturn(new VehicleDetails("Honda", "Civic"));
+
+        this.mvc.perform(get("/car/vehicle").accept(MediaType.TEXT_PLAIN)).andExpect(status().isOk()).andExpect(content().string("Honda Civic"));
+    }
+
+}
+----
+
+
+=== JPA
+
+** **@DataJpaTest**
+
+** **TestEntityManager**
+
+** **Domyśla obsługa transakcji i wycofania**
+
+** **Baza danych w pamięci**
+
+** **Auto-konfiguracja Hibernate, Spring Data oraz DataSource**
+
+** **@EntityScan**
+
+
+Przykład:
+
+
+[source,java]
+----
+@RunWith(SpringRunner.class)
+@DataJpaTest
+public class UserRepositoryTests {
+
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
+    private UserRepository repository;
+
+    @Test
+    public void findByUsernameShouldReturnUser() {
+        this.entityManager.persist(new User("sboot", "123"));
+        User user = this.repository.findByUsername("sboot");
+        
+        assertThat(user.getUsername()).isEqualTo("sboot");
+        assertThat(user.getVin()).isEqualTo("123");
+    }
+
+}
+----
+
+=== Testy klientów REST
+
+Przykład:
+
+[source,java]
+----
+@RestClientTest(MyClientService.class)
+RestTemplateBuilder
+MockRestServiceServer
+server.expect(requestTo("/...")).andRespond(...)
+
+----
+
+
+

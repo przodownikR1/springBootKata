@@ -1,0 +1,221 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== @Conditional
+
+== Konfiguracja 
+
+** Spring java config
+
+*** Bean
+
+*** @Configuration
+
+*** @ImportResource
+
+*** @ComponentScan
+
+*** @Import
+
+** Spring annotation
+
+*** @ImportResource
+
+*** @ComponentScan
+
+*** @Import
+
+** Spring profiles
+
+** yaml/properties
+
+
+
+
+** @SpringBootApplication - umożliwia skanowanie komponentów oraz auto-konfigurację
+
+
+
+
+=== Blokowanie wybranej autokonfiguracji
+
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+
+** Przykład
+
+----
+@EnableAutoConfiguration(exclude=[ActiveMQAutoConfiguration.class])
+----
+
+
+To samo co : 
+
+----
+@SpringBootApplication( exclude={ActiveMQAutoConfiguration.class} )
+----
+
+
+
+=== @SpringBootApplication
+
+To samo co : @Configuration + @EnableAutoConfiguration + @ComponentScan
+
+
+===  Lokalizowanie kandydatów do auto-konfiguracji
+
+Spring Boot sprawdza  plik **META-INF/spring.factories**  w opublikowanych jarach. 
+Taki plik powinien zawierać listę klas konfiguracyjnych oznaczonych @EnableAutoConfiguration
+
+
+== @Enable
+
+== Konfigurowanie
+
+Rdzeń to klasa @Configuration + @Conditional oraz jej odmiany
+
+TIP: META-INF/spring.factories
+
+
+===  Lokalizowanie kandydatów do auto-konfiguracji
+
+----
+META-INF/spring.factories // w danym jar.
+//lista configuracja powinna znajdować się poniżej klucza EnableAutoConfiguration
+----
+
+----
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.mycorp.libx.autoconfigure.LibXAutoConfiguration,\
+com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
+----
+
+=== Porządek konfiguracji
+
+** **@AutoConfigureAfter**
+
+** **@AutoConfigureBefore**
+
+===  Class conditions
+
+** **@ConditionalOnClass**
+
+** **@ConditionalOnMissingClass**
+
+=== Bean conditions
+
+** **@ConditionalOnBean** 
+
+** **@ConditionalOnMissingBean**
+
+
+=== Property conditions
+
+** **@ConditionalOnProperty**
+
+=== Web application conditions
+
+** **@ConditionalOnWebApplication**
+
+** **@ConditionalOnNotWebApplication**
+
+===  SpEL expression conditions
+
+** **@ConditionalOnExpression**
+
+
+=== Tworzenie własnego startera
+
+** Moduł startowy musi zawierać kod odpowiedzialny za auto-konfiguracje.
+
+** Musimy dostraczyć odpowiednie zależności
+
+
+** **@ConditionalOnClass**
+** **@ConditionalOnExpression**
+** **@ConditionalOnJava**
+** **@ConditionalOnJndi**
+** **@ConditionalOnMissingBean**
+** **@ConditionalOnMissingClass**
+** **@ConditionalOnProperty**
+** **@ConditionalOnResource**
+** **@ConditionalOnWebApplication**
+** **@ConditionalOnNotWebApplication**
+
+
+=== Przykład 
+
+
+[source,java]
+----
+@Configuration
+@ConditionalOnClass(JmsTemplate.class)
+@ConditionalOnBean(ConnectionFactory.class)
+@EnableConfigurationProperties(JmsProperties.class)
+@AutoConfigureAfter({ HornetQAutoConfiguration.class,
+ActiveMQAutoConfiguration.class })
+public class JmsAutoConfiguration {
+@Autowired
+private JmsProperties properties;
+@Autowired
+private ConnectionFactory connectionFactory;
+...
+
+@Bean
+@ConditionalOnMissingBean
+public JmsTemplate jmsTemplate() {
+JmsTemplate jmsTemplate = new
+JmsTemplate(this.connectionFactory);
+jmsTemplate.setPubSubDomain(this.properties.isPubSubDomain());
+return jmsTemplate;
+}
+----
+
+=== Health
+
+
+[source,java]
+----
+@Component
+public class ActiveMQHealth implements HealthIndicator {
+private ConnectionFactory factory;
+@Autowired
+public ActiveMQHealth(ConnectionFactory factory) {
+this.factory = factory;
+}
+@Override
+public Health health() {
+try {
+factory.createConnection();
+} catch (JMSException e) {
+return new Health.Builder()
+.down(e)
+.build();
+}
+return new Health.Builder()
+.status(Status.UP + ": Successfully connected to
+the broker")
+.build();
+}
+}
+----
+
+=== XML a Spring Boot
+
+@ImportResource({"META-INF/services.xml","META-INF/repositories.xml"})
+
+@ImportResource("classpath:applicationContext.xml")
+
+
+
+

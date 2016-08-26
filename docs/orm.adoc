@@ -1,0 +1,231 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== ORM
+
+[source,xml]
+----
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.hsqldb</groupId>
+    <artifactId>hsqldb</artifactId>
+    <scope>runtime</scope>
+</dependency>
+
+----
+
+
+** Przykład z H2
+
+[source,groovy]
+----
+dependencies {
+compile("org.springframework.boot:spring-boot-starter-data-jpa")
+compile("com.h2database:h2")
+}
+----
+
+TIP: Jeśli używasz H2 i devTools to domyślnie aktywuje się konsola webowa /h2-console
+
+NOTE : spring-jdbc - dla wbudowanej bazy auto-konfiguracja
+
+NOTE : Jeśli chcesz używać instancji bazy nawet po wyłączeniu aplikacji ustaw : DB_CLOSE_ON_EXIT=FALSE 
+
+----
+spring.datasource.url=jdbc:mysql://localhost/test
+spring.datasource.username=dbuser
+spring.datasource.password=dbpass
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+
+----
+
+** Przykład programistycznego tworzenia dataSource
+
+[source,java]
+----
+@Bean
+public DataSource dataSource() {
+DriverManagerDataSource dataSource = new DriverManagerDataSource();
+dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+dataSource.setUrl("jdbc:mysql://localhost:3306/db1");
+dataSource.setUsername("user1");
+dataSource.setPassword("pass1");
+return dataSource;
+}
+----
+
+Domyślne ustawienia:
+
+----
+# Number of ms to wait before throwing an exception if no connection is available.
+spring.datasource.tomcat.max-wait=10000
+
+# Maximum number of active connections that can be allocated from this pool at the same time.
+spring.datasource.tomcat.max-active=50
+
+# Validate the connection before borrowing it from the pool.
+spring.datasource.tomcat.test-on-borrow=true
+
+----
+
+
+=== Ładowanie danych z skryptu SQL
+
+----
+spring.datasource.platform: h2
+----
+
+Spring szuka sktyptu **data.sql** oraz dla innej platformy **db data-${platform}.sql**
+
+
+----
+src/main/resources/data-h2.sql
+
+insert into Person
+(id, name)
+values
+(1, 'przodownik');
+
+----
+
+
+=== Ładowanie danych programowe poprzez repozytoria 
+
+@PostConstruct lub @CommandLineRunner
+
+=== www.liquibase.org[Liquibase]
+
+Gradle
+
+----
+compile("org.liquibase:liquibase-core")
+----
+
+Maven
+
+----
+<dependency>
+<groupId>org.liquibase</groupId>
+<artifactId>liquibase-core</artifactId>
+</dependency>
+----
+
+=== http://flywaydb.org[Flyway]
+
+Gradle
+
+----
+compile("org.flywaydb:flyway-core")
+----
+
+Maven
+
+----
+<dependency>
+<groupId>org.flywayfb</groupId>
+<artifactId>flyway-core</artifactId>
+</dependency>
+----
+
+=== JNDI
+
+----
+spring.datasource.jndi-name=java:jboss/datasources/customers
+----
+
+=== JdbcTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public MyBean(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    // ...
+
+}
+----
+
+** Tradycyjne podejście 
+
+----
+@Bean
+public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+return new JdbcTemplate(dataSource);
+}
+
+@Bean
+public DataSource dataSource() {
+ return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScripts('schema.sql', 'data.sql').build();
+}
+----
+
+** Podejście Spring Boot
+
+Jeśli Spring Boot wykryje bibiotekę H2 w swoim classpath automatycznie skonfiguruje wbudowanę bazę. Jeśli dodatkowo wykryje JdbcTemplate w swoim classpath skonfiguruje też tę zależność za Ciebie.
+
+
+
+
+=== JPA & Spring Data
+
+
+source: http://www.slideshare.net/marius_bogoevici/developing-realtime-data-pipelines-with-spring-and-kafka 
+
+image:spring-data.jpg[]
+
+
+
+    **Hibernate** — popularna implementacja JPA
+    **Spring Data JPA** — proste tworzenie repozytoriów
+    **Spring ORMs** — Core ORM wspieranie ORM'a przez Spring
+    
+
+===  Użycie H2’s web console
+  
+Przykład
+
+----
+    com.h2database:h2 is on the classpath
+----   
+    
+Ustawienie : 
+    
+----
+spring.h2.console.enabled 
+----
+
+
+Ścieżka : 
+
+----
+/h2-console
+----
+
+
+=== Zabezpieczenie h2-console
+
+----
+    security.user.role
+    security.basic.authorize-mode
+    security.basic.enabled
+----   

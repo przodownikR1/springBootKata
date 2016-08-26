@@ -1,0 +1,235 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== NoSql
+
+== MongoDB
+
+
+Zależność : 
+
+----
+spring-boot-starter-data-mongodb             
+----
+
+=== Przykładowa encja
+
+[source,java]
+----
+@Document()
+public class Person {
+@Id
+private String id;
+private String name;
+@DBRef
+private List<Invoice> invoices;
+----
+
+
+=== Parametryzacja
+
+----
+spring.data.mongodb.host= # the db host
+spring.data.mongodb.port=27017 # the connection port
+spring.data.mongodb.uri=mongodb://localhost/test # connection URL
+spring.data.mongo.repositories.enabled=true # if SD enabled
+----
+
+===  MongoTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final MongoTemplate mongoTemplate;
+
+    @Autowired
+    public MyBean(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    // ...
+
+}
+----
+
+
+=== Konfiguracja
+
+----
+
+@EnableMongoRepositories(basePackages = "com.acme.repositories.mongo")
+interface Configuration { }
+
+@Configuration
+public class AppConfig {
+
+  /*
+   * Use the standard Mongo driver API to create a com.mongodb.Mongo instance.
+   */
+   public @Bean Mongo mongo() throws UnknownHostException {
+       return new Mongo("localhost");
+   }
+}
+@Configuration
+public class AppConfig {
+
+    /*
+     * Factory bean that creates the com.mongodb.Mongo instance
+     */
+     public @Bean MongoClientFactoryBean mongo() {
+          MongoClientFactoryBean mongo = new MongoClientFactoryBean();
+          mongo.setHost("localhost");
+          return mongo;
+     }
+}
+
+
+
+@Configuration
+public class MongoConfiguration {
+
+  public @Bean MongoDbFactory mongoDbFactory() throws Exception {
+    UserCredentials userCredentials = new UserCredentials("joe", "secret");
+    return new SimpleMongoDbFactory(new Mongo(), "database", userCredentials);
+  }
+
+  public @Bean MongoTemplate mongoTemplate() throws Exception {
+    return new MongoTemplate(mongoDbFactory());
+  }
+}
+
+----
+
+=== Spring Data MongoDB repozytoria
+
+----
+public interface CityRepository extends Repository<City, Long> {
+
+    Page<City> findAll(Pageable pageable);
+
+    City findByNameAndCountryAllIgnoringCase(String name, String country);
+
+}
+----
+
+
+=== Embedded Mongo
+
+Zależność maven: 
+
+----
+<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>1.48.0</version>
+            <scope>test</scope>
+        </dependency>
+----
+
+Zależność gradle :
+
+----
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'  
+    compile group: 'de.flapdoodle.embed', name: 'de.flapdoodle.embed.mongo', version: '1.50.5'
+----
+
+
+
+
+Health status : 
+
+----
+{
+
+    "status": "UP",
+    "diskSpace": {
+        "status": "UP",
+        "total": 219353915392,
+        "free": 121737756672,
+        "threshold": 10485760
+    },
+    "mongo": {
+        "status": "UP",
+        "version": "2.6.10"
+    }
+
+}
+----
+
+
+== Neo4j
+
+=== Połączenie z bazą Neo4j
+
+Neo4jSession, Session,  Neo4jOperations 
+
+=== Neo4jTemplate
+
+----
+@Component
+public class MyBean {
+
+    private final Neo4jTemplate neo4jTemplate;
+
+    @Autowired
+    public MyBean(Neo4jTemplate neo4jTemplate) {
+        this.neo4jTemplate = neo4jTemplate;
+    }
+
+    // ...
+
+}
+
+----
+
+----
+spring.data.neo4j.uri=http://my-server:7474
+spring.data.neo4j.username=neo4j
+spring.data.neo4j.password=secret
+----
+
+=== Embedded mode
+
+Zależność :
+
+----
+org.neo4j:neo4j-ogm-embedded-driver
+----
+
+
+Ustawienia : 
+
+----
+spring.data.neo4j.uri=file://var/tmp/graph.db
+----    
+
+===  Spring Data Neo4j repozytoria
+
+@EnableNeo4jRepositories(basePackages = "com.example.myapp.repository")
+@EnableTransactionManagement
+
+----
+public interface CityRepository extends GraphRepository<City> {
+
+    Page<City> findAll(Pageable pageable);
+
+    City findByNameAndCountry(String name, String country);
+
+}
+----

@@ -1,0 +1,527 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Spring Security
+
+** **wszechstronność metod autoryzacji i autentykacji**
+
+** **zabezpieczenie przez atakami (OWASP top ten)**
+
+** **integracja ze Spring MVC i Servlet API 3 i 3.1**
+
+** **od wersji 3.2 wsparcie dla JavaConfig**
+
+** **zabezpieczenie przed CRFS, session fixation, clickjacking, nagłówki security**
+
+** **automatyczny resolver dla pobierania Principle z żądania**
+
+** **integracje z usługami asynchronicznymi w Spring MVC**
+
+** **przenośność rozwiązania**
+
+** **dojrzałość**
+
+** **pewność**
+
+** **integracja z różnymi protokołami i rozwiązaniami jak :**
+
+*** openID
+
+*** OAuth
+
+*** LDAP
+
+*** SSO (CAS)
+
+*** RMI , HttpInvoker
+
+*** JAAS
+
+** Kerberos
+
+*** HTTP X.509
+
+*** i wiele innych
+
+
+=== OWASP Top Ten
+
+image::owaspTopTen.jpg[]
+
+
+=== Authentication : autoryzacja: uwierzytelnianie
+
+Zapewnia kontrolowany dostęp do zasobów ,
+bazuje na identyfikacji i uwierzytelnianiu.
+
+**Autoryzacja** to proces przyznawania uprawnień uwierzytelnionemu użytkownikowi. Dzięki
+temu użytkownik dostaje dostęp do określonych zasobów aplikacji czy systemu.
+Proces ten następuje co procesie uwierzytelnienia.
+Uprawnienia zwykle są w postaci ról.
+
+
+
+
+source: http://terasolunaorg.github.io/guideline/5.0.0.RELEASE/en/Security/Authentication.html
+
+image::spring_sec_1.jpg[]
+
+
+source:http://terasolunaorg.github.io/guideline/5.0.0.RELEASE/en/Security/Authorization.html
+
+image::autoryzacja.jpg[]
+
+=== Access control: Kontrola dostępu
+
+**Kontrola dostępu** polega na kontrolowaniu dostępu do określonego zasobu. Wymaga to
+ustalenia czy użytkownikowi należy przyznać dostęp do określonego zasobu.
+Proces ustalania kontroli dostępu związany jest z porównaniem atrybutu dostępu do
+danego zasobu z uprawnieniami lub innymi cechami użytkownika.
+
+** Autoryzacja** lub **kontrola dostępu** - procesy i środki dające dostęp do zasobów do których
+użytkownik jest zobligowany. Umożliwia na wykonywanie poszczególnych operacji lub
+dostęp do danych dla użytkowników, którzy faktycznie mają do nich dostępem
+
+
+=== Standartowe podejście 
+
+Zależności :
+
+=== Maven:
+
+[source,xml]
+----
+<dependencies>
+<!-- ... other dependency elements ... -->
+<dependency>
+<groupId>org.springframework.security</groupId>
+<artifactId>spring-security-web</artifactId>
+<version>3.2.4.RELEASE</version>
+</dependency>
+<dependency>
+<groupId>org.springframework.security</groupId>
+<artifactId>spring-security-config</artifactId>
+<version>3.2.4.RELEASE</version>
+</dependency>
+</dependencies>
+----
+
+=== Gradle :
+
+[source,groovy]
+----
+dependencies {
+compile 'org.springframework.security:spring-security-web:4.0.3.RELEASE'
+compile 'org.springframework.security:spring-security-config:4.0.3.RELEASE'
+}
+----
+
+=== Moduły
+
+** **Core spring-security-core** - auth i access-control, remoting support - ogólnie jak to 'core'
+jest niezbędny do działania czegokolwiek w spring security framework.
+Zapewnia zabezpieczenie dla aplikacji standalone, zdalnych klientów, i metod
+biznesowych, JDBC oraz obsługę kryptografii (Crypto)
+
+** **WEB spring-security-web** - zawiera filtry, które możemy modelować w łańcuch (Chain of
+responsiblity pattern) oraz integracje z Servlet API i URL-based access-control
+
+** **Config spring-security-config** - zawiera Xml namespace dla wygodnej konfiguracji z
+poziomu XML znanej ze Springa oraz JavaConfig support
+
+** **LDAP - spring-security-ldap** - autoryzacja oparta na protokole LDAP
+
+** **ACL - spring-security-acl** - autoryzacja oparta na poziomie dostępu do obiektów
+domenowych. Znamy takie podejście z systemów Linux czyli kto i w jakim stopniu ma
+dostęp do zasobu.
+
+** **CAS - spring-security-cas** - integracje z systemami SSO.
+
+** **OpenID - spring-security-openid** - wsparcie dla protokołu openID. Autoryzacja użytkownika
+po przez zewnętrzne serwery OpenID np Google
+
+
+=== Sposoby logowania
+
+** Login Form (login/password) authentication
+
+** Basic, Digest authentication (HTTP basic authentication)
+
+** Rememeber Me (cookie)
+
+** Ldap
+
+** Kerberos , Active Directory
+
+** JAAS
+
+** X.509
+
+** CAS
+
+** OpenId
+
+** Oauth2
+
+
+
+=== Zabezpieczanie dostępu do adresów URL
+
+----
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+http.authorizeRequests()
+.antMatchers("/user/register").permitAll()
+.antMatchers("/user/autologin").access("hasRole('ROLE_USER')")
+.antMatchers("/user/delete").access("hasRole('ROLE_ADMIN')")
+.antMatchers("/img/**").permitAll()
+.antMatchers("/images/**").permitAll()
+.anyRequest().authenticated()
+.and()
+.formLogin().loginPage("/login").failureUrl("/login?error").permitAll()
+.and()
+.logout().logoutUrl("/logout")
+.logoutSuccessHandler(logoutHandler)
+.deleteCookies("JSESSIONID")
+.and()
+.rememberMe().key(applicationSecret)
+.tokenValiditySeconds(31536000);
+}
+----
+
+
+=== Zabezpiecznie ścieżek dostępu 
+
+** access(String) – jeśli wartością SpEL jest true - dostęp
+
+** anonymous() - umożliwia dostęp anonimowych użytkownikom
+
+** authenticated() - umożliwia dostęp uwierzytelnionym użytkownikom
+
+** denyAll() - bezwarunkowa odmowa dostępu
+
+** fullyAuthenicated() - dostęp jedynie dla pełno uwierzytelnionych użytkowników
+(niezapamiętanym)
+
+** hasAnyAuthority(String ...) - dostęp jeśli jedno z podanych uprawnień jest przypisane do
+użytkownika
+
+** hasAnyRole(String ...) - umożliwia dostęp jeśli user posiada jedno z wymienionych ról
+
+** hasAuthority(String) – umożliwia dostęp jeśli user posiada wybrane uprawnienie
+
+** hasIpAddress(String) – jeśli user na zadany adres ip - dostęp
+
+** hasRole(String) – umożliwia dostęp jeśli user ma zadaną role
+
+** not() - neguje efekt wszystkich powyższych metod
+
+** permitAll() - bezwarunkowy dostęp
+
+** rememberMe() - umożliwia dostęp dla użytkowników z opcją remember-me
+
+=== Zabezpieczanie za pomocą SpEL : zwiększamy elastyczność
+
+
+** authentication – obiekt authentication użytkownika
+
+** denyAll – zawsze false
+
+** hasRole(String role) – true, jeśli użytkownik posiada taką rolę
+
+** hasAnyRole(lista ról) – true, jeśli user posiada którąś z ról
+
+** hasIpAddress(adres ip) – jeśli user jest przydzielony do tego adresu wtedy true
+
+** isAnonymous() - true, jeśli user jest anonimowy
+
+** isAuthenticated() - true, jeśli user nie jest anonimowy
+
+** isFullyAuthenticated() - true , jeśli użytkownik jest w pełni zalogowany (!rememberMe)
+
+** isRememberMe() - true, jeśli user jest zalogowany z opcją remember-me
+
+** permitAll – zawsze true
+
+** principal – obiekt principal danego użytkownika
+
+*** Przykład 
+
+----
+antMatchers("/author/create").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_DBA')")
+antMatchers("/messageDelete*").access("hasRole('ROLE_ADMIN) or hasIpAddress('127.0.0.1) or hasIpAddress('0:0:0:0:0:0:0:1')")
+----
+
+
+== Koncepcja
+
+** SecurityContextHolder → SecurityContext – dostęp wielowątkowy
+
+** SecurityContext → Authentication
+
+source:http://dev.anyframejava.org/
+
+image::securityContext.jpg[]
+
+** Authentication → principal
+
+** Principal – główna koncepcja użytkownika dla uwierzytelniania
+
+** UserDetails - user zrozumiały dla SpringSecurity
+
+** User – zwykła klasa domenowa
+
+
+source: http://terasolunaorg.github.io/guideline/5.0.0.RELEASE/en/Security/Authentication.html
+
+image::koncepcja.jpg[]
+
+
+*** Przykład
+
+[source,java]
+----
+private User getLoggedUser(){
+String login = ((UserDetails (SecurityContextHolder.getContext()).getAuthentication().getPrincipal()).getUsername();
+return userDAO.findByLogin(login);
+}
+
+----
+
+
+=== UserDetailService (read-only)
+
+[source,java]
+----
+public interface UserDetailsService {
+UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+}
+----
+
+** Dostarcza usługę uwierzytelnienia dla AuthenticationManager
+
+[source,java]
+----
+@Service("userAccountDetailsService")
+public class UserAccountDetailsService implements UserDetailsService {
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  UserAccount account = getUserAccount(username);
+  return new User(account.getUsername(),account.getPassword(),AuthorityUtils.createAuthorityList( account.getAuthority()));
+}
+
+public UserAccount getUserAccount(String username) {
+try {
+	TypedQuery<UserAccount> query = UserAccount.findUserAccountsByUsernameEquals(username);
+	return query.getSingleResult();
+     } catch (EmptyResultDataAccessException ex) {
+              throw new UsernameNotFoundException("Could not find user " + username, ex);
+}
+}
+}
+
+----
+
+=== UserDetails
+
+
+** **accountExpired(boolean)** – określa, czy konto wygasło czy nie
+
+** **accountLocked(boolean)** – określa, czy konto zostało zablokowane czy też nie
+
+** **and()** - łączenie w łańcuch
+
+** **authorities(GrantedAuthority ...)** - określa jedno lub więcej uprawnień nadanych użytkownikowi
+
+** **credentialsExpired(boolean )** - określa, czy dane wygasły czy też nie
+
+** **disabled(boolean)** – określa, czy konto jest włączone czy też nie
+
+** **password(String)** - hasło użytkownika
+
+** **roles(String ...)** - jedna lub więcej ról przypisanych do użytkownika
+
+
+
+=== @EnableWebSecurity
+
+** **@EnableWebSecurity** - włączamy ustawienia bezpieczeństwa  wyłącznie dla aplikacji typu web.
+
+----
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter{}
+----
+
+** **@EnableWebSecurity** żyje w symbiozie z WebSecurityConfigurer.
+
+** **WebSecurityConfigurerAdaper** rozszerza WebSecurityConfigurer dla potrzeb dewelopera.
+
+** **configure(WebSecurity)** - jej nadpisanie umożliwia konfigurację łańcucha filtrów
+
+** **configure(HttpSecurity)** - jej nadpisanie umożliwia konfigurację sposobu zabezpieczenia  żądań za pomocą interceptorów
+
+** **configure(AuthenticationManagerBuilder)** – jej nadpisanie umożliwia konfigurację usług szczegółów użytkownika.
+
+
+*** Przykład min 
+
+----
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@Autowired
+public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+auth.inMemoryAuthentication() .withUser("user").password("password").roles("USER");
+}
+----
+
+
+----
+
+protected void configure(HttpSecurity http) throws Exception {
+http.authorizeRequests().anyRequest().authenticated().and()
+.formLogin()
+.and()
+.httpBasic();
+}
+----
+
+=== Login Form
+
+
+** XML : form-login:
+
+----
+loginProcessingUrl: /j_spring_security_check
+usernameParameter: j_username
+passwordParameter: j_password
+----
+
+
+** Java Configuration : 
+
+----
+formLogin():
+loginProcessingUrl: /login
+usernameParameter: username
+passwordParameter: password
+----
+
+
+----
+protected void configuare(HttpSecurity http) throws Exception {
+http.authorizeRequests().anyRequest().authenticated().and().formLogin(). loginPage("/login") .permitAll();
+}
+----
+
+** View 
+
+----
+<c:url value="/login" var="loginUrl"/>
+<form action="${loginUrl}" method="post">
+<c:if test="${param.error != null}">
+<p>Invalid username and password </p>
+</c:if>
+<c:if test="${param.logout != null}">
+<p> You have been logged out. </p>
+</c:if>
+<p>
+<label for="username">Username</label>
+<input type="text" id="username" name="username"/>
+</p>
+<p>
+<label for="password">Password</label>
+<input type="password" id="password" name="password"/>
+</p>
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+<button type="submit" class="btn">Log in</button>
+</form>
+----
+
+=== Zabezpieczanie widoków widoków : Thymeleaf
+
+** **sec:authentication** - generuje właściwości obiektu uwierzytelnienia.
+
+** **sec:authorize** - warunkowo generuje zawartość w oparciu o wartość wyrażenia.
+
+** **sec:authorize-acl** - warunkowo generuje zawartość w oparciu o wartość wyrażenia
+
+** **sec:authorize-expr** - alias dla atrybutu sec:authorize
+
+** **sec:authorize-url** - warunkowo generuje zawartość w oparciu o reguły zabezpieczeń
+powiązane z daną ściężką URL.
+
+[source,html]
+----
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+This content is only shown to administrators.
+</div>
+
+<div sec:authorize="hasRole('ROLE_USER')">
+This content is only shown to users.
+</div>
+
+Logged user: <span sec:authentication="name">Bob</span>
+Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
+
+----
+
+[source,html]
+----
+<div th:with= "currentUser=${#httpServletRequest.userPrincipal?.name}">
+<div th:if= "${currentUser != null}">
+<form th:action="@{/logout}" method="post”>
+<input type= "submit" value="Log out" />
+</form>
+<p th:text="${currentUser}”>sample_user</p>
+</div>
+----
+
+
+=== Backend
+
+[source,java]
+----
+public class BackendAuth {
+
+@Autowired
+private AuthenticationManager authenticationManager;
+
+public boolean login(String login, String password) {
+ Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
+  boolean isAuthenticated = isAuthenticated(authentication);
+  if (isAuthenticated) {
+   SecurityContextHolder.getContext().setAuthentication(authentication);
+   }
+return isAuthenticated;
+}
+public boolean isAuthenticated(Authentication authentication) {
+  return authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+}
+
+}
+
+----
+
+
+=== @EnableGlobalMethodSecurity
+
+Konsola:
+
+----
+The default AuthenticationManager has a single user (‘user’ username and random password, printed at INFO level when the application starts up)
+
+Using default security password: 78fa095d-3f4c-48b1-ad50-e24c31d5cf35
+----
+

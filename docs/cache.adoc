@@ -1,0 +1,146 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== Caching
+
+
+=== Możliwi dostawcy
+
+** **Generic
+
+** **JCache (JSR-107)**
+
+** **EhCache 2.x**
+
+** **Hazelcast**
+
+** **Infinispan**
+
+** **Couchbase**
+
+** **Redis**
+
+** **Caffeine**
+
+** **Guava**
+
+** **Simple**
+
+=== CacheManager
+
+----
+@Bean
+public CacheManagerCustomizer<ConcurrentMapCacheManager> cacheManagerCustomizer() {
+    return new CacheManagerCustomizer<ConcurrentMapCacheManager>() {
+        @Override
+        public void customize(ConcurrentMapCacheManager cacheManager) {
+            cacheManager.setCacheNames(Arrays.asList("one", "two"));
+        }
+    };
+}
+----
+
+
+=== EhCache 2.x
+
+spring.cache.ehcache.config=classpath:config/another-config.xml
+
+
+----
+@Bean
+public EhCacheManagerFactoryBean getEhCacheFactory() {
+	EhCacheManagerFactoryBean factoryBean = new EhCacheManagerFactoryBean();
+	factoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
+	factoryBean.setShared(true);
+	return factoryBean;
+}
+
+@Bean
+public CacheManager getEhCacheManager() {
+	return new EhCacheCacheManager(getEhCacheFactory().getObject());
+}
+----
+
+Przykład : ehcache.xml
+
+----
+<ehcache xsi:noNamespaceSchemaLocation="ehcache.xsd"
+updateCheck="true" monitoring="autodetect" dynamicConfig="true" maxBytesLocalHeap="150M">
+
+<diskStore path="java.io.tmpdir"/>
+
+<cache name="person" maxBytesLocalHeap="100M"
+eternal="false"
+timeToIdleSeconds="300"
+overflowToDisk="true"
+maxElementsOnDisk="1000"
+memoryStoreEvictionPolicy="LRU"/>
+----
+
+Zależności : 
+
+----
+<dependency>
+	<groupId>javax.cache</groupId>
+	<artifactId>cache-api</artifactId>
+</dependency>
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+
+<dependency>
+	<groupId>org.ehcache</groupId>
+	<artifactId>ehcache</artifactId>
+	<version>2.8.+</version>
+</dependency>
+
+
+----
+
+
+----
+@Bean
+public JCacheManagerCustomizer cacheManagerCustomizer() {
+	return cm -> {
+		MutableConfiguration<Object, Object> configuration = new MutableConfiguration<>()
+				.setExpiryPolicyFactory(CreatedExpiryPolicy
+				.factoryOf(Duration.ONE_HOUR))
+				.setStoreByValue(false)
+				.setStatisticsEnabled(true);
+		cm.createCache("person", configuration);
+		cm.createCache("boot-versions", configuration);
+	};
+}
+----
+
+
+== Caffeine / Guava
+
+Zależność:
+
+----
+compile 'org.springframework.boot:spring-boot-starter-cache'    
+compile 'com.github.ben-manes.caffeine:caffeine'
+----
+
+Ustawienia: 
+
+@EnableCaching
+
+----
+spring.cache.caffeine.spec=recordStats,maximumSize=500,expireAfterAccess=600s
+----
+

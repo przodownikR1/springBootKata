@@ -1,0 +1,92 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== DevTools
+
+[source,xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+    </dependency>
+</dependencies>
+----
+
+[source,groovy]
+----
+dependencies {
+    compile("org.springframework.boot:spring-boot-devtools")
+}
+----
+
+----
+spring.thymeleaf.cache  
+----
+
+podobnie dla :
+
+----
+spring.thymeleaf.cache
+spring.freemarker.cache
+spring.velocity.cache
+spring.mustache.cache
+spring.groovy.template.cache
+----
+
+
+=== Tuning
+
+----
+spring:
+devtools:
+  restart:
+     exclude: /static/**,/templates/**
+----
+
+
+===  LiveReload plugin
+
+----
+Wyłączenie : spring.devtools.livereload.enabled=false.
+----
+
+
+=== Uniemożliwienie restartów
+
+[source,java]
+----
+public static void main(String[] args) {
+    System.setProperty("spring.devtools.restart.enabled", "false");
+    SpringApplication.run(MyApp.class, args);
+}
+----
+
+=== Zdalne aplikacje
+
+----
+spring.devtools.remote.secret=mysecret
+
+org.springframework.boot.devtools.RemoteSpringApplication 
+----
+
+
+== Spring loaded 
+
+Eclipse : 
+
+----
+-javaagent:/home/przodownik/springloaded-1.2.6.RELEASE.jar -noverify
+----
+

@@ -1,0 +1,222 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+
+== Starters
+
+** **spring-boot-starter**
+    
+Rdzeń Spring Boot. Zawiera elementy decydujące o auto-konfiguracji, logowaniu i rejestrowaniu zmian w YAML czy properties.
+
+WARNING: Zależność krytyczna
+
+** **spring-boot-starter-actuator**
+
+Pomaga monitorować i zarządzać aplikacją.
+    
+NOTE: Production ready feature
+
+** **spring-boot-starter-amqp**
+    
+Wspiera technologię opartą protokole AMPQ jak RABBIT-MQ 
+
+
+** **spring-boot-starter-aop**
+    
+Wspiera AOP
+
+
+** **spring-boot-starter-batch**
+    
+Wspiera integrację ze Spring Batch
+
+
+** **spring-boot-starter-cache**
+
+Wspiera integrację z Cache    
+
+
+** **spring-boot-starter-cloud-connectors**
+    
+Wspiera integrację z chmurą
+
+
+** **spring-boot-starter-data-elasticsearch**
+    
+Wspiera integrację z ElasticSearch
+
+** **spring-boot-starter-data-gemfire**
+    
+Wspiera integrację z GemFire 
+
+
+** **spring-boot-starter-data-jpa**
+
+Wspiera integrację z JPA oraz Spring-Data-JPA (spring-data-jpa,spring-orm)    
+
+** **spring-boot-starter-data-mongodb**
+    
+Wspiera integrację z MongoDB (spring-data-mongodb)
+
+
+** **spring-boot-starter-data-rest**
+
+Wspiera integrację z REST (spring-data-rest-webmvc)    
+
+
+** **spring-boot-starter-data-solr**
+    
+Wspiera integrację z Solr (spring-data-solr)
+
+** **spring-boot-starter-freemarker**
+    
+Wspiera integrację z FreeMarker    
+
+
+** **spring-boot-starter-groovy-templates**
+
+Wspiera integrację z Groovy    
+
+
+** **spring-boot-starter-hateoas**
+
+Wspiera integrację z HATEOAS (spring-hateoas)    
+
+
+** **spring-boot-starter-hornetq**
+    
+Wspiera integrację z HornetQ
+
+** **spring-boot-starter-integration**
+
+Wspiera integrację z Spring-integration    
+
+** **spring-boot-starter-jdbc**
+
+Wspiera integrację z JDBC    
+
+
+** **spring-boot-starter-jersey**
+
+Wspiera integrację z Jersey RESTful    
+
+
+** **spring-boot-starter-jta-atomikos**
+    
+Wspiera integrację JTA Atomikos
+
+
+** **spring-boot-starter-jta-bitronix**
+
+Wspiera integrację z JTA Bitronix    
+
+
+** **spring-boot-starter-mail**
+
+Wspiera dla wysyłki email    
+
+** **spring-boot-starter-mobile**
+
+Wspiera integrację z spring-mobile    
+
+** **spring-boot-starter-mustache**
+    
+Wspiera integrację z Mustache template    
+
+
+** **spring-boot-starter-redis**
+    
+Wspiera integrację z REDIS
+
+
+** **spring-boot-starter-security**
+    
+Wspiera integrację z Spring-Security 
+
+** **spring-boot-starter-social-facebook**
+    
+Wspiera integrację z Facebook (spring-social-facebook)
+
+
+** **spring-boot-starter-social-linkedin**
+
+Wspiera integrację z LinkedIn (spring-social-linkedin)    
+
+
+** **spring-boot-starter-social-twitter**
+
+Wspiera integrację z Twitter (spring-social-twitter)    
+
+
+** **spring-boot-starter-test**
+
+Wspiera testowanie (Junit, Hamcrest, Mockito)    
+
+
+** **spring-boot-starter-thymeleaf**
+    
+Wspiera integrację z Thymeleaf template
+
+
+** **spring-boot-starter-velocity**
+    
+Wspiera integrację z Velocity
+
+
+** **spring-boot-starter-web**
+    
+Wsparcie dla stosu webowego Springa (Tomcat, spring-webmvc)
+
+NOTE: Wbudowany Tomcat, Jackson JSON binding, JSR 303 validation, Spring Web i Spring MVC 
+
+** **spring-boot-starter-websocket**
+    
+Wspiera integrację z WebSocket
+
+
+** **spring-boot-starter-ws**
+
+Wspiera integrację z Web Service    
+
+** **spring-boot-starter-actuator**
+    
+Monitoring i metryki    
+
+** **spring-boot-starter-remote-shell**
+    
+Monitoring i metryki z poziomu ssh
+
+** **spring-boot-starter-jetty**
+    
+Integracja z Jetty (alternatywa dla Tomcat)
+
+
+** **spring-boot-starter-log4j**
+
+Wspiera integrację z Log4j    
+
+
+** **spring-boot-starter-logging**
+    
+    
+Import Spring Boot’s default logging framework (Logback).
+
+** **spring-boot-starter-tomcat**
+    
+Wspiera integrację z Tomcat (domyślne)
+
+
+** **spring-boot-starter-undertow**
+    
+Wspiera integrację z Undertow (alternatywa dla Tomcat)

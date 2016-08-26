@@ -1,0 +1,1445 @@
+:numbered:
+:icons: font
+:pagenums:
+:imagesdir: images
+:iconsdir: ./icons
+:stylesdir: ./styles
+:scriptsdir: ./js
+
+:image-link: https://pbs.twimg.com/profile_images/425289501980639233/tUWf7KiC.jpeg
+ifndef::sourcedir[:sourcedir: ./src/main/java/]
+ifndef::resourcedir[:resourcedir: ./src/main/resources/]
+ifndef::imgsdir[:imgsdir: ./../images]
+:source-highlighter: coderay
+
+== WEB
+
+=== Aktualne kontenery
+
+** **Tomcat 8 3.1 Java 7+**
+
+** **Tomcat 7 3.0 Java 6+**
+
+** **Jetty 9.3 3.1  Java 8+**
+
+** **Jetty 9.2  3.1  Java 7+**
+
+** **Jetty 8 3.0  Java 6+**
+
+** **Undertow 1.3 3.1 Java 7+**
+
+
+=== Spring MVC auto-configuration
+
+** **Inicjalizacja DispatcherServlet'a**
+
+** **Ustawienie 'encoding filter'**
+
+** **Konfiguracja statycznych zasobów**
+
+** **Włączenie ContentNegotiatingViewResolver & BeanViewResolver**
+
+** **Wsparcie dla sewrowania kontentu statycznego & webjars**
+
+** **Automatyczna rejestracja kowerterów i formaterów**
+
+** **Wsparcie dla HttpMessageConvertes**
+
+** **Automatyczna rejestracja MessageCodesResolver**
+
+** **Wsparcie dla statycznego index.html**
+
+** **Konfiguracja multipart resolver'a**
+
+** **favicon**
+ 
+=== Serwer port
+
+----
+server.port=9991  
+----
+
+
+=== Static Content
+
+----
+spring.resources.staticLocations
+----
+
+** /META-INF/resources/ 
+
+** /resources/ 
+
+** /static/ 
+
+** /public/ 
+
+
+=== Template engines
+
+
+** **FreeMarker**
+
+** **Groovy**
+
+** **Thymeleaf**
+
+** **Velocity (deprecated in 1.4)**
+
+** **Mustache**
+    
+
+=== favicon
+
+
+Zasób: 
+
+----
+src/main/resource/static/favicon.ico
+----
+
+
+HTML:
+
+[source,html]
+----
+   <link rel="icon" type="image/x-icon" href="/favicon.ico">
+----
+
+
+
+== Defiowanie filtrów
+
+[source,java]
+----
+@Configuration
+public class WebConfiguration{
+	@Bean
+	MyFilter myFilter(){
+   	 return	new MyFilter();
+	}
+}
+----
+
+NOTE: Automatyczna detekcja : javax.servlet.Filter
+
+
+== Interceptory
+
+
+** HandlerInterceptor
+
+[source,java]
+----
+public class WebConfiguration extends WebMvcConfigurerAdapter	{  //krok 1
+
+@Bean
+LocaleChangeInterceptor localeChangeInterceptor() { //krok 2
+		return new LocaleChangeInterceptor();
+}
+
+@Override 
+public void addInterceptors(InterceptorRegistry registry){ //krok 3
+ registry.addInterceptor(localeChangeInterceptor());
+}
+}
+----
+
+
+Wywołanie : 
+
+----
+http://{host}:{port}/{someUrl}?locale={locale_name}
+----
+
+
+== PropertyEditors
+
+[source,java]
+----
+public class CustomerEditor extends PropertyEditorSupport {
+    @Override
+    public void setAsText(String text) throws IllegalArgumentException {
+        if (StringUtils.hasText(text)) {
+            setValue(new Customer(text.trim(), ""));
+        } else {
+            setValue(null);
+        }
+    }
+
+    @Override
+    public String getAsText() {
+        Customer customer = (Customer) getValue();
+        if (customer != null) {
+            return customer.getFirstName();
+        }
+        return "";
+    }
+}
+----
+
+Dowiązanie :
+
+[source,java]
+----
+@InitBinder
+public	void initBinder(WebDataBinder binder)	{
+  binder.registerCustomEditor(Customer.class, new CustomerEditor());
+}
+----
+
+Kontroler :
+
+[source,java]
+----
+@RequestMapping(value ="/customer/{firstName}", method = RequestMethod.GET)
+public Customer getCustomer(@PathVariable Customer customer)
+{
+   return customer;
+}
+----
+
+Wywołanie
+
+----
+http://{host}:{port}/person/przodownik
+----
+
+
+WARNING: Nie jest to Thread-safe
+
+
+== Formatter
+
+[source,java]
+----
+public class PersonFormatter implements  Formatter<Person> {
+    private PersonRepository   repository;
+    public  PersonFormatter(PersonRepository    repository) {
+            this.repository =   repository;
+    }
+    @Override
+    public  Person  parse(String  name, Locale  locale) throws   ParseException  {
+            List<Person>  people  =  repository.findByFirstNameLike(name);
+            return people.get(0);
+    }
+    
+    @Override
+    public  String  print(Person person,   Locale  locale) {
+            return person.getFirstName();
+    }
+}
+
+----
+
+[source,java]
+----
+@Configuration
+public class WebConfig extends WebMvcConfigurationSupport{
+//...
+@Override
+public void addFormatters(FormatterRegistry registry)	{ 
+  registry.addFormatter(new PersonFormatter(personRepo));
+}
+}
+----
+
+----
+@RequestMapping(value ="/person/{login}", method = RequestMethod.GET)
+public Person getPerson(@PathVariable Person person)
+{
+   return personRepository.findBookByLogin(person.getLogin());
+}
+----
+
+
+== Defiowanie ścieżek do własnych zasobów statycznych
+
+
+[source,java]
+----
+@Configuration
+public class WebConfig extends WebMvcConfigurationSupport{
+//...
+@Override
+public void addResourceHandlers(ResourceHandlerRegistry	registry){
+  registry.addResourceHandler("/resource/**").addResourceLocations("classpath:/");
+}
+----
+
+** Przykład wywołania
+
+----
+http://{host}:{port}/resource/application.properties
+----
+
+
+== Jetty zamiast Tomcat'a
+
+Zależność Gradle : 
+
+----
+compile("org.springframework.boot:spring-boot-starter-jetty")
+
+configurations	{
+  compile.exclude	module:	"spring-boot-starter-tomcat"
+}
+----
+
+
+== Error Handling    
+
+@ControllerAdvice
+
+
+**  **@ExceptionHandler**
+
+** **@ModelAttribute**
+
+** **@InitBinder**
+
+TIP: basePackageClasses - zawężamy skanowanie
+
+
+** Przykład
+
+[source,java]
+----
+@ControllerAdvice(basePackageClasses = FooController.class)
+public class FooControllerAdvice extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(YourException.class)
+    @ResponseBody
+    ResponseEntity<?> handleControllerException(HttpServletRequest request, Throwable ex) {
+        HttpStatus status = getStatus(request);
+        return new ResponseEntity<>(new CustomErrorType(status.value(), ex.getMessage()), status);
+    }
+
+    private HttpStatus getStatus(HttpServletRequest request) {
+        Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+        if (statusCode == null) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return HttpStatus.valueOf(statusCode);
+    }
+
+   @ExceptionHandler({ ObjectOptimisticLockingFailureException.class, OptimisticLockingFailureException.class,
+            DataIntegrityViolationException.class })
+    @ResponseBody
+    public ResponseEntity handleConflict(Exception ex) {
+        return errorResponse(ex, HttpStatus.CONFLICT);
+    }
+
+ private ResponseEntity<ExceptionMessage> errorResponse(Throwable throwable, HttpStatus status) {
+        if (null != throwable) {
+            log.error("error caught: " + throwable.getMessage(), throwable);
+            return response(new ExceptionMessage(throwable), status);
+        } else {
+            log.error("unknown error caught in RESTController, {}", status);
+            return response(null, status);
+        }
+}
+
+ private <T> ResponseEntity<T> response(T body, HttpStatus status) {
+        return new ResponseEntity<>(body, new HttpHeaders(), status);
+}
+
+}
+
+----
+
+** Przykład 2: 
+
+[source,java]
+----
+@ControllerAdvice
+public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
+        List<String> errors = new ArrayList<>(fieldErrors.size() + globalErrors.size());
+        String error;
+        for (FieldError fieldError : fieldErrors) {
+            error = fieldError.getField() + ", " + fieldError.getDefaultMessage();
+            errors.add(error);
+        }
+        for (ObjectError objectError : globalErrors) {
+            error = objectError.getObjectName() + ", " + objectError.getDefaultMessage();
+            errors.add(error);
+        }
+        ErrorMessage errorMessage = new ErrorMessage(errors);
+        return new ResponseEntity(errorMessage, headers, status);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        String unsupported = "Unsupported content type: " + ex.getContentType();
+        String supported = "Supported content types: " + MediaType.toString(ex.getSupportedMediaTypes());
+        ErrorMessage errorMessage = new ErrorMessage(unsupported, supported);
+        return new ResponseEntity(errorMessage, headers, status);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        Throwable mostSpecificCause = ex.getMostSpecificCause();
+        ErrorMessage errorMessage;
+        if (mostSpecificCause != null) {
+            String exceptionName = mostSpecificCause.getClass().getName();
+            String message = mostSpecificCause.getMessage();
+            errorMessage = new ErrorMessage(exceptionName, message);
+        } else {
+            errorMessage = new ErrorMessage(ex.getMessage());
+        }
+        return new ResponseEntity(errorMessage, headers, status);
+    }
+}
+----
+
+Przykład 3: 
+
+----
+@ControllerAdvice
+public class GlobalControllerAdvice {
+
+	@InitBinder
+	public void configureBinding(WebDataBinder binder) {
+		binder.setDisallowedFields("id");
+	}
+
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public void handleDatabaseConstraintViolation() {
+	  //..
+	}
+
+}
+----
+
+
+@ResponseStatus
+
+[source,java]
+----
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "No such customer")
+public class CustomerFoundException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
+    public CustomerFoundException(String key) {
+        super(key + " not available");
+    }
+}
+----
+
+
+@ErrorHandler
+
+** Przykład
+
+[source,java]
+----
+    @ExceptionHandler({ NotFoundException.class })
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public BadRequest handleException(NotFoundException e, HttpServletRequest request) {
+        log(String.format(LOG_RESPONSE_FORMAT, HttpStatus.NOT_FOUND.value(), request.getRequestURI()), e.getMessage());
+        return new BadRequest(e.getMessage());
+    }
+
+
+    @ExceptionHandler({ RuntimeException.class })
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public BadRequest handleException(RuntimeException e, HttpServletRequest request) {
+        log(String.format(LOG_RESPONSE_FORMAT, HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI()), e.getMessage());
+        return new BadRequest(e.toString());
+    }
+
+    @ExceptionHandler({ IllegalArgumentException.class })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public BadRequest handleException(IllegalArgumentException e, HttpServletRequest request) {
+        log(String.format(LOG_RESPONSE_FORMAT, HttpStatus.BAD_REQUEST.value(), request.getRequestURI()), e.getMessage());
+        return new BadRequest(e.getMessage());
+    }
+
+
+    /**
+     *  more informative message than a generic HTTP-400 Bad Request
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BadRequest handleException(HttpMessageNotReadableException e, HttpServletRequest request) {
+        ...
+        return new BadRequest(e.getMessage());
+}
+----
+
+
+[source,java]
+----
+
+@Configuration
+public class ErrorConfig {
+
+
+    @Bean
+    public EmbeddedServletContainerCustomizer containerCustomizer() {
+        return new MyCustomizer();
+    }
+
+    private static class MyCustomizer implements EmbeddedServletContainerCustomizer {
+
+        @Override
+        public void customize(ConfigurableEmbeddedServletContainer container) {
+            container.addErrorPages(new ErrorPage(HttpStatus.BAD_REQUEST, "/400"));
+        }
+
+    }
+}
+
+----
+
+
+@SimpleErrorHandler
+
+
+@ResponseStatus
+
+** Przykład
+
+[source,java]
+----
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+public class BadRequest extends RuntimeException {
+    public BadRequest(String message) {
+        super(message);
+    }
+}
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public static class NotFound extends RuntimeException {
+
+}
+}
+
+
+----
+
+== SimpleMappingExceptionResolver
+
+[source,java]
+----
+ @Bean
+    public SimpleMappingExceptionResolver createSimpleMappingExceptionResolver() {
+      SimpleMappingExceptionResolver resolver = new SimpleMappingExceptionResolver();
+      Properties errorMaps = new Properties();
+      errorMaps.setProperty("MySpecificException", "error");
+      errorMaps.setProperty("NullPointerException", "error");
+      resolver.setExceptionMappings(errorMaps);
+      resolver.setDefaultErrorView("globalerror");
+      return resolver;
+   }
+----
+
+----
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>My Exception Handling</title>
+</head>
+<body>
+
+<h1>My Exception Handling</h1>
+
+${exception.message}
+
+</body>
+</html>
+----
+
+
+             
+=== Definiowanie stron błędów
+
+
+NOTE: Od Spring Boot 1.4 wystarczy stworzyć plik o danym kodzie błędu i umieścić do w zasobach statycznych. Automatyczne mapowanie.
+
+** Przykład : 4..
+
+----
+src/
+ +- main/
+     +- java/
+     |   + <source code>
+     +- resources/
+         +- public/
+             +- error/
+             |   +- 404.html
+             +- <other public assets>
+
+----
+
+
+** Przykład : 5..
+
+----
+src/
+ +- main/
+     +- java/
+     |   + <source code>
+     +- resources/
+         +- templates/
+             +- error/
+             |   +- 5xx.ftl
+             +- <other templates>
+----
+
+
+
+== Rest
+
+=== Adnotacje 
+
+
+** **@Controller** 	
+
+** **@RestController**
+
+** **@ResponseBody**	
+
+** **@PathVariable**
+
+** Przykład metody kontrolera
+
+[source,java]
+----
+@RequestMapping("/user/{id}/{field}")
+public void showUserField(@PathVariable("id") Long userId, @PathVariable("field") String field) {
+...
+----
+
+
+=== Prefix usługi
+
+** Przykład
+
+[source,java]
+----
+@Controller
+@RequestMapping("/user")
+public class UserController {
+...
+}
+----
+
+=== Spring Data REST
+
+Zależność : 
+
+----
+compile("org.springframework.boot:spring-boot-starter-data-rest")
+----
+
+
+** @RepositoryRestResource - oznaczenie danego repozytiorium
+
+
+[source,java]
+----
+
+@RepositoryRestResource(collectionResourceRel="person",path="persons")
+
+----
+
+[source,java]
+----
+@RepositoryRestResource
+public interface PersonRepo extends CrudRepository<Person, Long>
+{
+@RestResource(path="byName")
+public List findByPersonName(@Param("name") String personName);
+}
+----
+
+
+=== Wywoływanie serwisu REST
+
+[source,java]
+----
+@Service
+public class MyBean {
+
+    private final RestTemplate restTemplate;
+
+    public MyBean(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplate = restTemplateBuilder.build();
+    }
+
+    public Details someRestCall(String name) {
+        return this.restTemplate.getForObject("/{name}/details", Details.class, name);
+    }
+
+}
+----
+
+
+=== Dostrojenie RESTTemplate
+
+[source,java]
+----
+static class ProxyCustomizer implements RestTemplateCustomizer {
+
+    @Override
+    public void customize(RestTemplate restTemplate) {
+        HttpHost proxy = new HttpHost("proxy.example.com");
+        HttpClient httpClient = HttpClientBuilder.create()
+                .setRoutePlanner(new DefaultProxyRoutePlanner(proxy) {
+
+                    @Override
+                    public HttpHost determineProxy(HttpHost target,
+                            HttpRequest request, HttpContext context)
+                                    throws HttpException {
+                        if (target.getHostName().equals("192.168.0.5")) {
+                            return null;
+                        }
+                        return super.determineProxy(target, request, context);
+                    }
+
+                }).build();
+        restTemplate.setRequestFactory(
+                new HttpComponentsClientHttpRequestFactory(httpClient));
+    }
+
+}
+----
+
+=== Richardson Maturity Model
+
+source : https://technobeans.wordpress.com/
+
+image:richardson-maturity-model.png[]
+
+
+
+=== Hal browser
+
+Zależność : 
+
+----
+compile('org.springframework.data:spring-data-rest-hal-browser')
+----
+
+http://{host}:{port}/browser/index.html
+
+=== Swagger 2
+
+Zależności : 
+
+[source,groovy]
+----
+compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.5.0'
+compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.5.0'
+----
+
+
+Konfiguracja: 
+
+[source,java]
+----
+@Configuration
+@EnableSwagger2
+@Profile("rest")
+public class SwaggerConfig extends WebMvcConfigurerAdapter{                                    
+    @Bean
+    Docket api() { 
+        return new Docket(DocumentationType.SWAGGER_2)  
+          .select()                                  
+          .apis(RequestHandlerSelectors.any())              
+          .paths(PathSelectors.ant("/api/**"))          
+          .build()
+          .apiInfo(apiInfo());                                           
+    }
+    //TODO get info from properties
+    
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+            .title("Boot Kata - Web API")
+            .description("Boot Kata based on REST")            
+            .license("Apache License Version 2.0")
+            .version("1.0")
+            .build();
+    }
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+}
+}
+----
+
+
+URL: 
+
+http://{host}:{port}/swagger-ui.html
+
+lub REST
+
+http://{host}:{port}/v2/api-docs/
+
+
+
+=== Obsługa wyjątków
+
+** **DefaultHandlerExceptionResolver** 
+
+[source,java]
+----
+@RestController
+@RequestMapping("/customer")
+public class CustomerController implements HandlerExceptionResolver {
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<Object> get(){
+        throw new RuntimeException("customer not yet supported");
+    }
+
+    @Override
+    public ModelAndView resolveException(HttpServletRequest req, HttpServletResponse resp, Object handler, Exception ex) {
+        resp.reset();
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/json");
+
+        ModelAndView model = new ModelAndView(new MappingJackson2JsonView());
+        if (ex instanceof RuntimeException){
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            model.addObject("code", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            model.addObject("message", ex.getMessage());
+        } else {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            model.addObject("code", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            model.addObject("message", ex.getMessage());
+        }
+        return model;
+    }
+}
+
+----
+
+
+** **@ControllerAdvice** 
+
+----
+Przykład powyżej
+----
+
+** **@ExceptionHandler** 
+
+----
+Przykład powyżej
+----
+
+** **@ResponseStatus** 
+
+----
+Przykład powyżej
+----
+
+
+** **ErrorMvcAutoConfiguration** 
+
+----
+ErrorController
+
+${error.path:/error}
+
+${error.whitelabel.enabled:true}
+
+----
+
+** **SimpleMappingExceptionResolver**
+
+----
+Przykład powyżej
+----
+
+=== Hateoas
+
+** **Resource, Resources<T>**
+
+[source,java]
+----
+public class ProductResource extends ResourceSupport {
+
+    private UUID uuid;
+    private String name;
+    private String supplier;
+    private Double price;
+
+    @JsonCreator
+    public ProductResource(@JsonProperty(value = "uuid") @NotNull UUID uuid,
+                           @JsonProperty(value = "name") @NotNull String name,
+                           @JsonProperty(value = "supplier") @NotNull String supplier,
+                           @JsonProperty(value = "price") @NotNull Double price) {
+        this.uuid = uuid;
+        this.name = name;
+        this.supplier = supplier;
+        this.price = price;
+}
+----
+
+
+** **ResourceAssembler**
+
+[source,java]
+----
+public class ProductResourceAssembler extends ResourceAssemblerSupport<Product, ProductResource> {
+
+    public ProductResourceAssembler() {
+        super(ProductController.class, ProductResource.class);
+    }
+
+    @Override
+    public ProductResource toResource(Product product) {
+
+        ProductResource resource = createResourceWithId(product.getUuid(), product);
+        BeanUtils.copyProperties(product, resource);
+
+        return resource;
+    }
+
+    public Product toClass(ProductResource resource){
+
+        return new Product(resource.getUuid(), resource.getName(), resource.getSupplier(), resource.getPrice());
+
+    }
+}
+----
+
+----
+final class OwnerResourceAssembler implements ResourceAssembler<Owner, Resource<Owner>> {
+
+    @Override
+    public Resource<Owner> toResource(Owner owner) {
+        Cat cat = new Cat();
+        Resource<Owner> resource = new Resource<>(owner);
+        resource.add(linkTo(methodOn(HateoasOwnerController.class).read(owner.getId())).withSelfRel());
+        resource.add(linkTo(methodOn(HateoasCatController.class, owner.getId()).read(cat.getId())).withRel("cat"));
+
+        return resource;
+    }
+
+}
+----
+
+** **PagedResourcesAssembler**
+
+[source,java]
+----
+  @GetMapping(path = "/")
+    PagedResources<List<Resource<Customer>>> getAll(Pageable pageable) {
+        Page<Customer> result = customerRepository.findAll(pageable);
+        List<Resource<Customer>> customers = result.getContent().stream().map(this::toResource).collect(toList());
+        return new PagedResources(customers, getMetadata(result), getLinks(result));
+
+    }
+    
+    @GetMapping(path="/second",produces = MediaType.APPLICATION_JSON_VALUE)
+    public HttpEntity<PagedResources<Customer>> page(Pageable pageable,PagedResourcesAssembler pagedResourcesAssembler) {                      
+        return ResponseEntity.ok((pagedResourcesAssembler.toResource(customerRepository.findAll(pageable),customerAssembler )));
+}
+    
+    @Autowired
+    private UserResourceAssembler resourceAssembler;
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public PagedResources<User> getUsers(Pageable pageable, PagedResourcesAssembler assembler) {
+        return assembler.toResource(userService.getUsers(pageable), resourceAssembler);
+}
+
+----
+
+----
+ @RequestMapping(method = GET)
+    public Callable<HttpEntity<?>> getUsers(Pageable pageable, PagedResourcesAssembler<User> pagedResourcesAssembler) {
+        return () -> {
+            List<User> users = repository.findAll(pageable);
+            Page<User> page = new PageImpl<>(users, pageable, repository.count());
+            PagedResources<Resource<User>> resources = pagedResourcesAssembler.toResource(page, resourceAssembler());
+            resources.add(linkTo(methodOn(UserController.class).users(null, null)).withSelfRel());
+            resources.add(linkTo(methodOn(UserController.class).invoice(null)).withRel("invoice"));
+            return ok(resources);
+        };
+}
+----
+
+
+
+
+** **links (self)**
+
+[source,java]
+----
+   @GetMapping(path = "/all")
+    ResponseEntity<Resources<Resource<Customer>>> getAll() {
+        List<Link> links = new LinkedList<>();
+        links.add(linkTo(methodOn(getClass()).getAll()).withSelfRel());
+        List<Resource<Customer>> customers = customerRepository.findAll().stream().map(this::toResource).collect(Collectors.toList());
+        return ResponseEntity.ok(new Resources<>(customers, links));
+    }
+
+    private Resource<Customer> toResource(final Customer customer) {
+        List<Link> links = new LinkedList<>();
+        links.add(linkTo(methodOn(CustomerController.class).getCustomereByID(customer.getId())).withSelfRel());
+        return new Resource<>(customer, links);
+    }
+
+    private Resource<Customer> toResource(final Customer customer) {
+        List<Link> links = new LinkedList<>();
+        links.add(linkTo(methodOn(CustomerController.class).getCustomereByID(customer.getId())).withSelfRel());
+        return new Resource<>(customer, links);
+    }
+
+----
+
+** **ControllerLinkBuilder**
+
+[source,java]
+----
+public class TaskResource extends Resource<Task> {
+
+	TaskResource(Task task) {
+		super(task);
+
+       add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).read(task.getId()))
+				.withSelfRel());
+
+	add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).edit(task.getId(), new Task()))
+				.withRel("tasks"));
+
+	add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).list())
+				.withRel("previous"));
+
+	}
+
+}
+----
+
+[source,java]
+----
+public class CityResource extends Resource<City> {
+
+	public CityResource(City entity) {
+		super(entity, linkTo(methodOn(CityHateoasController.class).item(entity.getId())).withSelfRel(), linkTo(
+				CityHateoasController.class).slash(entity.getId()).withRel("delete"));
+	}
+}
+----
+
+
+== JSON
+
+
+=== @JsonView
+
+Domain class:
+
+[source,java]
+----
+public class User extends AbstractEntity{
+
+    public static interface OnlyLoginView {}
+    public static interface OnlyEmailView {}
+    public static interface OnlyEnabledView {}
+    public static interface OnlyVersionView {}
+    public static interface AllView extends OnlyLoginView, OnlyEmailView, OnlyEnabledView, OnlyVersionView {}
+
+    private static final long serialVersionUID = -8920961125119379475L;
+    private  String firstname;
+    @JsonView(User.OnlyEmailView.class)
+    private  String email;
+    @JsonView(User.OnlyLoginView.class)
+    private String login;
+    private String password;
+    @JsonView(User.OnlyEnabledView.class)
+    private boolean enabled;
+    @Transient
+    private LocalDate birthDate;
+
+    private String lastName;
+
+    @Enumerated
+    private Gender gender;
+
+----
+
+Controller class :
+
+[source,java]
+----
+@JsonView(User.OnlyEmailView.class)
+public User getUser(@PathVariable("userId") Long userId) {
+        Meter requests = metricRegistry.meter("requestsId");
+        requests.mark();
+        return userRepository.findOne(userId);
+
+}
+----
+
+Przykład 2 :
+
+----
+@RestController
+public class UserController {
+
+    @GetMapping("/user")
+    @JsonView(User.WithoutPasswordView.class)
+    public User getUser() {
+        return new User("przodownik", "!@@vve3223");
+    }
+}
+
+
+@Data
+//..
+public class User {
+
+    public interface WithoutPasswordView {};
+    public interface WithPasswordView extends WithoutPasswordView {};
+
+    @JsonView(WithoutPasswordView.class)
+    private String username;
+
+   @JsonView(WithPasswordView.class)
+    private String password;
+
+  
+}
+----
+
+NOTE: @JsonIgnore 
+
+NOTE: XStream => @XstreamOmitField
+
+=== @JsonBackReference
+
+Serializacja wstecz pominięta
+
+=== @JsonManagedReference 
+
+Normalna serializacja wstecz
+
+
+----
+@RunWith(SpringRunner.class)
+@JsonTest
+@Slf4j
+public class JsonSimpleTest {
+    @Autowired
+    private ObjectMapper objectMapper;
+    
+    @Test
+    public void shouldSerializationTest() throws JsonProcessingException{
+        User user = new User(1, "Przodownik",newArrayList());
+        Item i1 = new Item(1, "tv", user);
+        Item i2 = new Item(2, "bike", user);
+        user.addItem(i1);
+        user.addItem(i2);
+        
+       log.info("user: {}",objectMapper.writeValueAsString(user)); 
+       log.info("item1 : {}",objectMapper.writeValueAsString(i1)); 
+    }
+}
+
+----
+
+=== @JsonPropertyOrder
+
+----
+@Data
+@JsonPropertyOrder({ "name", "age","lastName","addressList" })
+public class Person {
+
+    private String name;
+    private String lastName;
+    private int age;
+    private List<Address> addressList;
+
+----
+
+=== @JsonSerialize
+
+
+----
+public class Alert {
+    public String name;
+    //... 
+    @JsonSerialize(using = MyDateSerializer.class)
+    public Date alertDate;
+}
+----
+
+
+----
+public class MyDateSerializer extends StdSerializer<Date> {
+ 
+    private static SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+ 
+    public MyDateSerializer() { 
+        this(null); 
+    } 
+ 
+    public MyDateSerializer(Class<Date> t) {
+        super(t); 
+    }
+ 
+    @Override
+    public void serialize(Date value, JsonGenerator gen, SerializerProvider arg2) 
+      throws IOException, JsonProcessingException {
+        gen.writeString(formatter.format(value));
+    }
+}
+----
+
+
+=== @JsonCreator - serializacja 
+
+
+----
+public class CreatorJsonExample {
+    public int id;
+    public String name;
+
+    @JsonCreator
+    public CreatorJsonExample(@JsonProperty("name") String name, @JsonProperty("id") int id) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+----
+
+Test: 
+
+----
+
+@RunWith(SpringRunner.class)
+@JsonTest
+@Slf4j
+public class JsonSimpleTest {
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Test
+    public void shouldCreateJsonWork() throws JsonProcessingException, IOException {
+
+        String json = "{\"id\":2,\"name\":\"przodownik\"}";     
+        CreatorJsonExample bean = objectMapper.readerFor(CreatorJsonExample.class).readValue(json);
+        assertEquals("przodownik", bean.name);
+    }
+----
+
+
+
+== SSL
+
+=== Generacja klucza 
+
+----
+keytool -genkey -alias springboot -keyalg RSA -keystore src/main/resources/tomcat.keystore
+----
+
+=== Ustawienia
+
+
+----
+server.port = 8443
+server.ssl.key-store = classpath:keystore.jks
+server.ssl.key-store-password = secret
+server.ssl.key-password = another-secret
+----
+
+
+[source,java]
+----
+@Configuration
+public class SecureTomcatConfiguration {
+@Bean
+public EmbeddedServletContainerFactory servletContainer() throws FileNotFoundException {
+TomcatEmbeddedServletContainerFactory f = new TomcatEmbeddedServletContainerFactory();
+f.addAdditionalTomcatConnectors(createSslConnector());
+return f;
+}
+private Connector createSslConnector() throws
+FileNotFoundException { Connector connector = new Connector(Http11NioProtocol.class.getName());
+Http11NioProtocol protocol = (Http11NioProtocol)connector.getProtocolHandler();
+connector.setPort(8443);
+connector.setSecure(true);
+connector.setScheme("https");
+protocol.setSSLEnabled(true);
+protocol.setKeyAlias("springboot");
+protocol.setKeystorePass("password");
+protocol.setKeystoreFile(ResourceUtils.getFile("src/main/resources/tomcat.keystore").getAbsolutePath());
+protocol.setSslProtocol("TLS");
+return connector;
+}
+}
+----
+
+
+----
+  @Bean
+    public EmbeddedServletContainerFactory servletContainer() {
+        final TomcatEmbeddedServletContainerFactory tomcatFactory = new TomcatEmbeddedServletContainerFactory();
+
+        // tomcatFactory.setAddress(InetAddress.getLocalHost());// you can restrict localhost access
+        tomcatFactory.setPort(8080);
+        // ServletContainerInitializer
+
+        /** This line has no significance . handled by the addViewControllers() method */
+        tomcatFactory.addContextCustomizers(context -> context.addWelcomeFile("/api/swagger-ui.html"));
+
+        try {
+            final ClassPathResource classPathResource = new ClassPathResource("keystore");
+
+            /** This code snippet enabled SSL . when you run from executable Jar this is not working. adding if condition to avoid error */
+            if (classPathResource.getFile().exists()) {
+                final Connector connector = new Connector();
+                connector.setPort(8443);
+                connector.setSecure(true);
+                connector.setScheme("https");
+                connector.setProperty("SSLEnabled", "true");
+                connector.setProperty("keystorePass", "spring");
+                connector.setProperty("keystoreFile", classPathResource.getFile().getAbsolutePath());
+                tomcatFactory.addAdditionalTomcatConnectors(connector);
+            }
+
+        } catch (final Exception e) {
+            LOGGER.debug("Error while loading classpath resource  ", e);
+        }
+
+        return tomcatFactory;
+    }
+----
+
+
+== Dalsza optymalizacja
+
+=== Zasoby statyczne : 
+
+----
+@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/resources/**")
+                .addResourceLocations("/public-resources/")
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic());
+    }
+
+}
+----
+
+
+=== Cache-Control, ETag, Last-Modified
+
+----
+@GetMapping("/book/{id}")
+public ResponseEntity<Book> showBook(@PathVariable Long id) {
+
+    Book book = findBook(id);
+    String version = book.getVersion();
+
+    return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS))
+                .eTag(version) // lastModified is also available
+                .body(book);
+}
+----
+
+Aktywacja:
+
+----
+@Bean
+public Filter etagFilter() {
+  return new ShallowEtagHeaderFilter();
+}
+----
+
+
+Przykład 2: 
+
+----
+ @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Customer> findOne(@PathVariable("id") long id) {
+        Customer customer = customerService.findOne(id);
+        return ResponseEntity
+                .ok()
+                .eTag(hashToEtag(customer))
+                .body(customer);
+    }
+
+
+private String hashToEtag(Object o) {
+        return "\"" + Integer.toString(o.hashCode()) + "\"";
+}
+
+----
+
+
+=== Parametryzowanie:
+
+
+----
+spring.thymeleaf.cache=true
+spring.messages.cache-seconds=-1
+
+security.headers.cache=false
+
+#3 dni
+spring.resources.cache-period=259200
+----
+
+=== Gzip
+
+----
+server.tomcat.compression=on
+server.tomcat.compressableMimeTypes=text/html,text/xml,text/css,text/plain,application/json,application/xml,application/javascript
+----
+
+=== Cache + @Cacheable
+
+----
+@Configuration
+@EnableCaching
+public class CacheConfiguration {
+ @Bean
+  public CacheManager cacheManager() {
+     SimpleCacheManager simpleCacheManager = new SimpleCacheManager();
+     simpleCacheManager.setCaches(Arrays.asList(new ConcurrentMapCache("customers")));
+     return simpleCacheManager;
+ }
+}
+----
+
+
+=== Cache Guava
+
+----
+@Configuration
+@EnableCaching
+public class CacheConfiguration {
+@Bean
+public CacheManager cacheManager() {
+  GuavaCacheManager cacheManager = new GuavaCacheManager("customers");
+  cacheManager.setCacheBuilder(CacheBuilder.newBuilder().softValues().expireAfterWrite(20, TimeUnit.MINUTES));
+return cacheManager;
+}
+}
+
+----
+
