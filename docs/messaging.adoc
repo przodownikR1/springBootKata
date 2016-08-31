@@ -84,6 +84,7 @@ management.health.jms.enabled=true
 
 Health status:
 
+
 ----
 {
   "status": "UP",
@@ -251,8 +252,8 @@ public class JmsQueueSender {
 
 ----
 @Bean
-	public Queue queue() {
-		return new ActiveMQQueue("sample.queue");
+public Queue queue() {
+	return new ActiveMQQueue("sample.queue");
 }
 ----
 

@@ -377,7 +377,7 @@ public String getPerson(@SessionAttribute String login, @RequestAttribute String
 
 *** Tomcat 8.5.2 oraz wczesne wesje 9
 
-=== wsparcie dla Hibernate 5 
+*** wsparcie dla Hibernate 5 
 
 == http://projects.spring.io/spring-boot/[Strona projektu] 
 
