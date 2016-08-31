@@ -1116,4 +1116,257 @@ public class MyBean {
 }
 ----
 
+== Przykłady
 
+=== Równoległy odbiorca
+
+
+image:rabbitConcurrentConsumer.png[]
+
+
+----
+
+@RabbitListener(queues = Rabbit3Config.QUEUE_HELLO)
+@Slf4j
+public class Receiver3 {
+
+    private final int instance;
+    private Random random;
+
+    public Receiver3(int instance) {
+        super();
+        this.instance = instance;
+        random = new Random();
+    }
+
+    @RabbitHandler
+    public void receive(String in) throws InterruptedException {
+        StopWatch watch = new StopWatch();
+        watch.start();
+        log.info("instance  {} receive {}", this.instance, in);
+        doWork();
+        watch.stop();
+        log.info("instance {} ,  Done in {} ", this.instance, watch.getTotalTimeSeconds());
+    }
+
+    private void doWork() throws InterruptedException {
+        Thread.sleep(instance * random.nextInt(2000));
+    }
+}
+----
+
+----
+@Slf4j
+public class Sender3 {
+    
+    @Autowired
+    private RabbitTemplate template;
+
+    @Autowired
+    private Queue queue;
+
+    @Scheduled(fixedDelay = 1000, initialDelay = 500)
+    public void send() {
+        String uuid = UUID.randomUUID().toString();             
+        template.convertAndSend(queue.getName(), uuid);
+        log.info("Sent  {}" , uuid);
+}
+}
+----
+
+----
+@Configuration
+public class Rabbit3Config {
+
+    public static final String QUEUE_HELLO = "helloQueue2";
+
+    @Bean
+    public Queue hello() {
+        return new Queue(QUEUE_HELLO);
+    }
+
+    @Bean
+    public Sender3 sender() {
+        return new Sender3();
+    }
+
+    @Bean
+    public Receiver3 receiveOne() {
+        return new Receiver3(2);
+    }
+
+    @Bean
+    public Receiver3 receiveTwo() {
+        return new Receiver3(3);
+    }
+
+}
+----
+
+
+=== Pub/Sub
+
+
+image:rabbitPubSub.png[]
+
+Konfiguracja: 
+
+----
+  @Bean
+    public Queue hello1() {
+        return new Queue(QUEUE_HELLO1);
+    }
+    
+    @Bean
+    public Queue hello2() {
+        return new Queue(QUEUE_HELLO2);
+    }
+    
+    @Bean
+    public ReceiverOne receiveOne() {
+        return new ReceiverOne();
+    }
+
+    @Bean
+    public ReceiverTwo receiveTwo() {
+        return new ReceiverTwo();
+    }
+    @Bean
+    public Sender sender(){
+        return new Sender();
+    }
+    
+    @Bean
+    public FanoutExchange fanoutExchangeA(){
+        return new FanoutExchange("exchange-example-my");
+    }
+
+    @Bean
+    public Binding binding1(){
+        return BindingBuilder.bind(hello1()).to(fanoutExchangeA());
+    }
+
+    @Bean
+    public Binding binding2(){
+        return BindingBuilder.bind(hello2()).to(fanoutExchangeA());
+    }
+----
+
+Sender:
+
+----
+@Slf4j
+public class Sender {
+    @Autowired
+    private RabbitTemplate template;  
+    @Scheduled(fixedDelay = 1000, initialDelay = 500)
+    public void send() {                
+        template.setExchange("exchange-example-my");
+        template.convertAndSend("Fanout hello");        
+    }
+
+}
+----
+
+Receiver:
+
+----
+@Slf4j
+@RabbitListener(queues = Rabbit4Config.QUEUE_HELLO2)
+public class ReceiverOne {
+
+    @RabbitHandler    
+    public void receive(String in) {
+        log.info("Received one : {}",in );
+    }
+
+}
+
+----
+
+=== Routing
+
+source: https://habrahabr.ru/post/262069/
+
+image:routingRabbit.png[]
+
+Konfiguracja:
+
+----
+@Configuration
+public class RoutingConfig {
+
+    public static final String QUEUE_HELLO1 = "Queue1";
+    public static final String QUEUE_HELLO2 = "Queue2";
+
+    @Bean
+    public Queue hello1() {
+        return new Queue(QUEUE_HELLO1);
+    }
+    
+    @Bean
+    public Queue hello2() {
+        return new Queue(QUEUE_HELLO2);
+    }
+    
+    
+    @Bean
+    public DirectExchange directExchange(){
+        return new DirectExchange("routing-exchange");
+    }
+
+    @Bean
+    public Binding errorBinding1(){
+        return BindingBuilder.bind(hello1()).to(directExchange()).with("error");
+    }
+
+    @Bean
+    public Binding errorBinding2(){
+        return BindingBuilder.bind(hello2()).to(directExchange()).with("error");
+    }
+
+    @Bean
+    public Binding infoBinding(){
+        return BindingBuilder.bind(hello1()).to(directExchange()).with("info");
+    }
+
+    @Bean
+    public Binding warningBinding(){
+        return BindingBuilder.bind(hello2()).to(directExchange()).with("warning");
+    }
+    
+    
+    @Bean
+    public Receiver receiveOne() {
+        return new Receiver();
+    }
+
+    @Bean
+    public Receiver2 receiveTwo() {
+        return new Receiver2();
+    }
+    
+    @Bean
+    public Sender sender(){
+        return new Sender();
+    }
+----
+ 
+
+Sender:   
+
+----
+@Slf4j
+public class Sender {
+    @Autowired
+    private RabbitTemplate template;  
+    @Scheduled(fixedDelay = 1000, initialDelay = 500)
+    public void send() {
+                
+        template.setExchange("routing-exchange");
+        template.convertAndSend("error", "direct message !");
+        log.info("Sent :{}", "direct message");
+    }
+
+}
+----
