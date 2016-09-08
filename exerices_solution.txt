@@ -1,0 +1,140 @@
+
+    @RequestMapping("/")
+    String index(Model model) {
+        model.addAttribute("hello", "Hello! @" + LocalDateTime.now());
+        return "index";
+}
+
+
+===spring mongo embedded
+
+spring.data.mongodb.port=0
+
+ <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+</dependency>
+
+====SSO
+
+@SpringBootApplication
+@EnableOAuth2Sso
+@RestController
+public class DemoApplication extends WebSecurityConfigurerAdapter {
+
+    @RequestMapping("/")
+    String hello(OAuth2Authentication authentication) {
+        return "Hello " + authentication.getName();
+    }
+
+    @RequestMapping("/details")
+    Object details(OAuth2Authentication authentication) {
+return authentication.getUserAuthentication();
+
+
+
+security.oauth2.client.client-id=746653690954-hheiimv40v167fp6f26g02e0a8441jpn.apps.googleusercontent.com
+security.oauth2.client.client-secret=jkZkT8xRZd6uHuzOTqohKgWR
+security.oauth2.client.access-token-uri=https://www.googleapis.com/oauth2/v3/token
+security.oauth2.client.user-authorization-uri=https://accounts.google.com/o/oauth2/auth
+security.oauth2.client.client-authentication-scheme=form
+security.oauth2.client.scope=profile,email
+security.oauth2.resource.user-info-uri=https://www.googleapis.com/plus/v1/people/me
+security.oauth2.resource.prefer-token-info=false
+
+
+<dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+</dependency>
+
+
+
+==== Oauth2 sso
+
+@SpringBootApplication
+@EnableOAuth2Sso
+@RestController
+public class DemoApplication extends WebSecurityConfigurerAdapter {
+
+    @RequestMapping("/")
+    String hello(OAuth2Authentication authentication) {
+        return "Hello " + authentication.getName();
+    }
+
+    @RequestMapping("/details")
+    Object details(OAuth2Authentication authentication) {
+        return authentication.getUserAuthentication();
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+security.oauth2.client.client-id=fd7b3f52ffb5c0637a45
+security.oauth2.client.client-secret=3402f06b0fc80f752d139753c1c3dd4048e7eb4f
+security.oauth2.client.access-token-uri=https://github.com/login/oauth/access_token
+security.oauth2.client.user-authorization-uri=https://github.com/login/oauth/authorize
+security.oauth2.client.client-authentication-scheme=form
+security.oauth2.resource.user-info-uri=https://api.github.com/user
+security.oauth2.resource.prefer-token-info=false
+
+
+
+<dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+</dependency>
+
+
+===session 
+
+<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session</artifactId>
+        </dependency>
+
+
+@SpringBootApplication
+@RestController
+public class DemoApplication {
+    @Value("${server.port:8080}")
+    int port;
+
+    @RequestMapping("/")
+    String hello(HttpSession session) {
+        return "port=" + port + ", id=" + session.getId();
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+spring.redis.host=192.168.99.100
+
+
+Run App1
+
+$ java -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=8080
+
+Run App2
+
+$ java -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=8081
+
+
+
+
