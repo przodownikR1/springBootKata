@@ -101,6 +101,34 @@ Pageable
 Sort
 
 
+Thymeleaf użyj i skonfiguruj.
+
+----
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <link rel="stylesheet" th:href="@{/style.css}"></link>
+</head>
+<body>
+<p>
+    <span th:text="${hello}">Hello!</span>
+</p>
+</body>
+</html>
+----
+
+style.css
+
+----
+body {
+    font-size: 12px;
+}
+----
+
+
+
 
 Spring Data REST
 
@@ -151,5 +179,13 @@ przejrzyj API acutator’a przy pomocy przeglądarki HAL
 dodaj zależności:
 spring-boot-starter-remote-shell
 zaloguj się na swoją aplikację przez ssh
+
+
+
+Zastosuj spring Security 
+
+Basic HTTP 
+
+Login Form
 
 
