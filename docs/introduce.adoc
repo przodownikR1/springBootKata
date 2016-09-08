@@ -12,6 +12,49 @@ ifndef::resourcedir[:resourcedir: ./src/main/resources/]
 ifndef::imgsdir[:imgsdir: ./../images]
 :source-highlighter: coderay
 
+
+== Moje źródła wiedzy 
+
+* http://projects.spring.io/spring-boot/[spring boot project]
+
+* http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/[spring boot reference]
+
+* **Moje Książki**
+
+** Learing Spring Boot
+
+** Spring Boot in Action 
+
+** Pro Spring Boot
+
+** Spring Boot CookBook
+
+** Building MicroServices 
+
+** The_Tao_of_MicroServices (MEP)
+
+** Spring MicroServices
+
+** Testing Java MicroServices (MEP)
+
+** Mastering MicroServices with JAVA
+
+** Spring MVC Cookbook
+
+** Spring Security 3.1
+
+** Mastering Spring MVC 4
+
+** Building A Restful Web Service with Spring
+
+** Spring REST
+
+** Mockito for Spring
+
+
+
+
+
 == Co to jest Spring Boot ?
 
 source: http://www.slideshare.net/roynilanjan/spring-boot-for-buidling-microservices
