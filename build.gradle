@@ -62,7 +62,6 @@ compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '3.1.2'
         exclude group: 'org.webjars.bower'
     }
     testCompile('org.springframework.boot:spring-boot-starter-test') 
-    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc:1.0.0.RC1')
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.2.0'
     testCompile 'com.jayway.awaitility:awaitility-java8:1.6.1'
