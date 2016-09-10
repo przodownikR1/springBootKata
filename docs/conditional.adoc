@@ -14,6 +14,156 @@ ifndef::imgsdir[:imgsdir: ./../images]
 
 == @Conditional
 
+* **Krok 1**
+
+----
+@Bean
+  public OSService osService(){
+    if (System.getProperty("os.name").contains("Windows")){
+      return new WindowService();
+    }
+    return new LinuxService();
+  }
+}
+----
+
+* **Krok 2**
+
+----
+@Configuration
+@Profile("Linux")
+public class OsLinuxConfiguration {
+ 
+  @Bean
+  public LinuxService linuxService() {
+    return new LinuxService();
+  }
+}
+
+
+@Profile("Windows") 
+public class OsWindowsConfiguration {
+ 
+  @Bean
+  public WindowsService windowsService() {
+    return new WindowsService();
+  }
+}
+
+----
+
+plus włączenie profilu 
+
+----
+context.getEnvironment().setActiveProfiles("Linux");
+----
+
+
+** **Krok 3 -> Conditional w praktyce**
+
+
+__source:blog.frankel.ch__
+
+image:conditional.png[]
+
+
+Przykład
+
+
+[source,java]
+----
+@Bean
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Conditional(AvailableOnClasspathCondition.class)
+public @interface AvailableOnClasspath {
+    public String value();
+}
+----
+
+
+
+[source,java]
+----
+@Slf4j
+class AvailableOnClasspathCondition implements Condition {
+
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+        Map<String, Object> attributes = metadata.getAnnotationAttributes(AvailableOnClasspath.class.getName());
+        String className = String.valueOf(attributes.get("value"));
+        try {
+            Class.forName(className);
+            log.info("class exists on classpath");
+            
+            return true;
+        } catch (ClassNotFoundException ignored) {
+            
+        }
+        log.info("class not exists on classpath");
+        return false;
+    }
+
+}
+----
+
+Przykład 2:
+
+
+[source,java]
+----
+@Target({ ElementType.TYPE, ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+@Conditional(ResourcePresentCondition.class)
+public @interface ResourcePresentConditional {
+
+    public String value();
+
+    public boolean negated() default false;
+
+}
+----
+
+[source,java]
+----
+@Slf4j
+public class ResourcePresentCondition implements Condition {
+
+    private static ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+
+    @Override
+    public boolean matches(ConditionContext ctx, AnnotatedTypeMetadata metadata) {
+        Map<String, Object> attributes = metadata
+                .getAnnotationAttributes(ResourcePresentConditional.class
+                        .getName());
+        return matches((String) attributes.get("value"),
+                (Boolean) attributes.get("negated"));
+    }
+
+    public static boolean matches(String value, boolean negated) {
+        boolean b = false;
+        try {
+            Resource[] resources = resourcePatternResolver.getResources(value);
+            for (Resource r : resources) {
+                if (r.exists()) {
+                    log.info("resource exists on the classpath");
+                    b = true;
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return b && !negated || !b && negated;
+    }
+
+}
+----
+
+__source:http://www.slideshare.net/nfrankel/javentura-spring-boot-under-the-hood__
+
+image:javentura-spring-boot-under-the-hood-11-638.jpg[]
+
 == Konfiguracja 
 
 ** Spring java config
