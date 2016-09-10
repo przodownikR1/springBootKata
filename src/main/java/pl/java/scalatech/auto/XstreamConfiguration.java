@@ -2,7 +2,7 @@ package pl.java.scalatech.auto;
 
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,13 +20,11 @@ public class XstreamConfiguration {
         return xstream;
     }
     
-    @Autowired(required=false)
-    private Collection<Converter> converters;
     
     @Bean
-    public Collection<Converter> conterters(XStream xstream ){
-        if(converters != null)
-            converters.forEach(c->xstream.registerConverter(c));
+    @ConditionalOnBean(Converter.class)
+    public Collection<Converter> conterters(XStream xstream , Collection<Converter> converters){    
+        converters.forEach(c->xstream.registerConverter(c));
         return converters;
         
     }
