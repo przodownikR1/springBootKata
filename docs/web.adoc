@@ -1323,6 +1323,35 @@ return connector;
     }
 ----
 
+----
+@Bean
+public EmbeddedServletContainerFactory servletContainer() {
+    TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
+    factory.setPort(9000);
+    factory.setSessionTimeout(10, TimeUnit.MINUTES);
+    factory.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/notfound.html"));
+    return factory;
+} 
+----
+
+== Context path
+
+----
+server.contextPath=/kataSpringboot
+----
+
+Sposób programistyczny
+
+----
+@Component
+public class CustomizationBean implements EmbeddedServletContainerCustomizer {
+    @Override
+    public void customize(ConfigurableEmbeddedServletContainer container) {
+        container.setContextPath("/kataSpringboot");
+    }
+}
+----
+
 
 == Dalsza optymalizacja
 
