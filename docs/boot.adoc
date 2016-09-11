@@ -234,6 +234,8 @@ include::web.adoc[]
 
 include::orm.adoc[]
 
+include::springData.adoc[]
+
 include::nosql.adoc[]
 
 == Using ResourceBundles for Internationalization (I18N)
