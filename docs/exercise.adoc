@@ -154,6 +154,44 @@ dodaj CommandLineRunner wpisujący do bazy kilka rekordów
 dodaj ResourceProcessor<Resource<Reservation>> dodając link do zdjęcia w postaci odwołania do wyszukania w grafikach google
 
 
+napisz własny repositoryCounter jako moduł :
+
+**  autoconfig
+
+
+----
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Import(RepoCounterConfiguration.class)
+@Documented
+public  @interface  EnableRepoCounting    {
+}
+----
+** healthStatus
+
+
+----
+ private final Collection<CrudRepository<?,Long>> repositories;
+
+    public DbCountRunner(Collection<CrudRepository<?,Long>> repositories) {
+        this.repositories = repositories;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        repositories.forEach(
+                crudRepository -> log.info("repo : {} , {} : entries", getRepositoryName(crudRepository.getClass()), crudRepository.count()));
+    }
+
+    private static String getRepositoryName(Class<? extends CrudRepository> crudRepositoryClass) {
+        for (Class repositoryInterface : crudRepositoryClass.getInterfaces()) {
+            if (repositoryInterface.getName().startsWith("{your_package_with_repo}")) {
+                return repositoryInterface.getSimpleName();
+            }
+        }
+        return "UnknownRepository";
+    }
+----
 
 
 
