@@ -46,10 +46,10 @@ public class SpringBootKataApplication {
         SpringApplication.run(SpringBootKataApplication.class, args);
     }
 
-    @Bean
+  /*  @Bean
     @Profile("counter")
     DbCountRunner runner(Collection<CrudRepository<?,Long>> repositories) {
         return new DbCountRunner(repositories);
-    }
+    }*/
 
 }

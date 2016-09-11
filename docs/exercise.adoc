@@ -193,9 +193,22 @@ public  @interface  EnableRepoCounting    {
     }
 ----
 
+----
+@NoArgsConstructor
+public class DbCountRunner implements HealthIndicator {
+    @Autowired
+    private Collection<CrudRepository<?, Long>> repositories;
+    
+      @SuppressWarnings("boxing")
+    @Override
+    public Health health() {
+    
+    ...
+    
+----
 
 
-napisz test perzystencji encji rezerwacji
+napisz test persystencji encji rezerwacji
 napisz test serializacji encji rezerwacji
 napisz test integracyjny MVC potwierdzający że link do zdjęcia jest zwrócony dla daej rezerwacji
 

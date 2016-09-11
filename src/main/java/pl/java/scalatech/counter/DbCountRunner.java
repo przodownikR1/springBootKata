@@ -2,28 +2,28 @@ package pl.java.scalatech.counter;
 
 import java.util.Collection;
 
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Profile("counter")
+@Component
+@NoArgsConstructor
+public class DbCountRunner implements HealthIndicator {
+    @Autowired
+    private Collection<CrudRepository<?, Long>> repositories;
 
-public class DbCountRunner implements CommandLineRunner {
 
-    private final Collection<CrudRepository<?,Long>> repositories;
-
-    public DbCountRunner(Collection<CrudRepository<?,Long>> repositories) {
-        this.repositories = repositories;
-    }
-
-    @Override
+    // @Override
     public void run(String... args) throws Exception {
-        repositories.forEach(
-                crudRepository -> log.info("repo : {} , {} : entries", getRepositoryName(crudRepository.getClass()), crudRepository.count()));
+        repositories.forEach(crudRepository -> log.info("repo : {} , {} : entries", getRepositoryName(crudRepository.getClass()), crudRepository.count()));
     }
 
     private static String getRepositoryName(Class<? extends CrudRepository> crudRepositoryClass) {
@@ -33,5 +33,21 @@ public class DbCountRunner implements CommandLineRunner {
             }
         }
         return "UnknownRepository";
+    }
+
+    @SuppressWarnings("boxing")
+    @Override
+    public Health health() {
+        try {
+            long count = repositories.size();
+            
+            if (count >= 0) {                
+                return Health.up().withDetail("count", count).build();
+            }
+            return Health.unknown().withDetail("count", count).build();
+        } catch (Exception e) {
+            return Health.down(e).build();
+        }
+
     }
 }
