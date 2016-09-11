@@ -81,4 +81,9 @@ local.properties
 gc.log
 /mongoDB-springBoot.log
 /file_from_fd_store.png
+<<<<<<< HEAD
 /exerices_solution.txt
+=======
+/.apt_generated/
+*.log
+>>>>>>> hateoas
