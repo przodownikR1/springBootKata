@@ -195,7 +195,45 @@ public  @interface  EnableRepoCounting    {
 
 
 
-napisz test perzystencji encji rezerwacji
+----
+ private final Collection<CrudRepository<?,Long>> repositories;
+
+    public DbCountRunner(Collection<CrudRepository<?,Long>> repositories) {
+        this.repositories = repositories;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        repositories.forEach(
+                crudRepository -> log.info("repo : {} , {} : entries", getRepositoryName(crudRepository.getClass()), crudRepository.count()));
+    }
+
+    private static String getRepositoryName(Class<? extends CrudRepository> crudRepositoryClass) {
+        for (Class repositoryInterface : crudRepositoryClass.getInterfaces()) {
+            if (repositoryInterface.getName().startsWith("{your_package_with_repo}")) {
+                return repositoryInterface.getSimpleName();
+            }
+        }
+        return "UnknownRepository";
+    }
+----
+
+----
+@NoArgsConstructor
+public class DbCountRunner implements HealthIndicator {
+    @Autowired
+    private Collection<CrudRepository<?, Long>> repositories;
+    
+      @SuppressWarnings("boxing")
+    @Override
+    public Health health() {
+    
+    ...
+    
+----
+
+
+napisz test persystencji encji rezerwacji
 napisz test serializacji encji rezerwacji
 napisz test integracyjny MVC potwierdzający że link do zdjęcia jest zwrócony dla daej rezerwacji
 
