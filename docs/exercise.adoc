@@ -19,7 +19,7 @@ Za pomoca narzędzia IDE lub ze strony spring.io
 wygeneruj szkielet aplikacji 
 
 Stwórz model Person
-
+ 
 
 Stwórz repozytorium do person
 
