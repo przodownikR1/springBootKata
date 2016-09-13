@@ -1,0 +1,81 @@
+bar:
+  datasource:
+    url: jdbc:mysql://localhost/bar_schema
+    username: root
+    password: d4t4b4s3sForLif3
+    driverClassName: com.mysql.jdbc.Driver
+    test-on-borrow: true
+    test-while-idle: true
+    validation-query: select 1;
+maxActive: 1
+
+
+
+
+@Configuration
+@EnableTransactionManagement
+@EnableJpaRepositories(
+        entityManagerFactoryRef = "entityManagerFactory", 
+        basePackages = { "com.sctrcd.multidsdemo.foo.repo" })
+public class FooConfig {
+
+    @Primary
+    @Bean(name = "dataSource")
+    @ConfigurationProperties(prefix="spring.datasource")
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Primary
+    @Bean(name = "entityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+            EntityManagerFactoryBuilder builder,
+            @Qualifier("dataSource") DataSource dataSource) {
+        return builder
+                .dataSource(dataSource)
+                .packages("com.sctrcd.multidsdemo.foo.domain")
+                .persistenceUnit("foo")
+                .build();
+    }
+
+    @Primary
+    @Bean(name = "transactionManager")
+    public PlatformTransactionManager transactionManager(
+            @Qualifier("entityManagerFactory") EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
+    }
+
+}
+==
+@Configuration
+@EnableTransactionManagement
+@EnableJpaRepositories(
+        entityManagerFactoryRef = "barEntityManagerFactory", 
+        transactionManagerRef = "barTransactionManager",
+        basePackages = { "com.sctrcd.multidsdemo.bar.repo" })
+public class BarConfig {
+
+    @Bean(name = "barDataSource")
+    @ConfigurationProperties(prefix="bar.datasource")
+    public DataSource barDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean(name = "barEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean barEntityManagerFactory(
+            EntityManagerFactoryBuilder builder,
+            @Qualifier("barDataSource") DataSource barDataSource) {
+        return builder
+                .dataSource(barDataSource)
+                .packages("com.sctrcd.multidsdemo.bar.domain")
+                .persistenceUnit("bar")
+                .build();
+    }
+
+    @Bean(name = "barTransactionManager")
+    public PlatformTransactionManager barTransactionManager(
+            @Qualifier("barEntityManagerFactory") EntityManagerFactory barEntityManagerFactory) {
+        return new JpaTransactionManager(barEntityManagerFactory);
+    }
+
+}
