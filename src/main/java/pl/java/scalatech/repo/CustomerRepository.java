@@ -27,8 +27,6 @@ public interface CustomerRepository extends CrudRepository<Customer, Long> {
 
     Collection<CustomerDto> findAllDtoedBy();
 
-    <T> Collection<T> findByFirstName(String firstname, Class<T> projection);
-
     CustomerProjection findProjectedById(Long id);
 
     Page<CustomerProjection> findPagedProjectedBy(Pageable pageable);

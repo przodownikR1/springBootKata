@@ -52,18 +52,14 @@ public class SpringBootKataApplication implements CommandLineRunner{
           log.info("findDtoWithConstructorExpression {}",customerRepository.findDtoWithConstructorExpression("kalina") );
           
           log.info("findAllDtoedBy {}",customerRepository.findAllDtoedBy() );
-          
-         /* 
-          log.info("findByFirstName  {}",customerRepository.findByFirstName("slawek",CustomerProjection.class) );
-          
-           log.info("findByFirstName  {}",customerRepository.findByFirstName("slawek",CustomerSummary.class) );
-          */
            
            log.info("findPagedProjectedBy  {}",customerRepository.findPagedProjectedBy(new PageRequest(0,10)) );
            
            log.info("findDtoWithConstructorExpression  {}",customerRepository.findDtoWithConstructorExpression("kalina") );
            
           log.info("findOptionalProjectionByLastName  {}",customerRepository.findOptionalProjectionByLastName("borowiecq") );
+          
+         // log.info("method1 :  {}",bookRepository.findByAuthorByJQL("sienkiewicz"));
     }
 
     private void populate() {

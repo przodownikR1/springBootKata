@@ -34,6 +34,6 @@ public class Book {
     
     @OneToMany
     @JoinColumn(name="bookId")
-    private List<Customer> customers = Lists.newArrayList();
+    private List<Customer> customers = Lists.newArrayList(); //owner
 
 }
