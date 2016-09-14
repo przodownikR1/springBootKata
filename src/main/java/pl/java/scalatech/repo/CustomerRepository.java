@@ -14,7 +14,7 @@ import pl.java.scalatech.domain.CustomerDto;
 import pl.java.scalatech.domain.CustomerProjection;
 import pl.java.scalatech.domain.CustomerSummary;
 
-@RepositoryRestResource(excerptProjection=CustomerProjection.class)
+
 public interface CustomerRepository extends CrudRepository<Customer, Long> {
 
     

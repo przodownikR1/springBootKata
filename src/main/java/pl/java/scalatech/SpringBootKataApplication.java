@@ -53,11 +53,11 @@ public class SpringBootKataApplication implements CommandLineRunner{
           
           log.info("findAllDtoedBy {}",customerRepository.findAllDtoedBy() );
           
-          
+         /* 
           log.info("findByFirstName  {}",customerRepository.findByFirstName("slawek",CustomerProjection.class) );
           
            log.info("findByFirstName  {}",customerRepository.findByFirstName("slawek",CustomerSummary.class) );
-          
+          */
            
            log.info("findPagedProjectedBy  {}",customerRepository.findPagedProjectedBy(new PageRequest(0,10)) );
            
